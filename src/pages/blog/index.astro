@@ -1,0 +1,238 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { BLOG_ARTICLES } from '../../data/blog';
+import { SITE } from '../../data/services';
+
+const categories = [...new Set(BLOG_ARTICLES.map(a => a.categorySlug))];
+
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+};
+---
+
+<Layout title="Блог о ремонте бытовой техники | Master-Tehniki74" description="Полезные статьи о ремонте и уходе за бытовой техникой: холодильники, стиральные машины, микроволновки, электроплиты, пылесосы. Советы от мастеров с 10-летним опытом." keywords="ремонт бытовой техники, советы по ремонту, уход за техникой, блог мастера, ремонт холодильников, ремонт стиральных машин" geoPlace="Миасс">
+  <SiteHeader />
+  <FloatingButton />
+
+  <main class="blog-page">
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
+
+      <header class="blog-header">
+        <h1>Блог о ремонте бытовой техники</h1>
+        <p>Советы от мастеров с 10-летним опытом. Уход, диагностика, ремонт и выбор запчастей.</p>
+      </header>
+
+      <nav class="category-nav">
+        <a href="#all" class="cat-link active" data-cat="all">Все статьи</a>
+        {categories.map(cat => {
+          const label = cat === 'holodilniki' ? 'Холодильники'
+            : cat === 'stiralnye-mashiny' ? 'Стиральные машины'
+            : cat === 'mikrovolnovki' ? 'Микроволновки'
+            : cat === 'elektroplity' ? 'Электроплиты'
+            : cat === 'pylesosy' ? 'Пылесосы'
+            : cat === 'biznes' ? 'Для бизнеса'
+            : 'Советы';
+          return <a href={`#${cat}`} class="cat-link" data-cat={cat} id={cat}>{label}</a>;
+        })}
+      </nav>
+
+      <div class="articles-grid">
+        {BLOG_ARTICLES.map(article => (
+          <a href={`/blog/${article.slug}/`} class="article-card" data-category={article.categorySlug}>
+            <div class="article-image">
+              <img src={article.image} alt={article.title} loading="lazy" />
+            </div>
+            <div class="article-content">
+              <span class="article-category">{article.category}</span>
+              <h2>{article.title}</h2>
+              <p class="article-desc">{article.description}</p>
+              <div class="article-meta">
+                <time datetime={article.date}>{formatDate(article.date)}</time>
+                <span class="meta-dot"></span>
+                <span>{article.readTime} мин чтения</span>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .blog-page {
+    padding-top: 100px;
+    padding-bottom: 64px;
+  }
+
+  .blog-header {
+    margin-bottom: 32px;
+  }
+
+  .blog-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .blog-header p {
+    font-size: 1.1rem;
+    color: #64748b;
+  }
+
+  .category-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .cat-link {
+    padding: 8px 18px;
+    background: #f1f5f9;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+
+  .cat-link:hover,
+  .cat-link.active {
+    background: #1d4ed8;
+    color: #fff;
+  }
+
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .article-card {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s;
+  }
+
+  .article-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .article-image {
+    height: 200px;
+    overflow: hidden;
+  }
+
+  .article-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s;
+  }
+
+  .article-card:hover .article-image img {
+    transform: scale(1.03);
+  }
+
+  .article-content {
+    padding: 24px;
+    flex: 1;
+  }
+
+  .article-category {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .article-content h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+    margin-bottom: 10px;
+  }
+
+  .article-desc {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  .meta-dot {
+    width: 3px;
+    height: 3px;
+    background: #94a3b8;
+    border-radius: 50%;
+  }
+
+  @media (max-width: 768px) {
+    .blog-page {
+      padding-top: 80px;
+    }
+
+    .blog-header h1 {
+      font-size: 1.75rem;
+    }
+
+    .articles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .article-image {
+      height: 180px;
+    }
+  }
+</style>
+
+<script>
+  const catLinks = document.querySelectorAll('.cat-link');
+  const cards = document.querySelectorAll('.article-card');
+
+  catLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      catLinks.forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+
+      const cat = (link as HTMLElement).dataset.cat;
+      cards.forEach(card => {
+        if (cat === 'all' || (card as HTMLElement).dataset.category === cat) {
+          (card as HTMLElement).style.display = '';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
