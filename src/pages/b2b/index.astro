@@ -1,0 +1,1052 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import FAQ from '../../components/FAQ.astro';
+import { SITE, CITIES, SERVICES } from '../../data/services';
+
+const title = 'Обслуживание и ремонт бытовой техники для предприятий | Master-Tehniki74';
+const description = `Договор на обслуживание бытовой техники для кафе, ресторанов, гостиниц, детсадов и производств в Миассе, Златоусте и Чебаркуле. Абонентское обслуживание, срочный ремонт, работа по безналу. Звоните: ${SITE.phone}`;
+
+const b2bFaq = [
+  { question: 'Как заключить договор на обслуживание?', answer: 'Свяжитесь с нами по телефону или оставьте заявку на сайте. Менеджер подготовит персональное предложение, согласует тариф и подготовит договор. Подписание — в офисе или удалённо (электронный документооборот).' },
+  { question: 'Работаете ли вы с бюджетными организациями?', answer: 'Да, работаем по 44-ФЗ и 223-ФЗ. Предоставляем полный пакет документов: договор, акт, счёт, счёт-фактура. Имеем опыт работы с детскими садами, школами и медицинскими учреждениями Челябинской области.' },
+  { question: 'Как быстро приедет мастер при аварийной поломке?', answer: 'Для клиентов по договору — приоритетный выезд в течение 1-2 часов. Для разовых обращений — в день обращения, обычно 2-3 часа.' },
+  { question: 'Можно ли оплатить безналом?', answer: 'Да, работаем по безналу с НДС и без НДС. Полный пакет документов: договор, акт выполненных работ, счёт на оплату, счёт-фактура. Для постоянных клиентов — отсрочка платежа до 30 дней.' },
+  { question: 'Что делать, если техника сломалась ночью?', answer: 'Мы работаем с 9:00 до 20:00. Для договорных клиентов с тарифом «Полное обслуживание» доступна экстренная линия — мастер выедет в течение 2 часов даже в нерабочее время (дополнительно оплачивается).' },
+  { question: 'Сколько стоит обслуживание?', answer: 'Абонентское обслуживание — от 5 000 руб/мес (до 10 единиц техники). Полное обслуживание — от 12 000 руб/мес (неограниченное количество). Точная стоимость зависит от количества и типа техники — подготовим персональный расчёт.' },
+];
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "Обслуживание бытовой техники для предприятий",
+  "description": "Договор на обслуживание и ремонт бытовой техники для юридических лиц",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Master-Tehniki74",
+    "telephone": SITE.phone,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Миасс",
+      "addressRegion": "Челябинская область",
+      "streetAddress": "ул. Победы, д. 18",
+    },
+    "openingHours": "Mo-Su 09:00-20:00",
+    "url": SITE.url,
+    "sameAs": [SITE.telegram],
+  },
+  "areaServed": Object.values(CITIES).map(c => ({
+    "@type": "City",
+    "name": c.name,
+  })),
+  "serviceType": "Обслуживание бытовой техники для предприятий",
+});
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Главная", "item": SITE.url },
+    { "@type": "ListItem", "position": 2, "name": "Для бизнеса", "item": `${SITE.url}/b2b/` },
+  ],
+});
+---
+
+<Layout title={title} description={description} keywords="обслуживание техники для предприятия, договор на ремонт, абонентское обслуживание, ремонт для юрлиц, безнал ремонт техники, обслуживание холодильников кафе, ремонт стиральных машин гостиница" schema={`[${schema},${breadcrumbSchema}]`} geoPlace="Миасс">
+  <SiteHeader />
+  <FloatingButton />
+
+  <main class="b2b-page">
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Главная', href: '/' }, { label: 'Для бизнеса' }]} />
+    </div>
+
+    <section class="hero-section">
+      <div class="container">
+        <span class="badge">Для юридических лиц</span>
+        <h1>Обслуживание и ремонт бытовой техники для предприятий</h1>
+        <p class="hero-desc">
+          Заключите договор на обслуживание — и ваш бизнес не остановится из-за поломки холодильника или стиральной машины.
+          Работаем с кафе, ресторанами, гостиницами, детскими садами, медицинскими учреждениями и производствами
+          в Миассе, Златоусте и Чебаркуле.
+        </p>
+        <div class="hero-actions">
+          <TelegramButtons context="Здравствуйте! Хочу заключить договор на обслуживание бытовой техники для предприятия." />
+          <a href={`tel:+${SITE.phoneRaw}`} class="btn-call">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Позвонить: {SITE.phone}
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="problems-section">
+      <div class="container">
+        <h2>Знакомые проблемы?</h2>
+        <div class="problems-grid">
+          <div class="problem-card">
+            <div class="problem-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <h3>Холодильник сломался — продукты на сумму</h3>
+            <p>В кафе или ресторане поломка холодильника — это убытки на десятки тысяч рублей: испорченные продукты, простой кухни, недовольные гости.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <h3>Мастер «завтра-послезавтра»</h3>
+            <p>Частный мастер не может приехать срочно. А каждый час простоя — это потерянные клиенты и репутация.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <h3>Нет документов для бухгалтерии</h3>
+            <p>Частный мастер работает без договора, акта и счёта. Бухгалтерия не может принять расходы без документов.</p>
+          </div>
+          <div class="problem-card">
+            <div class="problem-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <h3>Ремонт без гарантии</h3>
+            <p>Через месяц та же поломка — и снова платить. Без гарантии ремонт превращается в бесконечные расходы.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="solution-section">
+      <div class="container">
+        <h2>Договор на обслуживание — решение</h2>
+        <p class="section-desc">Один договор вместо поиска мастера каждый раз. Фиксированный бюджет, срочный выезд, полный пакет документов.</p>
+        <div class="solution-grid">
+          <div class="solution-card">
+            <div class="solution-number">01</div>
+            <h3>Плановая диагностика</h3>
+            <p>Раз в квартал мастер проверяет всю технику: компрессоры, ТЭНы, термостаты, уплотнители, фильтры. Мелкие проблемы устраняются до того, как станут крупными поломками.</p>
+          </div>
+          <div class="solution-card">
+            <div class="solution-number">02</div>
+            <h3>Срочный выезд</h3>
+            <p>При аварийной поломке — мастер приедет в течение 1-2 часов. Для договорных клиентов — приоритетный выезд без очереди. Работаем ежедневно с 9:00 до 20:00.</p>
+          </div>
+          <div class="solution-card">
+            <div class="solution-number">03</div>
+            <h3>Мелкий ремонт включён</h3>
+            <p>Замена лампочек, чистка фильтров, регулировка дверец, подтяжка контактов — всё это входит в абонентскую плату. Без дополнительных счетов.</p>
+          </div>
+          <div class="solution-card">
+            <div class="solution-number">04</div>
+            <h3>Скидка на запчасти</h3>
+            <p>Для клиентов по договору — скидка 15% на все запчасти. Оригинальные детали и качественные аналоги. Большинство запчастей в наличии на складе.</p>
+          </div>
+          <div class="solution-card">
+            <div class="solution-number">05</div>
+            <h3>Полный пакет документов</h3>
+            <p>Договор, акт выполненных работ, счёт на оплату, счёт-фактура, гарантийный талон. Работаем по безналу с НДС и без НДС. Для бюджетных организаций — по 44-ФЗ и 223-ФЗ.</p>
+          </div>
+          <div class="solution-card">
+            <div class="solution-number">06</div>
+            <h3>Гарантия до 24 месяцев</h3>
+            <p>Для договорных клиентов — расширенная гарантия до 24 месяцев на все виды работ. При повторной проблеме в гарантийный срок — ремонт бесплатно.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="whom-section">
+      <div class="container">
+        <h2>Кому нужен договор на обслуживание</h2>
+        <div class="whom-grid">
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            </div>
+            <h3>Кафе и рестораны</h3>
+            <p>Холодильники, морозильные лари, льдогенераторы, плиты. Поломка холодильника = убытки на продукты. Договор гарантирует выезд мастера за 1-2 часа.</p>
+          </div>
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9h1"/><path d="M9 13h1"/><path d="M9 17h1"/></svg>
+            </div>
+            <h3>Гостиницы и отели</h3>
+            <p>Стиральные машины для белья, холодильники в номерах, утюги, фены. Обслуживание 10-50 единиц техники по единому договору.</p>
+          </div>
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </div>
+            <h3>Детские сады</h3>
+            <p>Стиральные машины, холодильники, электроплиты, водонагреватели. Работаем по 44-ФЗ. Полный пакет документов для бюджетной организации.</p>
+          </div>
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            </div>
+            <h3>Медицинские учреждения</h3>
+            <p>Холодильники для лекарств, стерилизаторы, водонагреватели. Надёжность техники в медицине — вопрос безопасности пациентов.</p>
+          </div>
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <h3>Офисы и коворкинги</h3>
+            <p>Кулеры, микроволновки, холодильники, кофемашины. Обслуживание бытовой техники для комфортной работы сотрудников.</p>
+          </div>
+          <div class="whom-card">
+            <div class="whom-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 20h20"/><path d="M5 20v-8l7-8 7 8v8"/><path d="M9 20v-4h6v4"/></svg>
+            </div>
+            <h3>Производства</h3>
+            <p>Бытовая техника для бытовок, столовых и раздевалок. Холодильники, микроволновки, электрочайники, стиральные машины для спецодежды.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="tariffs-section">
+      <div class="container">
+        <h2>Тарифы на обслуживание</h2>
+        <p class="section-desc">Выберите подходящий тариф или запросите персональный расчёт</p>
+        <div class="tariffs-grid">
+          <div class="tariff-card">
+            <div class="tariff-header">
+              <h3>Абонентское обслуживание</h3>
+              <div class="tariff-price">от 5 000 <span>руб/мес</span></div>
+            </div>
+            <ul class="tariff-features">
+              <li>До 10 единиц техники</li>
+              <li>Плановая диагностика раз в квартал</li>
+              <li>Мелкий ремонт без доплат</li>
+              <li>Срочный выезд за 2 часа</li>
+              <li>Скидка 15% на запчасти</li>
+              <li>Гарантия до 12 месяцев</li>
+              <li>Полный пакет документов</li>
+            </ul>
+            <a href={`tel:+${SITE.phoneRaw}`} class="tariff-btn">Заключить договор</a>
+          </div>
+          <div class="tariff-card featured">
+            <div class="tariff-badge">Популярный</div>
+            <div class="tariff-header">
+              <h3>Полное обслуживание</h3>
+              <div class="tariff-price">от 12 000 <span>руб/мес</span></div>
+            </div>
+            <ul class="tariff-features">
+              <li>Неограниченное количество техники</li>
+              <li>Плановая диагностика раз в месяц</li>
+              <li>Любой ремонт включён</li>
+              <li>Приоритетный выезд за 1 час</li>
+              <li>Скидка 15% на запчасти</li>
+              <li>Гарантия до 24 месяцев</li>
+              <li>Полный пакет документов</li>
+              <li>Отсрочка платежа до 30 дней</li>
+              <li>Персональный менеджер</li>
+            </ul>
+            <a href={`tel:+${SITE.phoneRaw}`} class="tariff-btn">Заключить договор</a>
+          </div>
+          <div class="tariff-card">
+            <div class="tariff-header">
+              <h3>Разовый ремонт</h3>
+              <div class="tariff-price">по договорённости</div>
+            </div>
+            <ul class="tariff-features">
+              <li>Любое количество техники</li>
+              <li>Выезд в день обращения</li>
+              <li>Бесплатная диагностика</li>
+              <li>Скидка 15% для юрлиц</li>
+              <li>Гарантия до 12 месяцев</li>
+              <li>Полный пакет документов</li>
+              <li>Работа по безналу</li>
+            </ul>
+            <a href={`tel:+${SITE.phoneRaw}`} class="tariff-btn">Вызвать мастера</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="process-section">
+      <div class="container">
+        <h2>Как заключить договор</h2>
+        <div class="process-steps">
+          <div class="process-step">
+            <div class="step-num">1</div>
+            <h3>Заявка</h3>
+            <p>Оставьте заявку на сайте или позвоните по телефону {SITE.phone}. Расскажите о вашей технике и потребностях.</p>
+          </div>
+          <div class="process-step">
+            <div class="step-num">2</div>
+            <h3>Расчёт</h3>
+            <p>Менеджер подготовит персональный расчёт стоимости обслуживания исходя из количества и типа техники.</p>
+          </div>
+          <div class="process-step">
+            <div class="step-num">3</div>
+            <h3>Договор</h3>
+            <p>Подписание договора — в офисе или удалённо. Для бюджетных организаций — подготовка документации по 44-ФЗ/223-ФЗ.</p>
+          </div>
+          <div class="process-step">
+            <div class="step-num">4</div>
+            <h3>Обслуживание</h3>
+            <p>Мастер проводит первичную диагностику всей техники. Составляет реестр и план обслуживания. Далее — плановые и срочные выезды.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="cities-section">
+      <div class="container">
+        <h2>Работаем в трёх городах</h2>
+        <div class="cities-grid">
+          {Object.values(CITIES).map(city => (
+            <div class="city-block">
+              <h3>{city.name}</h3>
+              <p>{city.hasWorkshop ? `Мастерская: ${city.address}` : 'Выезд по всему городу'}</p>
+              <div class="city-areas">
+                {city.landmarks.map(area => (
+                  <span class="area-tag">{area}</span>
+                ))}
+              </div>
+              <a href={`/${city.slug}/`} class="city-link">Услуги в {city.namePrepositional} &rarr;</a>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="equipment-section">
+      <div class="container">
+        <h2>Какую технику мы обслуживаем</h2>
+        <div class="equipment-grid">
+          {Object.values(SERVICES).map(service => (
+            <div class="equipment-card">
+              <div class="equipment-icon" set:html={service.icon} />
+              <h3>{service.name}</h3>
+              <p>от {service.commonProblems[0].price.replace('от ', '')}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="docs-section">
+      <div class="container">
+        <h2>Документы для бухгалтерии</h2>
+        <p class="section-desc">Мы предоставляем полный пакет документов для любого типа организации</p>
+        <div class="docs-grid">
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <h3>Договор</h3>
+            <p>На обслуживание или разовый ремонт. С указанием сроков, стоимости и ответственности сторон.</p>
+          </div>
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Акт выполненных работ</h3>
+            <p>Подробный отчёт о проведённых работах с подписями мастера и представителя организации.</p>
+          </div>
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Счёт на оплату</h3>
+            <p>Счёт с реквизитами для безналичной оплаты. С НДС или без НДС — по выбору клиента.</p>
+          </div>
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Счёт-фактура</h3>
+            <p>Для организаций, работающих с НДС. Выставляется в установленные сроки.</p>
+          </div>
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Гарантийный талон</h3>
+            <p>Письменная гарантия на работы и запчасти. Срок — от 12 до 24 месяцев для договорных клиентов.</p>
+          </div>
+          <div class="doc-card">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            <h3>Ежемесячный отчёт</h3>
+            <p>Для договорных клиентов: подробный отчёт о проведённых работах, заменённых запчастях и состоянии техники.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <FAQ items={b2bFaq} heading="Частые вопросы о договоре на обслуживание" />
+
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-block">
+          <h2>Заключите договор на обслуживание</h2>
+          <p>Оставьте заявку — менеджер подготовит персональное предложение в течение 2 часов</p>
+          <TelegramButtons context="Здравствуйте! Хочу заключить договор на обслуживание бытовой техники для предприятия." />
+          <div class="cta-phone">
+            <span>Или позвоните:</span>
+            <a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .b2b-page {
+    padding-top: 100px;
+    padding-bottom: 0;
+  }
+
+  .hero-section {
+    padding: 48px 0 80px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(29, 78, 216, 0.1);
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .hero-section h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    max-width: 800px;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .btn-call {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    transition: all 0.2s;
+  }
+
+  .btn-call:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.1);
+  }
+
+  .problems-section {
+    padding: 80px 0;
+  }
+
+  .problems-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .problem-card {
+    padding: 28px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 16px;
+  }
+
+  .problem-icon {
+    margin-bottom: 16px;
+  }
+
+  .problem-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #991b1b;
+    margin-bottom: 8px;
+  }
+
+  .problem-card p {
+    font-size: 0.9rem;
+    color: #7f1d1d;
+    line-height: 1.6;
+    opacity: 0.8;
+  }
+
+  .solution-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .solution-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    text-align: center;
+    margin-bottom: 48px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .solution-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .solution-card {
+    padding: 28px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.2s;
+  }
+
+  .solution-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 24px rgba(29, 78, 216, 0.06);
+  }
+
+  .solution-number {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #bfdbfe;
+    margin-bottom: 12px;
+  }
+
+  .solution-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .solution-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .whom-section {
+    padding: 80px 0;
+  }
+
+  .whom-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .whom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .whom-card {
+    padding: 28px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.2s;
+  }
+
+  .whom-card:hover {
+    background: #fff;
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 24px rgba(29, 78, 216, 0.06);
+  }
+
+  .whom-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  .whom-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .whom-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .tariffs-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .tariffs-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .tariffs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .tariff-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 32px;
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .tariff-card:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+
+  .tariff-card.featured {
+    border-color: #1d4ed8;
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.12);
+  }
+
+  .tariff-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 16px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .tariff-header {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .tariff-header h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .tariff-price {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1d4ed8;
+  }
+
+  .tariff-price span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+  }
+
+  .tariff-features {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+
+  .tariff-features li {
+    padding: 8px 0;
+    font-size: 0.9rem;
+    color: #475569;
+    padding-left: 24px;
+    position: relative;
+  }
+
+  .tariff-features li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 14px;
+    width: 14px;
+    height: 14px;
+    background: #dcfce7;
+    border-radius: 50%;
+    border: 2px solid #16a34a;
+  }
+
+  .tariff-btn {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+  }
+
+  .tariff-btn:hover {
+    background: #1e40af;
+  }
+
+  .process-section {
+    padding: 80px 0;
+  }
+
+  .process-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 48px;
+    text-align: center;
+  }
+
+  .process-steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .process-step {
+    text-align: center;
+    padding: 28px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .process-step h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .process-step p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .cities-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .cities-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .cities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .city-block {
+    padding: 28px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .city-block h3 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .city-block p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 16px;
+  }
+
+  .city-areas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .area-tag {
+    padding: 4px 12px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #1d4ed8;
+  }
+
+  .city-link {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  .equipment-section {
+    padding: 80px 0;
+  }
+
+  .equipment-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .equipment-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 16px;
+  }
+
+  .equipment-card {
+    text-align: center;
+    padding: 24px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    transition: all 0.2s;
+  }
+
+  .equipment-card:hover {
+    background: #fff;
+    border-color: #bfdbfe;
+  }
+
+  .equipment-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 12px;
+    color: #1d4ed8;
+    margin: 0 auto 12px;
+  }
+
+  .equipment-card h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .equipment-card p {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  .docs-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .docs-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+    text-align: center;
+  }
+
+  .docs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .doc-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+  }
+
+  .doc-card svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .doc-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .doc-card p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  .cta-section {
+    padding: 80px 0;
+  }
+
+  .cta-block {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-radius: 24px;
+    color: #fff;
+  }
+
+  .cta-block h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cta-block p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-bottom: 32px;
+  }
+
+  .cta-phone {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .cta-phone a {
+    color: #93c5fd;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-section h1 {
+      font-size: 1.75rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .problems-grid,
+    .solution-grid,
+    .whom-grid,
+    .tariffs-grid,
+    .cities-grid,
+    .docs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .process-steps {
+      grid-template-columns: 1fr;
+    }
+
+    .equipment-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cta-block {
+      padding: 32px 20px;
+    }
+
+    .cta-block h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .problems-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .solution-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .whom-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tariffs-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .equipment-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
