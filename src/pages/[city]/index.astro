@@ -1,0 +1,663 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import Reviews from '../../components/Reviews.astro';
+import MasterTips from '../../components/MasterTips.astro';
+import { SITE, CITIES, SERVICES, CITY_FAQ, type CityKey } from '../../data/services';
+import FAQ from '../../components/FAQ.astro';
+
+export function getStaticPaths() {
+  return Object.entries(CITIES).map(([key, city]) => ({
+    params: { city: city.slug },
+    props: { cityKey: key },
+  }));
+}
+
+const { cityKey } = Astro.props;
+const city = CITIES[cityKey as CityKey];
+const serviceKeys = Object.keys(SERVICES);
+
+const title = `Ремонт бытовой техники в ${city.namePrepositional} — выезд на дом, гарантия | Master-Tehniki74`;
+const description = `Ремонт холодильников, стиральных машин, электроплит, микроволновок и пылесосов в ${city.namePrepositional}. Выезд мастера на дом, доступные цены, гарантия. Звоните: ${SITE.phone}`;
+const keywords = `ремонт бытовой техники ${city.name}, вызвать мастера ${city.namePrepositional}, ремонт холодильников ${city.namePrepositional}, ремонт стиральных машин ${city.name}, мастер ${city.name}`;
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": `Master-Tehniki74 — ${city.name}`,
+  "description": `Ремонт бытовой техники в ${city.namePrepositional}`,
+  "telephone": SITE.phone,
+  "url": `${SITE.url}/${city.slug}/`,
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": city.name,
+    "addressRegion": "Челябинская область",
+    "streetAddress": city.hasWorkshop ? "ул. Победы, д. 18" : "",
+  },
+  "openingHours": "Mo-Su 09:00-20:00",
+  "areaServed": {
+    "@type": "City",
+    "name": city.name,
+  },
+  "sameAs": [SITE.telegram, SITE.vk],
+});
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Главная", "item": SITE.url },
+    { "@type": "ListItem", "position": 2, "name": city.name, "item": `${SITE.url}/${city.slug}/` },
+  ],
+});
+
+const otherCities = Object.entries(CITIES).filter(([key]) => key !== cityKey);
+---
+
+<Layout title={title} description={description} keywords={keywords} schema={`[${schema},${breadcrumbSchema}]`} geoPlace={city.name}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <div class="container">
+      <Breadcrumbs items={[{ label: city.name }]} />
+    </div>
+
+    <section class="city-hero">
+      <div class="container">
+        <span class="badge">Работаем в {city.namePrepositional}</span>
+        <h1>Ремонт бытовой техники в {city.namePrepositional}</h1>
+        <p class="hero-desc">
+          Профессиональный ремонт холодильников, стиральных машин, электроплит, микроволновок и пылесосов
+          с выездом на дом в {city.namePrepositional}.
+          {city.hasWorkshop ? 'Наша мастерская находится по адресу: ' + city.address + '.' : `Обслуживаем все районы ${city.name}.`}
+          Три мастера, опыт более 10 лет, гарантия на все работы.
+        </p>
+        <TelegramButtons context={`Здравствуйте! Нужен ремонт бытовой техники в ${city.namePrepositional}.`} />
+      </div>
+    </section>
+
+    <section class="services-section">
+      <div class="container">
+        <h2>Наши услуги в {city.namePrepositional}</h2>
+        <p class="section-desc">Выберите тип техники, которую нужно отремонтировать</p>
+
+        <div class="services-grid">
+          {serviceKeys.map(key => {
+            const service = SERVICES[key as keyof typeof SERVICES];
+            return (
+              <a href={`/${city.slug}/${service.slug}/`} class="service-card">
+                <div class="service-icon" set:html={service.icon} />
+                <h3>{service.name}</h3>
+                <p>{service.commonProblems[0].price}</p>
+                <span class="card-link">Подробнее &rarr;</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="container">
+        <h2>Почему выбирают нас в {city.namePrepositional}</h2>
+        <div class="features-grid">
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <h3>Быстрый выезд</h3>
+            <p>Мастер приедет в день обращения. Среднее время ремонта — 1 день. Выезд по всем районам {city.namePrepositional}.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3>Гарантия до 12 месяцев</h3>
+            <p>Даём гарантию на все виды работ и запчасти. Ответственность за результат — наш принцип.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+            </div>
+            <h3>Честные цены</h3>
+            <p>Стоимость озвучиваем до начала работ. Никаких скрытых доплат. Диагностика — бесплатно при ремонте.</p>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+              </svg>
+            </div>
+            <h3>Запчасти в наличии</h3>
+            <p>Оригинальные детали и качественные аналоги. Большинство запчастей есть на складе в Миассе.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="areas-section">
+      <div class="container">
+        <h2>Районы обслуживания в {city.namePrepositional}</h2>
+        <p class="section-desc">Мы выезжаем во все районы {city.name}</p>
+        <div class="areas-list">
+          {city.landmarks.map(area => (
+            <span class="area-tag">{area}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="how-section">
+      <div class="container">
+        <h2>Как происходит ремонт в {city.namePrepositional}</h2>
+        <div class="how-grid">
+          <div class="how-step">
+            <div class="step-number">1</div>
+            <h3>Звонок или заявка</h3>
+            <p>Оставьте заявку на сайте или позвоните по телефону {SITE.phone}. Опишите проблему — мы подберём мастера.</p>
+          </div>
+          <div class="how-step">
+            <div class="step-number">2</div>
+            <h3>Выезд и диагностика</h3>
+            <p>Мастер приедет в {city.namePrepositional} в день обращения. Проведёт бесплатную диагностику и назовёт точную стоимость.</p>
+          </div>
+          <div class="how-step">
+            <div class="step-number">3</div>
+            <h3>Ремонт на месте</h3>
+            <p>В 80% случаев ремонт выполняется за один визит. {city.hasWorkshop ? 'Сложные ремонты — в нашей мастерской на ул. Победы, д. 18.' : 'Используем запчасти, которые всегда с собой.'}</p>
+          </div>
+          <div class="how-step">
+            <div class="step-number">4</div>
+            <h3>Гарантия и оплата</h3>
+            <p>Оплата после проверки работы. Выдаём гарантийный талон на 6-12 месяцев. Если проблема повторится — устраним бесплатно.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats-section">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-value">10+</span>
+            <span class="stat-label">лет опыта</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">3</span>
+            <span class="stat-label">мастера в штате</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">2000+</span>
+            <span class="stat-label">ремонтов за год</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value">4.9</span>
+            <span class="stat-label">средняя оценка</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="other-cities">
+      <div class="container">
+        <h2>Работаем и в других городах</h2>
+        <div class="cities-row">
+          {otherCities.map(([key, otherCity]) => (
+            <a href={`/${otherCity.slug}/`} class="city-card">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>{otherCity.name}</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <MasterTips />
+    <FAQ items={CITY_FAQ[cityKey as CityKey] || CITY_FAQ.miass} heading={`Частые вопросы о ремонте в ${city.namePrepositional}`} />
+    <Reviews city={city.name} />
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-block">
+          <h2>Нужен ремонт в {city.namePrepositional}?</h2>
+          <p>Оставьте заявку — мастер перезвонит в течение 15 минут</p>
+          <TelegramButtons context={`Здравствуйте! Нужен ремонт бытовой техники в ${city.namePrepositional}.`} />
+          <div class="cta-phone">
+            <span>Или позвоните:</span>
+            <a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .city-hero {
+    padding: 24px 0 64px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(29, 78, 216, 0.1);
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .city-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #0f172a;
+    margin-bottom: 20px;
+    max-width: 700px;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  .services-section {
+    padding: 80px 0;
+  }
+
+  .services-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    margin-bottom: 40px;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .service-card {
+    display: block;
+    padding: 28px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.3s;
+  }
+
+  .service-card:hover {
+    background: #fff;
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .service-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 14px;
+    color: #1d4ed8;
+    margin-bottom: 16px;
+  }
+
+  .service-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .service-card p {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    margin-bottom: 12px;
+  }
+
+  .card-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    transition: color 0.2s;
+  }
+
+  .service-card:hover .card-link {
+    color: #1d4ed8;
+  }
+
+  .about-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+
+  .feature {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+  }
+
+  .feature-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 12px;
+    color: #1d4ed8;
+    margin-bottom: 16px;
+  }
+
+  .feature h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .feature p {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .areas-section {
+    padding: 80px 0;
+  }
+
+  .areas-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .areas-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .area-tag {
+    padding: 8px 16px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #1d4ed8;
+  }
+
+  .other-cities {
+    padding: 64px 0;
+    background: #f8fafc;
+  }
+
+  .other-cities h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+  }
+
+  .cities-row {
+    display: flex;
+    gap: 16px;
+  }
+
+  .city-card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-weight: 500;
+    color: #1d4ed8;
+    transition: all 0.2s;
+  }
+
+  .city-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.08);
+  }
+
+  .cta-section {
+    padding: 80px 0;
+  }
+
+  .cta-block {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-radius: 24px;
+    color: #fff;
+  }
+
+  .cta-block h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cta-block p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-bottom: 32px;
+  }
+
+  .cta-phone {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .cta-phone a {
+    color: #93c5fd;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .city-hero {
+      padding: 16px 0 40px;
+    }
+
+    .city-hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .services-section,
+    .about-section,
+    .areas-section,
+    .cta-section {
+      padding: 48px 0;
+    }
+
+    .services-section h2,
+    .about-section h2,
+    .areas-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .features-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cities-row {
+      flex-direction: column;
+    }
+
+    .cta-block {
+      padding: 32px 20px;
+    }
+
+    .cta-block h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .how-section {
+    padding: 80px 0;
+  }
+
+  .how-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 40px;
+    text-align: center;
+  }
+
+  .how-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .how-step {
+    text-align: center;
+    padding: 28px 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 50%;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .how-step h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .how-step p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .stats-section {
+    padding: 64px 0;
+    background: #0f172a;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 24px;
+  }
+
+  .stat-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #60a5fa;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .stat-label {
+    font-size: 0.9rem;
+    color: #94a3b8;
+  }
+
+  @media (max-width: 768px) {
+    .how-section {
+      padding: 48px 0;
+    }
+
+    .how-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .how-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+  }
+</style>

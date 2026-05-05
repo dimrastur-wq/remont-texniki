@@ -1,0 +1,416 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import Reviews from '../../components/Reviews.astro';
+import { SITE, PARTS } from '../../data/services';
+
+const title = 'Запчасти для бытовой техники — купить в Миассе, Златоусте, Чебаркуле | Master-Tehniki74';
+const description = 'Запчасти для холодильников, стиральных машин, микроволновок, электроплит и пылесосов. Новые и Б/У. Наличие на складе в Миассе. Доставка по Южному Уралу.';
+const keywords = 'запчасти бытовая техника, купить запчасти Миасс, компрессор холодильника, ТЭН стиральной машины, магнетрон микроволновки, подшипник барабана';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Запчасти для бытовой техники",
+  "description": description,
+  "numberOfItems": PARTS.length,
+});
+
+const categories = [...new Set(PARTS.map(p => p.category))];
+---
+
+<Layout title={title} description={description} keywords={keywords} schema={schema}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Запчасти' }]} />
+    </div>
+
+    <section class="parts-hero">
+      <div class="container">
+        <span class="badge">Склад запчастей</span>
+        <h1>Запчасти для бытовой техники</h1>
+        <p class="hero-desc">
+          Оригинальные и совместимые запчасти для холодильников, стиральных машин, микроволновок, электроплит и пылесосов.
+          Новые и Б/У варианты. Наличие на складе в Миассе, доставка по Златоусту и Чебаркулю.
+        </p>
+        <TelegramButtons context="Здравствуйте! Ищу запчасти для бытовой техники." />
+      </div>
+    </section>
+
+    <section class="catalog-section">
+      <div class="container">
+        <div class="catalog-header">
+          <h2>Каталог запчастей</h2>
+          <div class="filter-row">
+            {categories.map(cat => (
+              <button class="filter-btn" data-category={cat}>{cat}</button>
+            ))}
+            <button class="filter-btn active" data-category="all">Все</button>
+          </div>
+        </div>
+
+        <div class="parts-grid" id="parts-grid">
+          {PARTS.map((part, i) => (
+            <div class="part-card" data-category={part.category}>
+              <div class="part-condition" data-condition={part.condition}>
+                {part.condition}
+              </div>
+              <h3>{part.name}</h3>
+              <span class="part-category">{part.category}</span>
+              <div class="part-bottom">
+                <span class="part-price">{part.price}</span>
+                <span class={`part-stock ${part.inStock ? 'in-stock' : 'out-of-stock'}`}>
+                  {part.inStock ? 'В наличии' : 'Под заказ'}
+                </span>
+              </div>
+              <a href={SITE.telegram + `?text=${encodeURIComponent(`Здравствуйте! Интересует запчасть: ${part.name}`)}`} target="_blank" class="part-order">
+                Заказать
+              </a>
+            </div>
+          ))}
+        </div>
+
+        <div class="add-part-note">
+          <h3>Не нашли нужную запчасть?</h3>
+          <p>Напишите нам — подберём и доставим под заказ. Работаем с поставщиками по всей России.</p>
+          <a href={SITE.telegram} target="_blank" class="btn-ask">Спросить в Telegram</a>
+        </div>
+      </div>
+    </section>
+
+    <Reviews />
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-block">
+          <h2>Нужна консультация по запчастям?</h2>
+          <p>Мастер поможет подобрать нужную деталь для вашей модели</p>
+          <TelegramButtons context="Здравствуйте! Нужна консультация по запчастям." />
+          <div class="cta-phone">
+            <span>Или позвоните:</span>
+            <a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .parts-hero {
+    padding: 24px 0 64px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(29, 78, 216, 0.1);
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .parts-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #0f172a;
+    margin-bottom: 20px;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  .catalog-section {
+    padding: 80px 0;
+  }
+
+  .catalog-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 20px;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 32px;
+  }
+
+  .filter-btn {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .filter-btn:hover,
+  .filter-btn.active {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+
+  .parts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .part-card {
+    padding: 24px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .part-card:hover {
+    background: #fff;
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .part-condition {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    width: fit-content;
+  }
+
+  .part-condition[data-condition="Новый"] {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .part-condition[data-condition="Б/У"] {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .part-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .part-category {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+
+  .part-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    margin-top: auto;
+  }
+
+  .part-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .part-stock {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+  }
+
+  .part-stock.in-stock {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .part-stock.out-of-stock {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .part-order {
+    display: block;
+    text-align: center;
+    padding: 10px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s;
+  }
+
+  .part-order:hover {
+    background: #1e40af;
+  }
+
+  .add-part-note {
+    margin-top: 48px;
+    padding: 32px;
+    background: #f8fafc;
+    border: 2px dashed #bfdbfe;
+    border-radius: 16px;
+    text-align: center;
+  }
+
+  .add-part-note h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .add-part-note p {
+    font-size: 0.95rem;
+    color: #64748b;
+    margin-bottom: 20px;
+  }
+
+  .btn-ask {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: #0088cc;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(0, 136, 204, 0.3);
+  }
+
+  .btn-ask:hover {
+    background: #006daa;
+    transform: translateY(-1px);
+  }
+
+  .cta-section {
+    padding: 80px 0;
+  }
+
+  .cta-block {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-radius: 24px;
+    color: #fff;
+  }
+
+  .cta-block h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cta-block p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-bottom: 32px;
+  }
+
+  .cta-phone {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .cta-phone a {
+    color: #93c5fd;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .parts-hero {
+      padding: 16px 0 40px;
+    }
+
+    .parts-hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .catalog-section,
+    .cta-section {
+      padding: 48px 0;
+    }
+
+    .catalog-header h2 {
+      font-size: 1.5rem;
+    }
+
+    .parts-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .cta-block {
+      padding: 32px 20px;
+    }
+
+    .cta-block h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .parts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+
+<script>
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.part-card');
+
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      const category = btn.getAttribute('data-category');
+
+      cards.forEach(card => {
+        if (category === 'all' || card.getAttribute('data-category') === category) {
+          (card as HTMLElement).style.display = '';
+        } else {
+          (card as HTMLElement).style.display = 'none';
+        }
+      });
+    });
+  });
+</script>

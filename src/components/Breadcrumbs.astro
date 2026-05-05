@@ -1,0 +1,68 @@
+---
+interface BreadcrumbItem {
+  label: string;
+  href?: string;
+}
+
+interface Props {
+  items: BreadcrumbItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Хлебные крошки">
+  <ol class="breadcrumb-list">
+    <li><a href="/">Главная</a></li>
+    {items.map((item, i) => (
+      <li>
+        <span class="separator">/</span>
+        {item.href ? <a href={item.href}>{item.label}</a> : <span class="current">{item.label}</span>}
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    padding: 88px 0 16px;
+  }
+
+  .breadcrumb-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px;
+    list-style: none;
+    font-size: 0.85rem;
+  }
+
+  .breadcrumb-list a {
+    color: #64748b;
+    transition: color 0.2s;
+  }
+
+  .breadcrumb-list a:hover {
+    color: #1d4ed8;
+  }
+
+  .separator {
+    color: #cbd5e1;
+    margin: 0 4px;
+  }
+
+  .current {
+    color: #1d4ed8;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    .breadcrumbs {
+      padding: 80px 0 8px;
+    }
+
+    .breadcrumb-list {
+      font-size: 0.75rem;
+    }
+  }
+</style>

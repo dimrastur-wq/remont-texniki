@@ -1,0 +1,188 @@
+---
+const services = [
+  {
+    title: 'Ремонт холодильников',
+    description: 'Устранение утечек фреона, замена компрессора, ремонт термостата, устранение обледенения и шума.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/><circle cx="16" cy="6" r="1" fill="currentColor"/><circle cx="16" cy="14" r="1" fill="currentColor"/></svg>`,
+    price: 'от 1 500 ₽',
+  },
+  {
+    title: 'Ремонт стиральных машин',
+    description: 'Замена подшипников, ремонт электроники, устранение протечек, замена ТЭНа и помпы.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="14" r="4"/><circle cx="12" cy="14" r="1.5" fill="currentColor"/><line x1="3" y1="7" x2="21" y2="7"/><circle cx="7" cy="4.5" r="0.8" fill="currentColor"/><circle cx="10" cy="4.5" r="0.8" fill="currentColor"/></svg>`,
+    price: 'от 1 200 ₽',
+  },
+  {
+    title: 'Ремонт микроволновок',
+    description: 'Замена магнетрона, ремонт блока управления, устранение искрения, замена слюдяной пластины.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="4" y="6" width="12" height="12" rx="1"/><circle cx="19" cy="9" r="1" fill="currentColor"/><circle cx="19" cy="13" r="1" fill="currentColor"/></svg>`,
+    price: 'от 800 ₽',
+  },
+  {
+    title: 'Диагностика',
+    description: 'Выезд мастера, осмотр техники, определение неисправности. При ремонте — диагностика бесплатно.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+    price: 'бесплатно',
+  },
+  {
+    title: 'Ремонт посудомоечных машин',
+    description: 'Устранение засоров, замена насоса, ремонт модуля управления, устранение протечек.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M7 6h10"/><path d="M7 10h10"/><path d="M7 14h4"/></svg>`,
+    price: 'от 1 800 ₽',
+  },
+  {
+    title: 'Запчасти и комплектующие',
+    description: 'Оригинальные и совместимые запчасти. Доставка под заказ, наличие на складе в Миассе.',
+    icon: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+    price: 'по запросу',
+  },
+];
+---
+
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Наши услуги</span>
+      <h2>Что мы ремонтируем</h2>
+      <p class="section-desc">Выполняем ремонт большинства видов бытовой техники. Работаем с популярными брендами и предоставляем гарантию на все виды работ.</p>
+    </div>
+
+    <div class="services-grid">
+      {services.map((service) => (
+        <div class="service-card">
+          <div class="service-icon" set:html={service.icon} />
+          <h3>{service.title}</h3>
+          <p>{service.description}</p>
+          <div class="service-price">
+            <span class="price-tag">{service.price}</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .services {
+    padding: 96px 0;
+    background: #fff;
+  }
+
+  .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 56px;
+  }
+
+  .section-label {
+    display: inline-block;
+    padding: 4px 14px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.7;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .service-card {
+    padding: 32px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    transition: all 0.3s;
+  }
+
+  .service-card:hover {
+    background: #fff;
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08);
+    transform: translateY(-2px);
+  }
+
+  .service-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 14px;
+    color: #1d4ed8;
+    margin-bottom: 20px;
+  }
+
+  .service-card h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+
+  .service-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .service-price {
+    display: flex;
+    align-items: center;
+  }
+
+  .price-tag {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    padding: 4px 12px;
+    background: #eff6ff;
+    border-radius: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .services {
+      padding: 64px 0;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    .services-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .service-card {
+      padding: 24px;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .services-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

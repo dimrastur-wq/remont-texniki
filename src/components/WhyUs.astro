@@ -1,0 +1,197 @@
+---
+const reasons = [
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+    title: 'Команда из трёх мастеров',
+    description: 'Работаем втроём — каждый специалист с опытом более 10 лет. Знаем свою технику досконально.',
+  },
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+    title: 'Своя мастерская',
+    description: 'Имеем собственную мастерскую в Миассе. Сложный ремонт выполняем на месте с полным оснащением.',
+  },
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+    title: 'Быстрый выезд',
+    description: 'Выезд в день обращения. Среднее время ремонта — 1 день. Ценим ваше время.',
+  },
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    title: 'Гарантия на работы',
+    description: 'Даём гарантию до 12 месяцев на все виды ремонта. Ответственность за результат — наш принцип.',
+  },
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+    title: 'Честные цены',
+    description: 'Стоимость озвучиваем до начала работ. Никаких скрытых доплат и накруток.',
+  },
+  {
+    icon: `<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    title: 'Оригинальные запчасти',
+    description: 'Используем оригинальные детали и качественные аналоги. Всё есть в наличии или под заказ.',
+  },
+];
+---
+
+<section class="why-us" id="why-us">
+  <div class="container">
+    <div class="why-us-layout">
+      <div class="why-us-text">
+        <span class="section-label">Почему мы</span>
+        <h2>Надёжный ремонт<br />от команды профессионалов</h2>
+        <p class="why-us-desc">
+          Мы — трое мастеров с собственной мастерской в Миассе. Не агентство и не посредники.
+          Работаем руками, отвечаем за качество.
+        </p>
+        <div class="why-us-cta">
+          <a href="#contact" class="btn-primary-sm">Оставить заявку</a>
+        </div>
+      </div>
+
+      <div class="why-us-grid">
+        {reasons.map((reason) => (
+          <div class="reason-card">
+            <div class="reason-icon" set:html={reason.icon} />
+            <div>
+              <h3>{reason.title}</h3>
+              <p>{reason.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .why-us {
+    padding: 96px 0;
+    background: #f8fafc;
+  }
+
+  .section-label {
+    display: inline-block;
+    padding: 4px 14px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  .why-us-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 64px;
+    align-items: start;
+  }
+
+  .why-us-text h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .why-us-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .btn-primary-sm {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+  }
+
+  .btn-primary-sm:hover {
+    background: #1e40af;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(29, 78, 216, 0.4);
+  }
+
+  .why-us-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .reason-card {
+    display: flex;
+    gap: 14px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+  }
+
+  .reason-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.06);
+  }
+
+  .reason-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 12px;
+    color: #1d4ed8;
+  }
+
+  .reason-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .reason-card p {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 768px) {
+    .why-us {
+      padding: 64px 0;
+    }
+
+    .why-us-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .why-us-text h2 {
+      font-size: 1.75rem;
+    }
+
+    .why-us-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .why-us-layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  }
+</style>

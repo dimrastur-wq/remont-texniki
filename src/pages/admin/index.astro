@@ -1,0 +1,1317 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { SITE } from '../../data/services';
+---
+
+<Layout title="Рассылка B2B | Master-Tehniki74" description="Управление рассылками для юридических лиц" geoPlace="Миасс">
+  <SiteHeader />
+
+  <main class="admin-page">
+    <div class="container">
+      <div class="admin-header">
+        <h1>B2B Рассылка</h1>
+        <p>Управление контактами юрлиц и email-рассылками по Миассу, Златоусту и Чебаркулю</p>
+      </div>
+
+      <div class="admin-tabs">
+        <button class="tab-btn active" data-tab="contacts">Контакты</button>
+        <button class="tab-btn" data-tab="campaigns">Рассылки</button>
+        <button class="tab-btn" data-tab="templates">Шаблоны</button>
+      </div>
+
+      <!-- Contacts Tab -->
+      <div class="tab-content active" id="tab-contacts">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <select id="city-filter">
+              <option value="">Все города</option>
+              <option value="Миасс">Миасс</option>
+              <option value="Златоуст">Златоуст</option>
+              <option value="Чебаркуль">Чебаркуль</option>
+            </select>
+            <select id="category-filter">
+              <option value="">Все категории</option>
+              <option value="Кафе и рестораны">Кафе и рестораны</option>
+              <option value="Гостиницы">Гостиницы</option>
+              <option value="Детские сады">Детские сады</option>
+              <option value="Медицина">Медицина</option>
+              <option value="Производство">Производство</option>
+              <option value="Офисы">Офисы</option>
+              <option value="Магазины">Магазины</option>
+              <option value="Другое">Другое</option>
+            </select>
+            <span class="contacts-count" id="contacts-count">0 контактов</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-outline" id="btn-import">Импорт CSV</button>
+            <button class="btn btn-primary" id="btn-add-contact">+ Добавить контакт</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="contacts-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="select-all" /></th>
+                <th>Компания</th>
+                <th>ИНН</th>
+                <th>Email</th>
+                <th>Телефон</th>
+                <th>Город</th>
+                <th>Категория</th>
+                <th>Контактное лицо</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="contacts-body">
+            </tbody>
+          </table>
+        </div>
+
+        <div class="bulk-actions" id="bulk-actions" style="display:none">
+          <span id="selected-count">0 выбрано</span>
+          <button class="btn btn-outline" id="btn-add-to-campaign">Добавить в рассылку</button>
+          <button class="btn btn-danger" id="btn-delete-selected">Удалить</button>
+        </div>
+      </div>
+
+      <!-- Campaigns Tab -->
+      <div class="tab-content" id="tab-campaigns">
+        <div class="toolbar">
+          <div class="toolbar-left">
+            <span class="campaigns-count" id="campaigns-count">0 рассылок</span>
+          </div>
+          <div class="toolbar-right">
+            <button class="btn btn-primary" id="btn-new-campaign">+ Новая рассылка</button>
+          </div>
+        </div>
+
+        <div class="campaigns-list" id="campaigns-list">
+        </div>
+      </div>
+
+      <!-- Templates Tab -->
+      <div class="tab-content" id="tab-templates">
+        <div class="templates-grid" id="templates-grid">
+          <div class="template-card" data-template="maintenance">
+            <div class="template-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <h3>Предложение на обслуживание</h3>
+            <p>Договор на регулярное обслуживание бытовой техники для предприятия</p>
+            <button class="btn btn-outline btn-sm template-use">Использовать</button>
+          </div>
+          <div class="template-card" data-template="repair">
+            <div class="template-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="8" cy="13" r="3"/><circle cx="16" cy="13" r="3"/></svg>
+            </div>
+            <h3>Ремонт со скидкой</h3>
+            <p>Разовый ремонт бытовой техники со скидкой 15% для юрлиц</p>
+            <button class="btn btn-outline btn-sm template-use">Использовать</button>
+          </div>
+          <div class="template-card" data-template="seasonal">
+            <div class="template-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h3>Сезонная проверка</h3>
+            <p>Предложение сезонной диагностики холодильников и кондиционеров</p>
+            <button class="btn btn-outline btn-sm template-use">Использовать</button>
+          </div>
+          <div class="template-card" data-template="custom">
+            <div class="template-icon">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </div>
+            <h3>Свободный шаблон</h3>
+            <p>Пустой шаблон для вашего текста предложения</p>
+            <button class="btn btn-outline btn-sm template-use">Использовать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Add Contact Modal -->
+  <div class="modal-overlay" id="modal-contact" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-contact-title">Добавить контакт</h2>
+        <button class="modal-close" id="close-contact-modal">&times;</button>
+      </div>
+      <form id="contact-form">
+        <input type="hidden" id="contact-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label for="company-name">Название компании *</label>
+            <input type="text" id="company-name" required placeholder="ООО Ромашка" />
+          </div>
+          <div class="form-group">
+            <label for="inn">ИНН</label>
+            <input type="text" id="inn" placeholder="7700000000" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-email">Email *</label>
+            <input type="email" id="contact-email" required placeholder="info@romashka.ru" />
+          </div>
+          <div class="form-group">
+            <label for="contact-phone">Телефон</label>
+            <input type="text" id="contact-phone" placeholder="+7 (351) 000-00-00" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-city">Город *</label>
+            <select id="contact-city" required>
+              <option value="Миасс">Миасс</option>
+              <option value="Златоуст">Златоуст</option>
+              <option value="Чебаркуль">Чебаркуль</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="contact-category">Категория</label>
+            <select id="contact-category">
+              <option value="">Не указана</option>
+              <option value="Кафе и рестораны">Кафе и рестораны</option>
+              <option value="Гостиницы">Гостиницы</option>
+              <option value="Детские сады">Детские сады</option>
+              <option value="Медицина">Медицина</option>
+              <option value="Производство">Производство</option>
+              <option value="Офисы">Офисы</option>
+              <option value="Магазины">Магазины</option>
+              <option value="Другое">Другое</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact-person">Контактное лицо</label>
+            <input type="text" id="contact-person" placeholder="Иванов Иван Иванович" />
+          </div>
+          <div class="form-group">
+            <label for="contact-notes">Заметки</label>
+            <input type="text" id="contact-notes" placeholder="Дополнительная информация" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="cancel-contact">Отмена</button>
+          <button type="submit" class="btn btn-primary" id="save-contact">Сохранить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Campaign Modal -->
+  <div class="modal-overlay" id="modal-campaign" style="display:none">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h2 id="modal-campaign-title">Новая рассылка</h2>
+        <button class="modal-close" id="close-campaign-modal">&times;</button>
+      </div>
+      <form id="campaign-form">
+        <input type="hidden" id="campaign-id" />
+        <div class="form-group">
+          <label for="campaign-subject">Тема письма *</label>
+          <input type="text" id="campaign-subject" required placeholder="Обслуживание бытовой техники для вашего предприятия" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="campaign-city">Город</label>
+            <select id="campaign-city">
+              <option value="">Все города</option>
+              <option value="Миасс">Миасс</option>
+              <option value="Златоуст">Златоуст</option>
+              <option value="Чебаркуль">Чебаркуль</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="campaign-category">Категория</label>
+            <select id="campaign-category">
+              <option value="">Все категории</option>
+              <option value="Кафе и рестораны">Кафе и рестораны</option>
+              <option value="Гостиницы">Гостиницы</option>
+              <option value="Детские сады">Детские сады</option>
+              <option value="Медицина">Медицина</option>
+              <option value="Производство">Производство</option>
+              <option value="Офисы">Офисы</option>
+              <option value="Магазины">Магазины</option>
+              <option value="Другое">Другое</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Получателей: <span id="campaign-recipients-count">0</span></label>
+        </div>
+        <div class="form-group">
+          <label for="campaign-body">Текст письма *</label>
+          <textarea id="campaign-body" required rows="12" placeholder="Уважаемые коллеги..."></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-outline" id="save-draft">Сохранить черновик</button>
+          <button type="submit" class="btn btn-primary" id="send-campaign">Отправить рассылку</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div class="modal-overlay" id="modal-import" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Импорт CSV</h2>
+        <button class="modal-close" id="close-import-modal">&times;</button>
+      </div>
+      <div class="import-info">
+        <p>Загрузите CSV-файл со столбцами: <code>company_name, inn, email, phone, city, category, contact_person</code></p>
+        <p>Город: Миасс, Златоуст или Чебаркуль</p>
+      </div>
+      <div class="form-group">
+        <input type="file" id="csv-file" accept=".csv" />
+      </div>
+      <div id="import-preview" style="display:none">
+        <p>Найдено контактов: <span id="import-count">0</span></p>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline" id="cancel-import">Отмена</button>
+        <button type="button" class="btn btn-primary" id="do-import" disabled>Импортировать</button>
+      </div>
+    </div>
+  </div>
+
+  <SiteFooter />
+</main>
+
+<style>
+  .admin-page {
+    padding-top: 100px;
+    padding-bottom: 64px;
+    min-height: 100vh;
+    background: #f8fafc;
+  }
+
+  .admin-header {
+    margin-bottom: 32px;
+  }
+
+  .admin-header h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .admin-header p {
+    font-size: 1.05rem;
+    color: #64748b;
+  }
+
+  .admin-tabs {
+    display: flex;
+    gap: 4px;
+    background: #e2e8f0;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 32px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .tab-btn.active {
+    background: #fff;
+    color: #1d4ed8;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .tab-content {
+    display: none;
+  }
+
+  .tab-content.active {
+    display: block;
+  }
+
+  .toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-right {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
+  }
+
+  .btn-primary:hover {
+    background: #1e40af;
+  }
+
+  .btn-outline {
+    background: #fff;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+  }
+
+  .btn-outline:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+  }
+
+  .btn-danger {
+    background: #dc2626;
+    color: #fff;
+  }
+
+  .btn-danger:hover {
+    background: #b91c1c;
+  }
+
+  .btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8rem;
+  }
+
+  select {
+    padding: 10px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #475569;
+    background: #fff;
+    font-family: inherit;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  .contacts-count, .campaigns-count {
+    font-size: 0.85rem;
+    color: #94a3b8;
+  }
+
+  .table-wrapper {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th {
+    padding: 14px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+  }
+
+  .data-table td {
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: #334155;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .data-table tr:hover td {
+    background: #f8fafc;
+  }
+
+  .data-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #1d4ed8;
+  }
+
+  .action-btn {
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #64748b;
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .action-btn:hover {
+    color: #1d4ed8;
+    background: #eff6ff;
+  }
+
+  .action-btn.delete:hover {
+    color: #dc2626;
+    background: #fef2f2;
+  }
+
+  .bulk-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+
+  .bulk-actions span {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  /* Campaigns */
+  .campaigns-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .campaign-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 24px;
+    transition: all 0.2s;
+  }
+
+  .campaign-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.06);
+  }
+
+  .campaign-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+  }
+
+  .campaign-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .campaign-status {
+    padding: 4px 12px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .campaign-status.draft {
+    background: #f1f5f9;
+    color: #64748b;
+  }
+
+  .campaign-status.sent {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+
+  .campaign-status.sending {
+    background: #fef3c7;
+    color: #d97706;
+  }
+
+  .campaign-meta {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+
+  .campaign-stats {
+    display: flex;
+    gap: 24px;
+  }
+
+  .campaign-stat {
+    text-align: center;
+  }
+
+  .campaign-stat-value {
+    display: block;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .campaign-stat-label {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  /* Templates */
+  .templates-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .template-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 28px;
+    transition: all 0.2s;
+  }
+
+  .template-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.06);
+  }
+
+  .template-icon {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 14px;
+    margin-bottom: 16px;
+  }
+
+  .template-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .template-card p {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.5;
+  }
+
+  /* Modals */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+  }
+
+  .modal {
+    background: #fff;
+    border-radius: 20px;
+    padding: 32px;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  .modal-lg {
+    max-width: 800px;
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .modal-header h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1f5f9;
+    border: none;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
+    background: #fff;
+  }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 200px;
+    line-height: 1.6;
+  }
+
+  .modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .import-info {
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .import-info code {
+    background: #e2e8f0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 64px 24px;
+    color: #94a3b8;
+  }
+
+  .empty-state svg {
+    margin-bottom: 16px;
+  }
+
+  .empty-state p {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .admin-page {
+      padding-top: 80px;
+    }
+
+    .toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .toolbar-left, .toolbar-right {
+      width: 100%;
+    }
+
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+
+    .templates-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .campaign-stats {
+      gap: 16px;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    .data-table {
+      min-width: 700px;
+    }
+  }
+</style>
+
+<script>
+  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+  const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+  // Tab switching
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Load contacts
+  async function loadContacts() {
+    const cityFilter = (document.getElementById('city-filter') as HTMLSelectElement).value;
+    const categoryFilter = (document.getElementById('category-filter') as HTMLSelectElement).value;
+
+    let url = `${SUPABASE_URL}/rest/v1/b2b_contacts?select=*&order=created_at.desc&status=eq.active`;
+    if (cityFilter) url += `&city=eq.${encodeURIComponent(cityFilter)}`;
+    if (categoryFilter) url += `&category=eq.${encodeURIComponent(categoryFilter)}`;
+
+    const res = await fetch(url, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+      },
+    });
+
+    const contacts = await res.json();
+    const tbody = document.getElementById('contacts-body')!;
+    document.getElementById('contacts-count')!.textContent = `${contacts.length} контактов`;
+
+    if (contacts.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" class="empty-state"><p>Нет контактов. Добавьте первый контакт или импортируйте CSV.</p></td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = contacts.map((c: any) => `
+      <tr>
+        <td><input type="checkbox" class="contact-check" data-id="${c.id}" /></td>
+        <td><strong>${c.company_name}</strong></td>
+        <td>${c.inn || '—'}</td>
+        <td>${c.email}</td>
+        <td>${c.phone || '—'}</td>
+        <td>${c.city}</td>
+        <td>${c.category || '—'}</td>
+        <td>${c.contact_person || '—'}</td>
+        <td>
+          <button class="action-btn edit-contact" data-id="${c.id}">Изм.</button>
+          <button class="action-btn delete delete-contact" data-id="${c.id}">Удл.</button>
+        </td>
+      </tr>
+    `).join('');
+
+    // Wire up edit/delete
+    tbody.querySelectorAll('.edit-contact').forEach(btn => {
+      btn.addEventListener('click', () => editContact((btn as HTMLElement).dataset.id!));
+    });
+    tbody.querySelectorAll('.delete-contact').forEach(btn => {
+      btn.addEventListener('click', () => deleteContact((btn as HTMLElement).dataset.id!));
+    });
+
+    // Checkbox handling
+    updateBulkActions();
+  }
+
+  // Save contact
+  document.getElementById('contact-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = (document.getElementById('contact-id') as HTMLInputElement).value;
+    const data = {
+      company_name: (document.getElementById('company-name') as HTMLInputElement).value,
+      inn: (document.getElementById('inn') as HTMLInputElement).value,
+      email: (document.getElementById('contact-email') as HTMLInputElement).value,
+      phone: (document.getElementById('contact-phone') as HTMLInputElement).value,
+      city: (document.getElementById('contact-city') as HTMLSelectElement).value,
+      category: (document.getElementById('contact-category') as HTMLSelectElement).value,
+      contact_person: (document.getElementById('contact-person') as HTMLInputElement).value,
+      notes: (document.getElementById('contact-notes') as HTMLInputElement).value,
+    };
+
+    const method = id ? 'PATCH' : 'POST';
+    const url = id
+      ? `${SUPABASE_URL}/rest/v1/b2b_contacts?id=eq.${id}`
+      : `${SUPABASE_URL}/rest/v1/b2b_contacts`;
+
+    await fetch(url, {
+      method,
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(data),
+    });
+
+    closeModal('modal-contact');
+    loadContacts();
+  });
+
+  // Edit contact
+  async function editContact(id: string) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/b2b_contacts?id=eq.${id}`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+    const contacts = await res.json();
+    if (contacts.length === 0) return;
+    const c = contacts[0];
+
+    (document.getElementById('modal-contact-title') as HTMLElement).textContent = 'Редактировать контакт';
+    (document.getElementById('contact-id') as HTMLInputElement).value = c.id;
+    (document.getElementById('company-name') as HTMLInputElement).value = c.company_name || '';
+    (document.getElementById('inn') as HTMLInputElement).value = c.inn || '';
+    (document.getElementById('contact-email') as HTMLInputElement).value = c.email || '';
+    (document.getElementById('contact-phone') as HTMLInputElement).value = c.phone || '';
+    (document.getElementById('contact-city') as HTMLSelectElement).value = c.city || 'Миасс';
+    (document.getElementById('contact-category') as HTMLSelectElement).value = c.category || '';
+    (document.getElementById('contact-person') as HTMLInputElement).value = c.contact_person || '';
+    (document.getElementById('contact-notes') as HTMLInputElement).value = c.notes || '';
+
+    (document.getElementById('modal-contact') as HTMLElement).style.display = 'flex';
+  }
+
+  // Delete contact
+  async function deleteContact(id: string) {
+    if (!confirm('Удалить контакт?')) return;
+    await fetch(`${SUPABASE_URL}/rest/v1/b2b_contacts?id=eq.${id}`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+    loadContacts();
+  }
+
+  // Bulk actions
+  function updateBulkActions() {
+    const checked = document.querySelectorAll('.contact-check:checked');
+    const bulk = document.getElementById('bulk-actions')!;
+    if (checked.length > 0) {
+      bulk.style.display = 'flex';
+      (document.getElementById('selected-count') as HTMLElement).textContent = `${checked.length} выбрано`;
+    } else {
+      bulk.style.display = 'none';
+    }
+  }
+
+  document.addEventListener('change', (e) => {
+    if ((e.target as HTMLElement).classList.contains('contact-check')) updateBulkActions();
+  });
+
+  document.getElementById('select-all')!.addEventListener('change', (e) => {
+    const checked = (e.target as HTMLInputElement).checked;
+    document.querySelectorAll('.contact-check').forEach((cb: any) => cb.checked = checked);
+    updateBulkActions();
+  });
+
+  document.getElementById('btn-delete-selected')!.addEventListener('click', async () => {
+    const checked = Array.from(document.querySelectorAll('.contact-check:checked')).map((cb: any) => cb.dataset.id);
+    if (checked.length === 0 || !confirm(`Удалить ${checked.length} контактов?`)) return;
+
+    const orFilter = checked.map(id => `id.eq.${id}`).join(',');
+    await fetch(`${SUPABASE_URL}/rest/v1/b2b_contacts?or=(${orFilter})`, {
+      method: 'DELETE',
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+    loadContacts();
+  });
+
+  // Add to campaign from selection
+  document.getElementById('btn-add-to-campaign')!.addEventListener('click', () => {
+    const checked = Array.from(document.querySelectorAll('.contact-check:checked')).map((cb: any) => cb.dataset.id);
+    if (checked.length === 0) return;
+    openCampaignModal();
+    (document.getElementById('campaign-recipients-count') as HTMLElement).textContent = String(checked.length);
+  });
+
+  // Modal open/close
+  function openModal(id: string) {
+    (document.getElementById(id) as HTMLElement).style.display = 'flex';
+  }
+
+  function closeModal(id: string) {
+    (document.getElementById(id) as HTMLElement).style.display = 'none';
+  }
+
+  document.getElementById('btn-add-contact')!.addEventListener('click', () => {
+    (document.getElementById('contact-form') as HTMLFormElement).reset();
+    (document.getElementById('contact-id') as HTMLInputElement).value = '';
+    (document.getElementById('modal-contact-title') as HTMLElement).textContent = 'Добавить контакт';
+    openModal('modal-contact');
+  });
+
+  document.getElementById('close-contact-modal')!.addEventListener('click', () => closeModal('modal-contact'));
+  document.getElementById('cancel-contact')!.addEventListener('click', () => closeModal('modal-contact'));
+
+  // Campaign modal
+  function openCampaignModal() {
+    (document.getElementById('campaign-form') as HTMLFormElement).reset();
+    (document.getElementById('campaign-id') as HTMLInputElement).value = '';
+    (document.getElementById('modal-campaign-title') as HTMLElement).textContent = 'Новая рассылка';
+    openModal('modal-campaign');
+  }
+
+  document.getElementById('btn-new-campaign')!.addEventListener('click', openCampaignModal);
+  document.getElementById('close-campaign-modal')!.addEventListener('click', () => closeModal('modal-campaign'));
+
+  // Count recipients when filters change
+  async function countRecipients() {
+    const city = (document.getElementById('campaign-city') as HTMLSelectElement).value;
+    const category = (document.getElementById('campaign-category') as HTMLSelectElement).value;
+    let url = `${SUPABASE_URL}/rest/v1/b2b_contacts?select=id&status=eq.active`;
+    if (city) url += `&city=eq.${encodeURIComponent(city)}`;
+    if (category) url += `&category=eq.${encodeURIComponent(category)}`;
+
+    const res = await fetch(url, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+
+    const data = await res.json();
+    (document.getElementById('campaign-recipients-count') as HTMLElement).textContent = String(data.length);
+  }
+
+  document.getElementById('campaign-city')!.addEventListener('change', countRecipients);
+  document.getElementById('campaign-category')!.addEventListener('change', countRecipients);
+
+  // Save draft
+  document.getElementById('save-draft')!.addEventListener('click', async () => {
+    const data = {
+      subject: (document.getElementById('campaign-subject') as HTMLInputElement).value,
+      body: (document.getElementById('campaign-body') as HTMLTextAreaElement).value,
+      city_filter: (document.getElementById('campaign-city') as HTMLSelectElement).value,
+      category_filter: (document.getElementById('campaign-category') as HTMLSelectElement).value,
+      status: 'draft',
+    };
+
+    await fetch(`${SUPABASE_URL}/rest/v1/b2b_campaigns`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(data),
+    });
+
+    closeModal('modal-campaign');
+    loadCampaigns();
+  });
+
+  // Send campaign
+  document.getElementById('campaign-form')!.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const subject = (document.getElementById('campaign-subject') as HTMLInputElement).value;
+    const body = (document.getElementById('campaign-body') as HTMLTextAreaElement).value;
+    const city = (document.getElementById('campaign-city') as HTMLSelectElement).value;
+    const category = (document.getElementById('campaign-category') as HTMLSelectElement).value;
+
+    if (!confirm('Запустить рассылку?')) return;
+
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/b2b-campaign`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ subject, body, city_filter: city, category_filter: category }),
+    });
+
+    const result = await res.json();
+    if (result.success) {
+      alert(`Рассылка запущена! Отправлено: ${result.sent}`);
+    } else {
+      alert(`Ошибка: ${result.error || 'Не удалось запустить рассылку'}`);
+    }
+
+    closeModal('modal-campaign');
+    loadCampaigns();
+  });
+
+  // Load campaigns
+  async function loadCampaigns() {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/b2b_campaigns?select=*&order=created_at.desc`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+    });
+
+    const campaigns = await res.json();
+    const list = document.getElementById('campaigns-list')!;
+    (document.getElementById('campaigns-count') as HTMLElement).textContent = `${campaigns.length} рассылок`;
+
+    if (campaigns.length === 0) {
+      list.innerHTML = `<div class="empty-state"><p>Нет рассылок. Создайте первую.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = campaigns.map((c: any) => `
+      <div class="campaign-card">
+        <div class="campaign-card-header">
+          <h3>${c.subject}</h3>
+          <span class="campaign-status ${c.status}">${c.status === 'draft' ? 'Черновик' : c.status === 'sent' ? 'Отправлено' : 'Отправка...'}</span>
+        </div>
+        <div class="campaign-meta">
+          ${c.city_filter ? `Город: ${c.city_filter}` : 'Все города'} ${c.category_filter ? `| Категория: ${c.category_filter}` : ''}
+          ${c.sent_at ? `| Отправлено: ${new Date(c.sent_at).toLocaleDateString('ru-RU')}` : ''}
+        </div>
+        <div class="campaign-stats">
+          <div class="campaign-stat">
+            <span class="campaign-stat-value">${c.total_sent}</span>
+            <span class="campaign-stat-label">Отправлено</span>
+          </div>
+          <div class="campaign-stat">
+            <span class="campaign-stat-value">${c.total_opened}</span>
+            <span class="campaign-stat-label">Открыто</span>
+          </div>
+          <div class="campaign-stat">
+            <span class="campaign-stat-value">${c.total_clicked}</span>
+            <span class="campaign-stat-label">Кликов</span>
+          </div>
+          <div class="campaign-stat">
+            <span class="campaign-stat-value">${c.total_bounced}</span>
+            <span class="campaign-stat-label">Недоставлено</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Templates
+  const TEMPLATES: Record<string, { subject: string; body: string }> = {
+    maintenance: {
+      subject: 'Обслуживание бытовой техники для вашего предприятия',
+      body: `Уважаемые коллеги!
+
+Мастерская Master-Tehniki74 предлагает договор на регулярное обслуживание бытовой техники для вашего предприятия.
+
+Что входит в обслуживание:
+— Плановая диагностика холодильников, стиральных машин, электроплит
+— Чистка фильтров, замена изношенных уплотнителей
+— Мелкий ремонт без дополнительной оплаты
+— Срочный выезд мастера при аварийной поломке (в течение 2 часов)
+
+Тарифы:
+— Абонентское обслуживание от 5 000 руб/мес (до 10 единиц техники)
+— Полное обслуживание от 12 000 руб/мес (неограниченное количество)
+
+Работаем по безналу (с НДС и без НДС). Полный пакет документов: договор, акт, счёт.
+
+Звоните: 8 (951) 257-77-57
+Пишите: https://t.me/Drugan1900
+
+С уважением,
+команда Master-Tehniki74`,
+    },
+    repair: {
+      subject: 'Ремонт бытовой техники со скидкой 15% для юрлиц',
+      body: `Уважаемые партнёры!
+
+Master-Tehniki74 — ремонт бытовой техники в Миассе, Златоусте и Чебаркуле. Мы работаем с юридическими лицами и предлагаем скидку 15% на все виды ремонта.
+
+Ремонтируем:
+— Холодильники (от 2 000 руб)
+— Стиральные машины (от 1 200 руб)
+— Электроплиты и варочные панели (от 800 руб)
+— Микроволновки (от 500 руб)
+— Пылесосы (от 600 руб)
+
+Преимущества работы с нами:
+— Выезд мастера в день обращения
+— Гарантия до 12 месяцев
+— Работа по безналу
+— Полный пакет документов
+
+Для получения скидки 15% упомяните это письмо при обращении.
+
+Звоните: 8 (951) 257-77-57
+Пишите: https://t.me/Drugan1900
+
+С уважением,
+команда Master-Tehniki74`,
+    },
+    seasonal: {
+      subject: 'Сезонная диагностика холодильников и техники',
+      body: `Уважаемые коллеги!
+
+Перед началом сезона предлагаем провести диагностику и профилактическое обслуживание бытовой техники на вашем предприятии.
+
+Почему это важно:
+— Профилактика в 5 раз дешевле аварийного ремонта
+— Своевременная замена изношенных деталей предотвращает поломки
+— Чистая техника работает эффективнее и экономит электроэнергию
+
+Что мы проверяем:
+— Герметичность холодильных камер и уплотнителей
+— Состояние компрессоров и термостатов
+— Нагревательные элементы плит и духовок
+— Сливные системы стиральных машин
+— Фильтры и щётки пылесосов
+
+Стоимость диагностики: бесплатно при заказе обслуживания.
+
+Звоните: 8 (951) 257-77-57
+Пишите: https://t.me/Drugan1900
+
+С уважением,
+команда Master-Tehniki74`,
+    },
+    custom: {
+      subject: '',
+      body: '',
+    },
+  };
+
+  document.querySelectorAll('.template-use').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = (btn.closest('.template-card') as HTMLElement).dataset.template!;
+      const tpl = TEMPLATES[key];
+      openCampaignModal();
+      (document.getElementById('campaign-subject') as HTMLInputElement).value = tpl.subject;
+      (document.getElementById('campaign-body') as HTMLTextAreaElement).value = tpl.body;
+    });
+  });
+
+  // Import CSV
+  document.getElementById('btn-import')!.addEventListener('click', () => openModal('modal-import'));
+  document.getElementById('close-import-modal')!.addEventListener('click', () => closeModal('modal-import'));
+  document.getElementById('cancel-import')!.addEventListener('click', () => closeModal('modal-import'));
+
+  let importData: any[] = [];
+
+  document.getElementById('csv-file')!.addEventListener('change', (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const text = ev.target?.result as string;
+      const lines = text.split('\n').filter(l => l.trim());
+      if (lines.length < 2) return;
+
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      importData = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        const obj: any = {};
+        headers.forEach((h, idx) => {
+          if (['company_name', 'inn', 'email', 'phone', 'city', 'category', 'contact_person'].includes(h)) {
+            obj[h] = values[idx] || '';
+          }
+        });
+        if (obj.email && obj.company_name) {
+          obj.status = 'active';
+          importData.push(obj);
+        }
+      }
+
+      (document.getElementById('import-preview') as HTMLElement).style.display = 'block';
+      (document.getElementById('import-count') as HTMLElement).textContent = String(importData.length);
+      (document.getElementById('do-import') as HTMLButtonElement).disabled = importData.length === 0;
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('do-import')!.addEventListener('click', async () => {
+    if (importData.length === 0) return;
+
+    await fetch(`${SUPABASE_URL}/rest/v1/b2b_contacts`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(importData),
+    });
+
+    alert(`Импортировано ${importData.length} контактов`);
+    importData = [];
+    closeModal('modal-import');
+    loadContacts();
+  });
+
+  // Filters
+  document.getElementById('city-filter')!.addEventListener('change', loadContacts);
+  document.getElementById('category-filter')!.addEventListener('change', loadContacts);
+
+  // Init
+  loadContacts();
+  loadCampaigns();
+</script>
+</Layout>

@@ -1,0 +1,526 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import Reviews from '../../components/Reviews.astro';
+import MasterTips from '../../components/MasterTips.astro';
+import { SITE, CITIES, SERVICES, CITY_FAQ, SERVICE_FAQ, type CityKey, type ServiceKey } from '../../data/services';
+import FAQ from '../../components/FAQ.astro';
+
+export function getStaticPaths() {
+  const paths = [];
+  for (const [cityKey, city] of Object.entries(CITIES)) {
+    for (const [serviceKey, service] of Object.entries(SERVICES)) {
+      paths.push({
+        params: { city: city.slug, service: service.slug },
+        props: { cityKey, serviceKey },
+      });
+    }
+  }
+  return paths;
+}
+
+const { cityKey, serviceKey } = Astro.props;
+const city = CITIES[cityKey as CityKey];
+const service = SERVICES[serviceKey as ServiceKey];
+
+const title = `${service.name} в ${city.namePrepositional} на дому — недорого, гарантия | Master-Tehniki74`;
+const description = `${service.name} в ${city.namePrepositional} с выездом на дом. Опытные мастера, оригинальные запчасти, гарантия до 12 месяцев. Звоните: ${SITE.phone}`;
+const keywords = `${service.name.toLowerCase()} ${city.namePrepositional.toLowerCase()}, ремонт бытовой техники ${city.name}, вызвать мастера ${city.name}, ${service.lsiKeywords.join(', ')}`;
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": `${service.name} в ${city.namePrepositional}`,
+  "description": description,
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Master-Tehniki74",
+    "telephone": SITE.phone,
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": city.name,
+      "addressRegion": "Челябинская область",
+      "streetAddress": city.hasWorkshop ? "ул. Победы, д. 18" : "",
+    },
+    "openingHours": "Mo-Su 09:00-20:00",
+    "url": SITE.url,
+    "sameAs": [SITE.telegram, SITE.vk],
+  },
+  "areaServed": {
+    "@type": "City",
+    "name": city.name,
+  },
+  "serviceType": service.name,
+});
+
+const breadcrumbSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    { "@type": "ListItem", "position": 1, "name": "Главная", "item": SITE.url },
+    { "@type": "ListItem", "position": 2, "name": city.name, "item": `${SITE.url}/${city.slug}/` },
+    { "@type": "ListItem", "position": 3, "name": service.name, "item": `${SITE.url}/${city.slug}/${service.slug}/` },
+  ],
+});
+
+const landmark = city.landmarks[Math.floor(Math.random() * city.landmarks.length)];
+const landmark2 = city.landmarks.filter(l => l !== landmark)[0] || city.landmarks[0];
+---
+
+<Layout title={title} description={description} keywords={keywords} schema={`[${schema},${breadcrumbSchema}]`} geoPlace={city.name}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <div class="container">
+      <Breadcrumbs items={[
+        { label: city.name, href: `/${city.slug}/` },
+        { label: service.name },
+      ]} />
+    </div>
+
+    <section class="service-hero">
+      <div class="container">
+        <span class="badge">Работаем в {city.namePrepositional}</span>
+        <h1>{service.name} в {city.namePrepositional} на дому</h1>
+        <p class="hero-desc">
+          Опытные мастера с выездом на дом в {city.namePrepositional}. Ремонтируем {service.lsiKeywords.slice(0, 3).join(', ')} и другие неисправности.
+          {city.hasWorkshop ? 'Своя мастерская позволяет выполнять сложный ремонт на месте.' : `Выезд в район {landmark} и другие районы ${city.name}.`}
+          Гарантия до 12 месяцев.
+        </p>
+        <TelegramButtons context={`Здравствуйте! Нужен ${service.name.toLowerCase()} в ${city.namePrepositional}.`} />
+      </div>
+    </section>
+
+    <section class="problems-section">
+      <div class="container">
+        <h2>Частые неисправности и стоимость {service.nameGenitive} в {city.namePrepositional}</h2>
+        <p class="section-desc">Ориентировочные цены на ремонт. Точную стоимость мастер назовёт после диагностики.</p>
+
+        <div class="price-table-wrapper">
+          <table class="price-table">
+            <thead>
+              <tr>
+                <th>Проблема</th>
+                <th>Причина</th>
+                <th>Стоимость</th>
+              </tr>
+            </thead>
+            <tbody>
+              {service.commonProblems.map((item) => (
+                <tr>
+                  <td>{item.problem}</td>
+                  <td>{item.cause}</td>
+                  <td class="price">{item.price}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <p class="table-note">* Цены указаны ориентировочно. Точная стоимость зависит от модели техники и сложности ремонта. Диагностика — бесплатно при заказе ремонта.</p>
+      </div>
+    </section>
+
+    <section class="about-section">
+      <div class="container">
+        <h2>{service.name} в {city.namePrepositional}: когда обращаться к мастеру</h2>
+        <div class="about-content">
+          <p>{service.description}</p>
+          <p>Если вы находитесь в {city.namePrepositional} — будь то {landmark} или {landmark2} — наш мастер приедет в удобное для вас время. Выезд в день обращения, средний срок ремонта — 1 день.</p>
+          <p>Мы работаем с {service.lsiKeywords.slice(0, 4).join(', ')} и другими компонентами. Используем оригинальные запчасти и качественные аналоги. На все работы предоставляем гарантию до 12 месяцев.</p>
+          <p>Не пытайтесь ремонтировать технику самостоятельно — это может привести к более серьёзным поломкам и увеличить стоимость ремонта. Доверьте работу профессионалам.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="parts-block">
+      <div class="container">
+        <div class="parts-cta">
+          <div class="parts-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+            </svg>
+          </div>
+          <div>
+            <h3>Нужны запчасти для вашей модели?</h3>
+            <p>У нас в наличии на складе {service.lsiKeywords.slice(0, 2).join(' и ')} для большинства марок. Новые и Б/У варианты.</p>
+          </div>
+          <a href="/zapchasti/" class="parts-link">Смотреть каталог</a>
+        </div>
+      </div>
+    </section>
+
+    <MasterTips />
+    <FAQ items={SERVICE_FAQ[serviceKey as ServiceKey] || SERVICE_FAQ.holodilnik} heading={`Частые вопросы о ${service.nameGenitive}`} />
+    <Reviews city={city.name} service={service.name} />
+
+    <section class="other-services-section">
+      <div class="container">
+        <h2>Другие услуги в {city.namePrepositional}</h2>
+        <div class="other-services-grid">
+          {Object.entries(SERVICES).filter(([key]) => key !== serviceKey).map(([key, s]) => (
+            <a href={`/${city.slug}/${s.slug}/`} class="other-service-card">
+              <div class="other-service-icon" set:html={s.icon} />
+              <div>
+                <h3>{s.name}</h3>
+                <p>{s.commonProblems[0].price}</p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-block">
+          <h2>Закажите {service.name.toLowerCase()} в {city.namePrepositional}</h2>
+          <p>Мастер перезвонит в течение 15 минут и согласует удобное время выезда.</p>
+          <TelegramButtons context={`Здравствуйте! Нужен ${service.name.toLowerCase()} в ${city.namePrepositional}.`} />
+          <div class="cta-phone">
+            <span>Или позвоните:</span>
+            <a href={`tel:+${SITE.phoneRaw}`}>{SITE.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .service-hero {
+    padding: 24px 0 64px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(29, 78, 216, 0.1);
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .service-hero h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: #0f172a;
+    margin-bottom: 20px;
+    max-width: 800px;
+  }
+
+  .hero-desc {
+    font-size: 1.1rem;
+    color: #475569;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 700px;
+  }
+
+  .problems-section {
+    padding: 80px 0;
+  }
+
+  .problems-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    margin-bottom: 40px;
+  }
+
+  .price-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .price-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+
+  .price-table th {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 16px 20px;
+    text-align: left;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .price-table td {
+    padding: 14px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 0.9rem;
+    color: #475569;
+  }
+
+  .price-table tr:hover td {
+    background: #f8fafc;
+  }
+
+  .price-table td.price {
+    font-weight: 600;
+    color: #1d4ed8;
+    white-space: nowrap;
+  }
+
+  .table-note {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  .about-section {
+    padding: 80px 0;
+    background: #f8fafc;
+  }
+
+  .about-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+  }
+
+  .about-content p {
+    font-size: 1rem;
+    color: #475569;
+    line-height: 1.8;
+    margin-bottom: 16px;
+  }
+
+  .parts-block {
+    padding: 48px 0;
+  }
+
+  .parts-cta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 28px 32px;
+    background: #eff6ff;
+    border: 2px solid #bfdbfe;
+    border-radius: 16px;
+  }
+
+  .parts-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 14px;
+  }
+
+  .parts-cta h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .parts-cta p {
+    font-size: 0.9rem;
+    color: #64748b;
+  }
+
+  .parts-link {
+    margin-left: auto;
+    padding: 10px 20px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    transition: all 0.25s;
+    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.3);
+  }
+
+  .parts-link:hover {
+    background: #1e40af;
+    transform: translateY(-1px);
+  }
+
+  .cta-section {
+    padding: 80px 0;
+  }
+
+  .cta-block {
+    text-align: center;
+    padding: 48px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    border-radius: 24px;
+    color: #fff;
+  }
+
+  .cta-block h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
+
+  .cta-block p {
+    font-size: 1.05rem;
+    opacity: 0.9;
+    margin-bottom: 32px;
+  }
+
+  .cta-phone {
+    margin-top: 20px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+
+  .cta-phone a {
+    color: #93c5fd;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-left: 8px;
+  }
+
+  @media (max-width: 768px) {
+    .service-hero {
+      padding: 16px 0 40px;
+    }
+
+    .service-hero h1 {
+      font-size: 1.75rem;
+    }
+
+    .hero-desc {
+      font-size: 1rem;
+    }
+
+    .problems-section,
+    .about-section,
+    .cta-section {
+      padding: 48px 0;
+    }
+
+    .problems-section h2,
+    .about-section h2 {
+      font-size: 1.5rem;
+    }
+
+    .parts-cta {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .parts-link {
+      margin-left: 0;
+    }
+
+    .cta-block {
+      padding: 32px 20px;
+    }
+
+    .cta-block h2 {
+      font-size: 1.5rem;
+    }
+
+    .price-table th,
+    .price-table td {
+      padding: 10px 12px;
+      font-size: 0.8rem;
+    }
+  }
+
+  .other-services-section {
+    padding: 64px 0;
+    background: #f8fafc;
+  }
+
+  .other-services-section h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 32px;
+  }
+
+  .other-services-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .other-service-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    transition: all 0.2s;
+  }
+
+  .other-service-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.06);
+  }
+
+  .other-service-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #eff6ff;
+    border-radius: 10px;
+    color: #1d4ed8;
+    flex-shrink: 0;
+  }
+
+  .other-service-card h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .other-service-card p {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  .other-service-card svg {
+    margin-left: auto;
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+
+  .other-service-card:hover svg {
+    color: #1d4ed8;
+  }
+
+  @media (max-width: 768px) {
+    .other-services-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

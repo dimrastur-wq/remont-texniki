@@ -1,0 +1,222 @@
+---
+import { MASTER_TIPS } from '../data/reviews';
+
+const today = new Date();
+const dayIndex = today.getDate() % MASTER_TIPS.length;
+const tip = MASTER_TIPS[dayIndex];
+---
+
+<section class="tips-section">
+  <div class="container">
+    <div class="tip-card">
+      <div class="tip-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      </div>
+      <div class="tip-content">
+        <span class="tip-label">Совет дня от нашего мастера</span>
+        <h3>{tip.title}</h3>
+        <p>{tip.text}</p>
+      </div>
+    </div>
+
+    <div class="all-tips">
+      <button class="tips-toggle" id="tips-toggle">
+        Все советы мастера
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+
+      <div class="tips-list" id="tips-list" style="display: none;">
+        {MASTER_TIPS.map((t, i) => (
+          <div class={`tip-item ${i === dayIndex ? 'active' : ''}`}>
+            <span class="tip-number">{i + 1}</span>
+            <div>
+              <h4>{t.title}</h4>
+              <p>{t.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tips-section {
+    padding: 64px 0;
+  }
+
+  .tip-card {
+    display: flex;
+    gap: 20px;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    border: 2px solid #bfdbfe;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+
+  .tip-icon {
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border-radius: 14px;
+    color: #1d4ed8;
+  }
+
+  .tip-label {
+    display: inline-block;
+    padding: 3px 10px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .tip-content h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .tip-content p {
+    font-size: 0.95rem;
+    color: #475569;
+    line-height: 1.7;
+  }
+
+  .all-tips {
+    text-align: center;
+  }
+
+  .tips-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .tips-toggle:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+  }
+
+  .tips-toggle.open svg {
+    transform: rotate(180deg);
+  }
+
+  .tips-toggle svg {
+    transition: transform 0.3s;
+  }
+
+  .tips-list {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    text-align: left;
+  }
+
+  .tip-item {
+    display: flex;
+    gap: 14px;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.3s;
+  }
+
+  .tip-item.active {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+  }
+
+  .tip-number {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #64748b;
+  }
+
+  .tip-item.active .tip-number {
+    background: #1d4ed8;
+    color: #fff;
+  }
+
+  .tip-item h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .tip-item p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 768px) {
+    .tips-section {
+      padding: 48px 0;
+    }
+
+    .tip-card {
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .tips-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('tips-toggle');
+  const list = document.getElementById('tips-list');
+
+  toggle?.addEventListener('click', () => {
+    const isOpen = list?.style.display !== 'none';
+    if (list) {
+      list.style.display = isOpen ? 'none' : 'grid';
+    }
+    toggle?.classList.toggle('open');
+    if (toggle) {
+      toggle.innerHTML = isOpen
+        ? 'Все советы мастера <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'
+        : 'Свернуть советы <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>';
+    }
+  });
+</script>

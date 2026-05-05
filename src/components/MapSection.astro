@@ -1,0 +1,249 @@
+---
+const cities = [
+  { name: 'Миасс', address: 'ул. Победы, д. 18 (цоколь)', primary: true },
+  { name: 'Златоуст', address: 'Выезд по всему городу', primary: false },
+  { name: 'Чебаркуль', address: 'Выезд по всему городу', primary: false },
+];
+---
+
+<section class="map-section" id="map">
+  <div class="container">
+    <div class="section-header">
+      <span class="section-label">Зона обслуживания</span>
+      <h2>Работаем в трёх городах</h2>
+      <p class="section-desc">Наша мастерская находится в Миассе. Выезд мастера — по всему городу и соседним населённым пунктам.</p>
+    </div>
+
+    <div class="map-layout">
+      <div class="map-placeholder">
+        <div class="map-inner">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+            <circle cx="12" cy="10" r="3" />
+          </svg>
+          <div class="map-cities-visual">
+            <div class="map-dot primary">
+              <span class="dot-label">Миасс</span>
+            </div>
+            <div class="map-dot">
+              <span class="dot-label">Златоуст</span>
+            </div>
+            <div class="map-dot">
+              <span class="dot-label">Чебаркуль</span>
+            </div>
+          </div>
+          <p class="map-note">Карта зоны обслуживания</p>
+        </div>
+      </div>
+
+      <div class="cities-list">
+        {cities.map((city) => (
+          <div class={city.primary ? 'city-card primary' : 'city-card'}>
+            <div class="city-marker">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+            </div>
+            <div>
+              <h3>{city.name}</h3>
+              <p>{city.address}</p>
+            </div>
+            {city.primary && <span class="badge-primary">Мастерская</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .map-section {
+    padding: 96px 0;
+    background: #fff;
+  }
+
+  .section-header {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 56px;
+  }
+
+  .section-label {
+    display: inline-block;
+    padding: 4px 14px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    font-size: 1.05rem;
+    color: #64748b;
+    line-height: 1.7;
+  }
+
+  .map-layout {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .map-placeholder {
+    background: #f0f7ff;
+    border: 2px dashed #bfdbfe;
+    border-radius: 20px;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .map-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .map-cities-visual {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+  }
+
+  .map-dot {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    background: #93c5fd;
+    border-radius: 50%;
+    border: 3px solid #1d4ed8;
+  }
+
+  .map-dot.primary {
+    background: #1d4ed8;
+    width: 20px;
+    height: 20px;
+    box-shadow: 0 0 0 6px rgba(29, 78, 216, 0.2);
+  }
+
+  .dot-label {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    white-space: nowrap;
+  }
+
+  .map-note {
+    font-size: 0.85rem;
+    color: #94a3b8;
+  }
+
+  .cities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .city-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    transition: all 0.3s;
+  }
+
+  .city-card.primary {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .city-card:hover {
+    border-color: #93c5fd;
+  }
+
+  .city-marker {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #dbeafe;
+    border-radius: 10px;
+    color: #1d4ed8;
+  }
+
+  .city-card.primary .city-marker {
+    background: #1d4ed8;
+    color: #fff;
+  }
+
+  .city-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .city-card p {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  .badge-primary {
+    margin-left: auto;
+    padding: 4px 10px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .map-section {
+      padding: 64px 0;
+    }
+
+    h2 {
+      font-size: 1.75rem;
+    }
+
+    .map-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .map-placeholder {
+      aspect-ratio: 4 / 3;
+    }
+
+    .badge-primary {
+      display: none;
+    }
+  }
+</style>
