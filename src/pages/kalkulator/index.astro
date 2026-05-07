@@ -1,0 +1,662 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+
+const title = 'Калькулятор стоимости ремонта — узнайте цену за 1 минуту | Master-Tehniki74';
+const description = 'Пройдите мини-тест: что случилось с техникой, какая марка, в чём симптом. Получите примерную стоимость ремонта и скидку 5% за прохождение.';
+---
+
+<Layout
+  title={title}
+  description={description}
+  keywords="калькулятор ремонта техники, сколько стоит ремонт холодильника, стоимость ремонта стиральной машины, онлайн расчёт ремонта, скидка на ремонт"
+  canonical="/kalkulator/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main>
+    <section class="quiz-section">
+      <div class="container">
+        <div class="quiz-wrap">
+          <div class="quiz-header">
+            <div class="quiz-badge">Калькулятор ремонта</div>
+            <h1>Узнайте стоимость ремонта за 1 минуту</h1>
+            <p>Ответьте на 4 вопроса — получите примерную цену и скидку <strong>5%</strong> при записи</p>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-wrap">
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-label" id="progress-label">Шаг 1 из 4</span>
+          </div>
+
+          <!-- Quiz steps -->
+          <div class="quiz-body" id="quiz-body">
+
+            <!-- Step 1: appliance type -->
+            <div class="step active" data-step="1">
+              <h2 class="step-q">Какая техника сломалась?</h2>
+              <div class="options-grid">
+                <button class="opt" data-value="holodilnik" data-label="Холодильник">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/></svg>
+                  </span>
+                  Холодильник
+                </button>
+                <button class="opt" data-value="stiralnaya" data-label="Стиральная машина">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><line x1="3" y1="7" x2="21" y2="7"/></svg>
+                  </span>
+                  Стиральная машина
+                </button>
+                <button class="opt" data-value="elektroplita" data-label="Электроплита / духовка">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="8" cy="13" r="3"/><circle cx="16" cy="13" r="3"/></svg>
+                  </span>
+                  Электроплита / духовка
+                </button>
+                <button class="opt" data-value="mikrovolnovka" data-label="Микроволновка">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="4" y="6" width="12" height="12" rx="1"/></svg>
+                  </span>
+                  Микроволновка
+                </button>
+                <button class="opt" data-value="pylesos" data-label="Пылесос">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                  </span>
+                  Пылесос
+                </button>
+                <button class="opt" data-value="other" data-label="Другая техника">
+                  <span class="opt-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  </span>
+                  Другая
+                </button>
+              </div>
+            </div>
+
+            <!-- Step 2: symptom -->
+            <div class="step" data-step="2">
+              <h2 class="step-q">Что именно происходит?</h2>
+              <div class="options-list" id="symptoms-list"></div>
+            </div>
+
+            <!-- Step 3: brand -->
+            <div class="step" data-step="3">
+              <h2 class="step-q">Какая марка техники?</h2>
+              <div class="options-grid brands-grid">
+                <button class="opt" data-value="bosch" data-label="Bosch">Bosch</button>
+                <button class="opt" data-value="samsung" data-label="Samsung">Samsung</button>
+                <button class="opt" data-value="lg" data-label="LG">LG</button>
+                <button class="opt" data-value="indesit" data-label="Indesit">Indesit</button>
+                <button class="opt" data-value="atlant" data-label="Атлант">Атлант</button>
+                <button class="opt" data-value="beko" data-label="Beko">Beko</button>
+                <button class="opt" data-value="electrolux" data-label="Electrolux">Electrolux</button>
+                <button class="opt" data-value="haier" data-label="Haier">Haier</button>
+                <button class="opt" data-value="other" data-label="Другая марка">Другая</button>
+              </div>
+            </div>
+
+            <!-- Step 4: age -->
+            <div class="step" data-step="4">
+              <h2 class="step-q">Сколько лет технике?</h2>
+              <div class="options-list">
+                <button class="opt opt--wide" data-value="1-3" data-label="До 3 лет">До 3 лет — новая, скорее всего заводской брак</button>
+                <button class="opt opt--wide" data-value="3-7" data-label="3–7 лет">3–7 лет — рабочий возраст, ремонт выгоден</button>
+                <button class="opt opt--wide" data-value="7-12" data-label="7–12 лет">7–12 лет — оцениваем по состоянию</button>
+                <button class="opt opt--wide" data-value="12+" data-label="Больше 12 лет">Больше 12 лет — посмотрим, стоит ли ремонтировать</button>
+              </div>
+            </div>
+
+            <!-- Step 5: result -->
+            <div class="step" data-step="5">
+              <div class="result-wrap">
+                <div class="result-icon">
+                  <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h2>Примерная стоимость готова</h2>
+                <div class="result-summary" id="result-summary"></div>
+
+                <div class="result-price-box" id="result-price-box">
+                  <div class="rp-label">Ориентировочная стоимость ремонта</div>
+                  <div class="rp-price" id="rp-price"></div>
+                  <div class="rp-note">* Точную цену назовёт мастер после диагностики. Диагностика бесплатна при заказе ремонта.</div>
+                </div>
+
+                <div class="discount-box">
+                  <div class="discount-badge">🎁 Ваша скидка 5%</div>
+                  <p>Назовите мастеру <strong id="discount-code"></strong> при звонке — получите скидку 5% на работу.</p>
+                </div>
+
+                <div class="result-actions">
+                  <a href={`tel:+${SITE.phoneRaw}`} class="btn-call">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Позвонить и записаться
+                  </a>
+                  <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="btn-tg">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.546c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.15 14.18l-2.946-.92c-.64-.203-.653-.64.136-.948l11.498-4.433c.532-.194 1 .13.724.37z"/></svg>
+                    Написать в Telegram
+                  </a>
+                  <button class="btn-reset" id="btn-reset">Пройти заново</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /quiz-body -->
+
+          <!-- Back button -->
+          <button class="btn-back" id="btn-back" style="display:none">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Назад
+          </button>
+
+        </div><!-- /quiz-wrap -->
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  .quiz-section {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: flex-start;
+    padding: 72px 0 80px;
+    background: linear-gradient(160deg, #f0f6ff 0%, #fff 60%);
+  }
+
+  .quiz-wrap {
+    max-width: 700px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .quiz-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .quiz-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1d4ed8;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .quiz-header h1 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+
+  .quiz-header p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+    border-radius: 100px;
+    width: 25%;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  /* Steps */
+  .step { display: none; animation: fadeIn 0.25s ease; }
+  .step.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-q {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .brands-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .opt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 12px;
+    background: #fff;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #1e293b;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .opt:hover {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    transform: translateY(-2px);
+  }
+
+  .opt.selected {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .opt--wide {
+    flex-direction: row;
+    text-align: left;
+    padding: 14px 18px;
+    font-weight: 500;
+    justify-content: flex-start;
+  }
+
+  .opt-icon {
+    color: #1d4ed8;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  /* Back button */
+  .btn-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 6px 0;
+    transition: color 0.2s;
+  }
+
+  .btn-back:hover { color: #475569; }
+
+  /* Result */
+  .result-wrap {
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  .result-icon {
+    width: 64px;
+    height: 64px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+  }
+
+  .result-wrap h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+
+  .result-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .summary-tag {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.82rem;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 100px;
+  }
+
+  .result-price-box {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border: 1px solid #bfdbfe;
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .rp-label {
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 8px;
+  }
+
+  .rp-price {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    margin-bottom: 8px;
+  }
+
+  .rp-note {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    line-height: 1.5;
+  }
+
+  .discount-box {
+    background: #fefce8;
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    text-align: left;
+  }
+
+  .discount-badge {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #92400e;
+    margin-bottom: 6px;
+  }
+
+  .discount-box p {
+    font-size: 0.88rem;
+    color: #78350f;
+    line-height: 1.5;
+  }
+
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btn-call {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #0f172a;
+    color: #fff;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: background 0.2s;
+  }
+
+  .btn-call:hover { background: #1d4ed8; }
+
+  .btn-tg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #0088cc;
+    color: #fff;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .btn-tg:hover { background: #0077b5; }
+
+  .btn-reset {
+    background: none;
+    border: 1px solid #e2e8f0;
+    color: #94a3b8;
+    padding: 11px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-reset:hover { border-color: #94a3b8; color: #475569; }
+
+  @media (max-width: 600px) {
+    .options-grid { grid-template-columns: 1fr 1fr; }
+    .brands-grid { grid-template-columns: 1fr 1fr 1fr; }
+    .quiz-section { padding: 56px 0 60px; }
+  }
+</style>
+
+<script>
+  const SYMPTOMS: Record<string, { label: string; price: [number, number] }[]> = {
+    holodilnik: [
+      { label: 'Не морозит / не охлаждает', price: [1800, 5000] },
+      { label: 'Намерзает лёд на стенках', price: [1200, 3000] },
+      { label: 'Течёт вода на пол', price: [700, 2000] },
+      { label: 'Сильный шум и вибрация', price: [900, 2500] },
+      { label: 'Не включается', price: [1500, 4000] },
+      { label: 'Работает не переставая', price: [1000, 2500] },
+    ],
+    stiralnaya: [
+      { label: 'Не сливает воду', price: [1000, 2500] },
+      { label: 'Шумит при отжиме', price: [2000, 5000] },
+      { label: 'Не нагревает воду', price: [1200, 3000] },
+      { label: 'Течёт вода из машины', price: [800, 2500] },
+      { label: 'Не крутит барабан', price: [1000, 3500] },
+      { label: 'Ошибка на дисплее', price: [1500, 5000] },
+    ],
+    elektroplita: [
+      { label: 'Не работает конфорка', price: [700, 2500] },
+      { label: 'Не нагревается духовка', price: [1000, 3000] },
+      { label: 'Искрение при включении', price: [500, 1500] },
+      { label: 'Не регулируется температура', price: [800, 2500] },
+      { label: 'Плита не включается', price: [1200, 4000] },
+    ],
+    mikrovolnovka: [
+      { label: 'Не греет', price: [1000, 3000] },
+      { label: 'Искрение внутри', price: [400, 1200] },
+      { label: 'Не крутится тарелка', price: [600, 1500] },
+      { label: 'Не включается', price: [600, 2000] },
+      { label: 'Сильный гул', price: [800, 2500] },
+    ],
+    pylesos: [
+      { label: 'Плохо всасывает', price: [500, 1500] },
+      { label: 'Не включается', price: [800, 2500] },
+      { label: 'Сильный шум', price: [1000, 3000] },
+      { label: 'Не заезжает на базу (робот)', price: [800, 2000] },
+      { label: 'Быстро разряжается (робот)', price: [1200, 3000] },
+    ],
+    other: [
+      { label: 'Не включается', price: [800, 3000] },
+      { label: 'Ненормальный шум', price: [700, 2500] },
+      { label: 'Течёт / протечка', price: [600, 2000] },
+      { label: 'Другой симптом', price: [600, 4000] },
+    ],
+  };
+
+  const AGE_MODIFIER: Record<string, number> = {
+    '1-3': 0.9,
+    '3-7': 1.0,
+    '7-12': 1.1,
+    '12+': 1.2,
+  };
+
+  let currentStep = 1;
+  const totalSteps = 4;
+  const answers: Record<string, { value: string; label: string }> = {};
+  let selectedPrice: [number, number] = [800, 3000];
+
+  const progressFill = document.getElementById('progress-fill') as HTMLDivElement;
+  const progressLabel = document.getElementById('progress-label') as HTMLSpanElement;
+  const btnBack = document.getElementById('btn-back') as HTMLButtonElement;
+  const symptomsList = document.getElementById('symptoms-list') as HTMLDivElement;
+
+  function updateProgress() {
+    const pct = (currentStep / totalSteps) * 100;
+    progressFill.style.width = `${Math.min(pct, 100)}%`;
+    progressLabel.textContent = currentStep <= totalSteps
+      ? `Шаг ${currentStep} из ${totalSteps}`
+      : 'Готово!';
+    btnBack.style.display = currentStep > 1 && currentStep <= totalSteps ? 'flex' : 'none';
+  }
+
+  function showStep(n: number) {
+    document.querySelectorAll<HTMLDivElement>('.step').forEach(s => s.classList.remove('active'));
+    const target = document.querySelector<HTMLDivElement>(`.step[data-step="${n}"]`);
+    if (target) target.classList.add('active');
+    currentStep = n;
+    updateProgress();
+  }
+
+  function buildSymptoms(applianceKey: string) {
+    const list = SYMPTOMS[applianceKey] || SYMPTOMS['other'];
+    symptomsList.innerHTML = '';
+    list.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'opt opt--wide';
+      btn.dataset.value = item.label;
+      btn.dataset.label = item.label;
+      btn.dataset.priceMin = String(item.price[0]);
+      btn.dataset.priceMax = String(item.price[1]);
+      btn.textContent = item.label;
+      btn.addEventListener('click', () => {
+        selectedPrice = [item.price[0], item.price[1]];
+        selectOption(btn, 2);
+      });
+      symptomsList.appendChild(btn);
+    });
+  }
+
+  function selectOption(btn: HTMLButtonElement, step: number) {
+    const parent = btn.closest('.step');
+    parent?.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    answers[`step${step}`] = { value: btn.dataset.value || '', label: btn.dataset.label || '' };
+
+    setTimeout(() => {
+      if (step < totalSteps) {
+        showStep(step + 1);
+      } else {
+        showResult();
+      }
+    }, 220);
+  }
+
+  function showResult() {
+    // Apply age modifier
+    const age = answers['step4']?.value || '3-7';
+    const mod = AGE_MODIFIER[age] || 1.0;
+    const low = Math.round(selectedPrice[0] * mod / 100) * 100;
+    const high = Math.round(selectedPrice[1] * mod / 100) * 100;
+
+    // Build summary tags
+    const summaryEl = document.getElementById('result-summary')!;
+    summaryEl.innerHTML = ['step1', 'step2', 'step3', 'step4']
+      .filter(k => answers[k])
+      .map(k => `<span class="summary-tag">${answers[k].label}</span>`)
+      .join('');
+
+    // Price
+    document.getElementById('rp-price')!.textContent = `${low.toLocaleString('ru-RU')} – ${high.toLocaleString('ru-RU')} ₽`;
+
+    // Discount code
+    const code = `КВ-${Date.now().toString(36).toUpperCase().slice(-5)}`;
+    document.getElementById('discount-code')!.textContent = `«${code}»`;
+
+    progressFill.style.width = '100%';
+    progressLabel.textContent = 'Готово!';
+    btnBack.style.display = 'none';
+    showStep(5);
+  }
+
+  // Bind static step options (step 1, 3, 4)
+  document.querySelectorAll<HTMLButtonElement>('.step[data-step="1"] .opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      answers['step1'] = { value: btn.dataset.value || '', label: btn.dataset.label || '' };
+      buildSymptoms(btn.dataset.value || 'other');
+      setTimeout(() => { selectOption(btn, 1); }, 0);
+      showStep(2);
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.step[data-step="3"] .opt').forEach(btn => {
+    btn.addEventListener('click', () => selectOption(btn, 3));
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('.step[data-step="4"] .opt').forEach(btn => {
+    btn.addEventListener('click', () => selectOption(btn, 4));
+  });
+
+  btnBack.addEventListener('click', () => {
+    if (currentStep > 1) showStep(currentStep - 1);
+  });
+
+  document.getElementById('btn-reset')?.addEventListener('click', () => {
+    Object.keys(answers).forEach(k => delete (answers as any)[k]);
+    document.querySelectorAll('.opt').forEach(b => b.classList.remove('selected'));
+    selectedPrice = [800, 3000];
+    showStep(1);
+  });
+
+  updateProgress();
+</script>

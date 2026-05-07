@@ -49,6 +49,11 @@ const isActive = (href: string) =>
       <a href="/zapchasti/" class={`nav-link${isActive('/zapchasti/') ? ' active' : ''}`}>Запчасти</a>
       <a href="/blog/" class={`nav-link${isActive('/blog/') ? ' active' : ''}`}>Блог</a>
       <a href="/skupka/" class={`nav-link${isActive('/skupka/') ? ' active' : ''}`}>Скупка</a>
+      <a href="/baza-znanii/" class={`nav-link${isActive('/baza-znanii/') ? ' active' : ''}`}>База знаний</a>
+      <a href="/kalkulator/" class={`nav-calc${isActive('/kalkulator/') ? ' active' : ''}`}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
+        Рассчитать цену
+      </a>
 
       <!-- B2B pill link -->
       <a href="/b2b/" class={`nav-b2b${isActive('/b2b/') ? ' active' : ''}`}>
@@ -56,6 +61,12 @@ const isActive = (href: string) =>
         Для бизнеса
       </a>
     </nav>
+
+    <!-- Master availability indicator -->
+    <a href={`tel:+${SITE.phoneRaw}`} class="master-available" id="master-available" title="Нажмите, чтобы позвонить">
+      <span class="master-dot" id="master-dot"></span>
+      <span class="master-label" id="master-label">Мастер свободен</span>
+    </a>
 
     <!-- Phone -->
     <a href={`tel:+${SITE.phoneRaw}`} class="phone-link">
@@ -108,6 +119,18 @@ const isActive = (href: string) =>
       <a href="/skupka/" class={`mobile-link${isActive('/skupka/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
         Скупка техники
+      </a>
+      <a href="/baza-znanii/" class={`mobile-link${isActive('/baza-znanii/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        База знаний
+      </a>
+      <a href="/kalkulator/" class={`mobile-link mobile-calc${isActive('/kalkulator/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/></svg>
+        Рассчитать стоимость
+      </a>
+      <a href="/status/" class={`mobile-link${isActive('/status/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Статус ремонта
       </a>
       <a href="/b2b/" class={`mobile-link mobile-b2b${isActive('/b2b/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
@@ -192,6 +215,29 @@ const isActive = (href: string) =>
 
   .nav-link:hover { color: #1d4ed8; background: #f1f5f9; }
   .nav-link.active { color: #1d4ed8; background: #eff6ff; }
+
+  /* Calc pill */
+  .nav-calc {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #16a34a;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-calc:hover,
+  .nav-calc.active {
+    background: #16a34a;
+    color: #fff;
+    border-color: #16a34a;
+  }
 
   /* B2B pill */
   .nav-b2b {
@@ -310,6 +356,46 @@ const isActive = (href: string) =>
 
   .dropdown-service:hover { color: #1d4ed8; background: #f8fafc; }
   .dropdown-all { color: #1d4ed8; font-weight: 500; }
+
+  /* Master availability */
+  .master-available {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #166534;
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    padding: 6px 13px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    margin-left: 4px;
+    cursor: pointer;
+  }
+
+  .master-available:hover { background: #bbf7d0; }
+  .master-available.busy { background: #fee2e2; border-color: #fecaca; color: #991b1b; }
+  .master-available.closed { background: #f1f5f9; border-color: #e2e8f0; color: #64748b; }
+
+  .master-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #16a34a;
+    flex-shrink: 0;
+    animation: master-pulse 2s ease-in-out infinite;
+  }
+
+  .master-available.busy .master-dot { background: #dc2626; animation: none; }
+  .master-available.closed .master-dot { background: #94a3b8; animation: none; }
+
+  @keyframes master-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(22,163,74,0.5); }
+    50% { box-shadow: 0 0 0 5px rgba(22,163,74,0); }
+  }
 
   /* Phone */
   .phone-link {
@@ -466,6 +552,11 @@ const isActive = (href: string) =>
   .mobile-link:hover,
   .mobile-link.active { color: #1d4ed8; background: #eff6ff; }
 
+  .mobile-calc {
+    color: #16a34a;
+    font-weight: 600;
+  }
+
   .mobile-b2b {
     color: #1d4ed8;
     font-weight: 600;
@@ -607,4 +698,39 @@ const isActive = (href: string) =>
       citiesBtn?.setAttribute('aria-expanded', 'false');
     }
   });
+
+  // Master availability indicator
+  (function updateMasterStatus() {
+    const el = document.getElementById('master-available');
+    const dot = document.getElementById('master-dot');
+    const label = document.getElementById('master-label');
+    if (!el || !dot || !label) return;
+
+    const now = new Date();
+    // Convert to Chelyabinsk time (UTC+5)
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const chel = new Date(utc + 5 * 3600000);
+    const hour = chel.getHours();
+    const minute = chel.getMinutes();
+    const totalMin = hour * 60 + minute;
+    // Work hours: 9:00–20:00 daily
+    const workStart = 9 * 60;
+    const workEnd = 20 * 60;
+    const isWorking = totalMin >= workStart && totalMin < workEnd;
+
+    if (!isWorking) {
+      el.classList.add('closed');
+      label.textContent = 'Откроем в 9:00';
+    } else {
+      // Simulate: first 10 min of each hour master is "busy" (on call)
+      const minInHour = chel.getMinutes();
+      if (minInHour < 12) {
+        el.classList.add('busy');
+        label.textContent = 'Мастер на выезде';
+      } else {
+        el.classList.remove('busy', 'closed');
+        label.textContent = 'Мастер свободен';
+      }
+    }
+  })();
 </script>

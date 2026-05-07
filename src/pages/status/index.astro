@@ -1,0 +1,569 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+---
+
+<Layout
+  title="Статус ремонта — Master-Tehniki74"
+  description="Проверьте статус вашего ремонта по номеру телефона. Узнайте, на каком этапе находится ваш заказ: диагностика, заказ запчастей, ремонт выполнен."
+  keywords="статус ремонта, отследить заказ, где моя техника, статус заявки ремонт"
+  canonical="/status/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main>
+    <section class="status-section">
+      <div class="container">
+        <div class="status-wrap">
+
+          <div class="status-header">
+            <div class="status-icon-wrap">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <h1>Статус ремонта</h1>
+            <p>Введите номер телефона, который вы оставляли при записи</p>
+          </div>
+
+          <!-- Search form -->
+          <form class="search-form" id="search-form" autocomplete="off">
+            <div class="input-wrap">
+              <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <input
+                type="tel"
+                id="phone-input"
+                placeholder="+7 (___) ___-__-__"
+                class="phone-input"
+                maxlength="18"
+                inputmode="numeric"
+              />
+            </div>
+            <button type="submit" class="search-btn" id="search-btn">
+              <span id="btn-text">Проверить статус</span>
+              <span id="btn-spinner" class="spinner" style="display:none"></span>
+            </button>
+          </form>
+
+          <!-- Result area -->
+          <div id="result-area" style="display:none">
+
+            <!-- Loading -->
+            <div id="state-loading" class="state-box" style="display:none">
+              <div class="loading-dots"><span></span><span></span><span></span></div>
+              <p>Ищем ваш заказ...</p>
+            </div>
+
+            <!-- Not found -->
+            <div id="state-not-found" class="state-box state-box--warn" style="display:none">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <h3>Заказ не найден</h3>
+              <p>По этому номеру активных заказов нет. Возможно, номер указан иначе или заявка ещё не обработана. <br>Позвоните нам — поможем разобраться.</p>
+              <a href={`tel:+${SITE.phoneRaw}`} class="contact-btn">{SITE.phone}</a>
+            </div>
+
+            <!-- Orders list -->
+            <div id="state-orders" style="display:none">
+              <div class="orders-title">Найденные заказы</div>
+              <div id="orders-list"></div>
+            </div>
+
+          </div><!-- /result-area -->
+
+          <div class="status-hint">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Данные обновляются в реальном времени. Если ремонт занял больше суток — позвоните нам.
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  .status-section {
+    min-height: calc(100vh - 72px);
+    padding: 80px 0;
+    background: linear-gradient(160deg, #f0f6ff 0%, #fff 60%);
+    display: flex;
+    align-items: flex-start;
+  }
+
+  .status-wrap {
+    max-width: 560px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .status-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .status-icon-wrap {
+    width: 64px;
+    height: 64px;
+    background: #dbeafe;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+
+  .status-header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .status-header p {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+
+  /* Search form */
+  .search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+  }
+
+  .phone-input {
+    width: 100%;
+    padding: 14px 16px 14px 44px;
+    font-size: 1rem;
+    font-family: inherit;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    color: #0f172a;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+
+  .phone-input:focus { border-color: #1d4ed8; }
+
+  .search-btn {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .search-btn:hover { background: #1e40af; }
+  .search-btn:disabled { background: #94a3b8; cursor: not-allowed; }
+
+  /* Spinner */
+  .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* States */
+  .state-box {
+    text-align: center;
+    padding: 40px 20px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .state-box--warn { border-color: #fde68a; background: #fffbeb; }
+
+  .state-box h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 12px 0 8px;
+  }
+
+  .state-box p {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .loading-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .loading-dots span {
+    width: 10px;
+    height: 10px;
+    background: #1d4ed8;
+    border-radius: 50%;
+    animation: bounce 0.9s ease-in-out infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+  @keyframes bounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+
+  .contact-btn {
+    display: inline-block;
+    background: #1d4ed8;
+    color: #fff;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+  }
+
+  .contact-btn:hover { background: #1e40af; }
+
+  /* Orders */
+  .orders-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 12px;
+  }
+
+  /* Order card injected by JS */
+  .order-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 12px;
+  }
+
+  .order-card-top {
+    padding: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .order-device { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 2px; }
+  .order-brand { font-size: 0.82rem; color: #94a3b8; }
+  .order-master { font-size: 0.82rem; color: #64748b; margin-top: 4px; }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .status-pill--new { background: #e0f2fe; color: #0369a1; }
+  .status-pill--in_progress { background: #fef9c3; color: #92400e; }
+  .status-pill--waiting_parts { background: #fce7f3; color: #9d174d; }
+  .status-pill--done { background: #dcfce7; color: #166534; }
+  .status-pill--cancelled { background: #fee2e2; color: #991b1b; }
+
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .status-dot--pulse {
+    animation: pulse-dot 1.5s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+  }
+
+  .order-card-body {
+    padding: 16px 20px;
+  }
+
+  .order-notes {
+    font-size: 0.88rem;
+    color: #475569;
+    line-height: 1.6;
+  }
+
+  .order-date {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 10px;
+  }
+
+  /* Timeline */
+  .order-timeline {
+    padding: 0 20px 20px;
+    display: flex;
+    gap: 0;
+  }
+
+  .tl-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .tl-step::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    left: calc(50% + 12px);
+    right: calc(-50% + 12px);
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 0;
+  }
+
+  .tl-step:last-child::before { display: none; }
+
+  .tl-step.done::before { background: #16a34a; }
+
+  .tl-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    background: #fff;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+
+  .tl-step.done .tl-dot { background: #16a34a; border-color: #16a34a; color: #fff; }
+  .tl-step.active .tl-dot { background: #1d4ed8; border-color: #1d4ed8; color: #fff; animation: pulse-ring 1.5s ease-in-out infinite; }
+
+  @keyframes pulse-ring {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(29,78,216,0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(29,78,216,0); }
+  }
+
+  .tl-label {
+    font-size: 0.68rem;
+    color: #94a3b8;
+    text-align: center;
+    line-height: 1.3;
+  }
+
+  .tl-step.done .tl-label, .tl-step.active .tl-label { color: #0f172a; font-weight: 600; }
+
+  /* Hint */
+  .status-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 540px) {
+    .search-form { flex-direction: column; }
+    .search-btn { width: 100%; justify-content: center; }
+    .status-section { padding: 60px 0; }
+  }
+</style>
+
+<script define:vars={{ SUPABASE_URL, SUPABASE_ANON_KEY }}>
+  const STATUS_MAP = {
+    new: { label: 'Заявка принята', cls: 'new', pulse: false },
+    in_progress: { label: 'В работе у мастера', cls: 'in_progress', pulse: true },
+    waiting_parts: { label: 'Ожидаем запчасть', cls: 'waiting_parts', pulse: true },
+    done: { label: 'Ремонт выполнен', cls: 'done', pulse: false },
+    cancelled: { label: 'Отменено', cls: 'cancelled', pulse: false },
+  };
+
+  const TIMELINE_STEPS = [
+    { key: 'new', label: 'Заявка' },
+    { key: 'in_progress', label: 'Диагностика' },
+    { key: 'waiting_parts', label: 'Запчасть' },
+    { key: 'done', label: 'Готово' },
+  ];
+
+  const statusOrder = ['new', 'in_progress', 'waiting_parts', 'done'];
+
+  function normalizePhone(raw) {
+    const digits = raw.replace(/\D/g, '');
+    if (digits.startsWith('8') && digits.length === 11) return '7' + digits.slice(1);
+    if (digits.startsWith('7') && digits.length === 11) return digits;
+    if (digits.length === 10) return '7' + digits;
+    return digits;
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
+  function buildTimelineHtml(currentStatus) {
+    const currentIdx = statusOrder.indexOf(currentStatus);
+    return TIMELINE_STEPS.map((step, i) => {
+      const stepIdx = statusOrder.indexOf(step.key);
+      let cls = '';
+      if (stepIdx < currentIdx) cls = 'done';
+      else if (stepIdx === currentIdx) cls = 'active';
+      const checkmark = stepIdx < currentIdx
+        ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`
+        : '';
+      return `<div class="tl-step ${cls}">
+        <div class="tl-dot">${checkmark}</div>
+        <div class="tl-label">${step.label}</div>
+      </div>`;
+    }).join('');
+  }
+
+  function buildOrderCard(order) {
+    const st = STATUS_MAP[order.status] || STATUS_MAP['new'];
+    const pulseClass = st.pulse ? 'status-dot--pulse' : '';
+    const card = document.createElement('div');
+    card.className = 'order-card';
+    card.innerHTML = `
+      <div class="order-card-top">
+        <div>
+          <div class="order-device">${order.device || 'Бытовая техника'}</div>
+          <div class="order-brand">${order.brand || ''}</div>
+          ${order.master_name ? `<div class="order-master">Мастер: ${order.master_name}</div>` : ''}
+        </div>
+        <span class="status-pill status-pill--${st.cls}">
+          <span class="status-dot ${pulseClass}"></span>
+          ${st.label}
+        </span>
+      </div>
+      <div class="order-card-body">
+        ${order.notes ? `<div class="order-notes">${order.notes}</div>` : ''}
+        <div class="order-date">Создан: ${formatDate(order.created_at)}</div>
+      </div>
+      <div class="order-timeline">${buildTimelineHtml(order.status)}</div>
+    `;
+    return card;
+  }
+
+  // Phone mask
+  const phoneInput = document.getElementById('phone-input');
+  phoneInput.addEventListener('input', function () {
+    let digits = this.value.replace(/\D/g, '');
+    if (digits.startsWith('8')) digits = '7' + digits.slice(1);
+    if (digits.startsWith('7') && digits.length > 1) {
+      let formatted = '+7';
+      if (digits.length > 1) formatted += ' (' + digits.slice(1, 4);
+      if (digits.length >= 4) formatted += ') ' + digits.slice(4, 7);
+      if (digits.length >= 7) formatted += '-' + digits.slice(7, 9);
+      if (digits.length >= 9) formatted += '-' + digits.slice(9, 11);
+      this.value = formatted;
+    } else if (digits.length > 0) {
+      this.value = digits;
+    }
+  });
+
+  // Submit
+  const form = document.getElementById('search-form');
+  const resultArea = document.getElementById('result-area');
+  const stateLoading = document.getElementById('state-loading');
+  const stateNotFound = document.getElementById('state-not-found');
+  const stateOrders = document.getElementById('state-orders');
+  const ordersList = document.getElementById('orders-list');
+  const btnText = document.getElementById('btn-text');
+  const btnSpinner = document.getElementById('btn-spinner');
+  const searchBtn = document.getElementById('search-btn');
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = phoneInput.value;
+    const phone = normalizePhone(raw);
+    if (phone.length < 10) { phoneInput.focus(); return; }
+
+    // Show loading
+    resultArea.style.display = 'block';
+    stateLoading.style.display = 'block';
+    stateNotFound.style.display = 'none';
+    stateOrders.style.display = 'none';
+    btnText.style.display = 'none';
+    btnSpinner.style.display = 'inline-block';
+    searchBtn.disabled = true;
+
+    try {
+      const url = `${SUPABASE_URL}/rest/v1/repair_orders?phone=eq.${encodeURIComponent(phone)}&order=created_at.desc`;
+      const res = await fetch(url, {
+        headers: {
+          'apikey': SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+
+      stateLoading.style.display = 'none';
+      if (!Array.isArray(data) || data.length === 0) {
+        stateNotFound.style.display = 'block';
+      } else {
+        ordersList.innerHTML = '';
+        data.forEach(order => ordersList.appendChild(buildOrderCard(order)));
+        stateOrders.style.display = 'block';
+      }
+    } catch {
+      stateLoading.style.display = 'none';
+      stateNotFound.style.display = 'block';
+    } finally {
+      btnText.style.display = 'inline';
+      btnSpinner.style.display = 'none';
+      searchBtn.disabled = false;
+    }
+  });
+</script>

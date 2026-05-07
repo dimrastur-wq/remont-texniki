@@ -1,0 +1,563 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+
+const articles = [
+  {
+    slug: 'kak-pochistit-filtr-stiralnoy-mashiny',
+    category: 'Стиральные машины',
+    categoryColor: 'blue',
+    title: 'Как почистить фильтр стиральной машины за 2 минуты',
+    excerpt: 'Забитый фильтр — причина половины поломок. Показываем, где он находится и как его прочистить без мастера.',
+    duration: '2 мин чтения',
+    video: false,
+    tips: [
+      'Отключите машину от сети',
+      'Найдите лючок внизу панели (есть у большинства моделей)',
+      'Подставьте ёмкость — из-за заглушки выльется вода',
+      'Выкрутите фильтр против часовой стрелки',
+      'Промойте под краном, очистите от ниток и мусора',
+      'Вставьте обратно и закрутите до щелчка',
+    ],
+    warning: 'Если после чистки машина всё равно не сливает — неисправна помпа. Это уже ремонт.',
+  },
+  {
+    slug: 'pochemu-holodilnik-gudit',
+    category: 'Холодильники',
+    categoryColor: 'cyan',
+    title: 'Почему холодильник гудит и стоит ли беспокоиться',
+    excerpt: 'Лёгкое гудение — норма. Громкий стук и вибрация — сигнал о поломке. Разбираем, что к чему.',
+    duration: '3 мин чтения',
+    video: false,
+    tips: [
+      'Тихое гудение (30–40 дБ) — работает компрессор, это нормально',
+      'Громкий стук при запуске — износ пускового реле, деталь стоит 400 ₽',
+      'Вибрация о пол — ослабли ножки, подтяните их вручную',
+      'Звук журчащей воды — хладагент движется по трубкам, норма',
+      'Скрежет или треск — возможен износ вентилятора испарителя',
+    ],
+    warning: 'Если шум появился резко и холодильник перестал морозить — вероятна утечка фреона. Срочно звоните мастеру.',
+  },
+  {
+    slug: 'limonka-ili-net',
+    category: 'Советы',
+    categoryColor: 'yellow',
+    title: 'Лимонная кислота в стиральной машине: мифы и правда',
+    excerpt: 'Все слышали совет «кинь лимонку». Мастера говорят другое — объясняем почему.',
+    duration: '3 мин чтения',
+    video: false,
+    tips: [
+      'Лимонная кислота действительно растворяет накипь на ТЭНе',
+      'НО: агрессивная среда разъедает резиновые манжеты и прокладки',
+      'Производители (Bosch, LG, Samsung) прямо запрещают это в инструкции',
+      'Правильно: использовать специальные таблетки-очистители (Calgon, Top Descaler)',
+      'Периодичность чистки: раз в 2-3 месяца при жёсткой воде в Миассе',
+    ],
+    warning: 'Однократное использование лимонки скорее всего не навредит. Регулярное — ускорит износ уплотнителей.',
+  },
+  {
+    slug: 'pochemu-mikrovolnovka-iskrit',
+    category: 'Микроволновки',
+    categoryColor: 'orange',
+    title: 'Микроволновка искрит внутри — что делать прямо сейчас',
+    excerpt: 'Не ждите. Искрение опасно и быстро убивает магнетрон. Первые шаги — за 30 секунд.',
+    duration: '2 мин чтения',
+    video: false,
+    tips: [
+      'Немедленно выключите микроволновку и отключите от сети',
+      'Не включайте снова до осмотра мастером',
+      'Причина №1: повреждена или загрязнена слюдяная пластина (стоит 200 ₽)',
+      'Причина №2: жир на внутренних стенках — протрите влажной тряпкой',
+      'Причина №3: треснул волновод — нужна замена детали',
+    ],
+    warning: 'Продолжение работы с искрением выводит магнетрон из строя. Замена магнетрона — от 1 200 ₽ вместо 200 ₽ за пластину.',
+  },
+  {
+    slug: 'kak-proverit-komplektnost-remont',
+    category: 'Советы',
+    categoryColor: 'green',
+    title: 'Как проверить, что мастер действительно поменял запчасть',
+    excerpt: 'Здоровое недоверие экономит деньги. Три простых способа убедиться, что ремонт реальный.',
+    duration: '2 мин чтения',
+    video: false,
+    tips: [
+      'Попросите показать старую деталь перед выбросом — честный мастер не откажет',
+      'Спросите артикул/название запчасти и проверьте цену на маркетплейсе',
+      'Фото "до" — попросите мастера сфотографировать поломку до разборки',
+      'Гарантийный талон — требуйте письменную гарантию на работу и деталь',
+      'Чек или договор — фиксирует факт ремонта и защищает при споре',
+    ],
+    warning: 'Мы выдаём фото поломки по запросу и всегда возвращаем старую деталь клиенту.',
+  },
+  {
+    slug: 'uhod-za-holodilnikom',
+    category: 'Холодильники',
+    categoryColor: 'cyan',
+    title: 'Как продлить жизнь холодильника: уход раз в 3 месяца',
+    excerpt: 'Пять простых действий, которые сэкономят 3 000–5 000 ₽ на ремонте.',
+    duration: '3 мин чтения',
+    video: false,
+    tips: [
+      'Почистите конденсатор сзади пылесосом — пыль перегревает компрессор',
+      'Проверьте уплотнительную резинку — она должна плотно прилегать по всему периметру',
+      'Разморозьте морозилку, если лёд намёрз больше 5 мм',
+      'Проверьте уровень — холодильник должен стоять ровно (компрессор работает тише)',
+      'Не ставьте горячую еду — это нагружает компрессор',
+    ],
+    warning: null,
+  },
+];
+
+const categoryColors: Record<string, string> = {
+  blue: '#dbeafe',
+  cyan: '#cffafe',
+  yellow: '#fef9c3',
+  orange: '#ffedd5',
+  green: '#dcfce7',
+};
+
+const categoryTextColors: Record<string, string> = {
+  blue: '#1e40af',
+  cyan: '#0e7490',
+  yellow: '#92400e',
+  orange: '#9a3412',
+  green: '#166534',
+};
+---
+
+<Layout
+  title="База знаний по ремонту техники — советы мастеров | Master-Tehniki74"
+  description="Полезные советы по уходу за бытовой техникой: чистка фильтра стиралки, почему гудит холодильник, лимонка в машине — правда и мифы. Видео-ответы мастеров."
+  keywords="советы по ремонту техники, как ухаживать за холодильником, чистка фильтра стиральной машины, микроволновка искрит что делать, база знаний ремонт техники"
+  canonical="/baza-znanii/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <div class="hero-badge">База знаний</div>
+          <h1>Советы мастеров — коротко и по делу</h1>
+          <p>Отвечаем на реальные вопросы клиентов: что починить самому, а когда звать мастера</p>
+          <div class="hero-stats">
+            <div class="hs-item"><strong>{articles.length}</strong> статей</div>
+            <div class="hs-div"></div>
+            <div class="hs-item"><strong>10+</strong> лет опыта мастеров</div>
+            <div class="hs-div"></div>
+            <div class="hs-item"><strong>Бесплатно</strong> — всегда</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video masters section -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Видео-визитки мастеров</h2>
+          <p>Знайте, кто к вам приедет — до звонка</p>
+        </div>
+        <div class="masters-grid">
+          <div class="master-card">
+            <div class="master-video-stub">
+              <div class="video-play">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="video-duration">0:35</div>
+              <div class="video-label">Скоро — видео-визитка мастера</div>
+            </div>
+            <div class="master-info">
+              <div class="master-name">Андрей</div>
+              <div class="master-spec">Холодильники, стиральные машины</div>
+              <div class="master-exp">10 лет опыта · более 800 ремонтов</div>
+              <div class="master-quote">"Приезжаю в бахилах, работаю чисто. Объясняю всё понятно."</div>
+            </div>
+          </div>
+          <div class="master-card">
+            <div class="master-video-stub">
+              <div class="video-play">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="video-duration">0:32</div>
+              <div class="video-label">Скоро — видео-визитка мастера</div>
+            </div>
+            <div class="master-info">
+              <div class="master-name">Сергей</div>
+              <div class="master-spec">Электроплиты, микроволновки</div>
+              <div class="master-exp">7 лет опыта · более 500 ремонтов</div>
+              <div class="master-quote">"Большинство ремонтов делаю за один визит — запчасти всегда с собой."</div>
+            </div>
+          </div>
+          <div class="master-card">
+            <div class="master-video-stub">
+              <div class="video-play">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="video-duration">0:30</div>
+              <div class="video-label">Скоро — видео-визитка мастера</div>
+            </div>
+            <div class="master-info">
+              <div class="master-name">Виктор</div>
+              <div class="master-spec">Пылесосы, мелкая техника</div>
+              <div class="master-exp">5 лет опыта · более 300 ремонтов</div>
+              <div class="master-quote">"Ремонт роботов-пылесосов — моя специализация. Dyson, iRobot, Xiaomi."</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Articles -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Статьи и советы</h2>
+          <p>Реальные ответы — без воды</p>
+        </div>
+        <div class="articles-grid">
+          {articles.map(a => (
+            <article class="article-card">
+              <div class="article-meta">
+                <span class="article-cat" style={`background:${categoryColors[a.categoryColor]};color:${categoryTextColors[a.categoryColor]}`}>{a.category}</span>
+                <span class="article-dur">{a.duration}</span>
+              </div>
+              <h3 class="article-title">{a.title}</h3>
+              <p class="article-excerpt">{a.excerpt}</p>
+
+              <div class="article-tips">
+                <div class="tips-label">Что нужно знать:</div>
+                <ul>
+                  {a.tips.map(tip => (
+                    <li>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      {tip}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {a.warning && (
+                <div class="article-warning">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  {a.warning}
+                </div>
+              )}
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-inner">
+          <h2>Не нашли ответ на свой вопрос?</h2>
+          <p>Опишите ситуацию в Telegram — мастер ответит лично, без обязательств</p>
+          <div class="cta-btns">
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--tg">Написать в Telegram</a>
+            <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn cta-btn--call">{SITE.phone}</a>
+            <a href="/kalkulator/" class="cta-btn cta-btn--calc">Рассчитать стоимость ремонта</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 80px 0 64px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #93c5fd;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    color: #94a3b8;
+    font-size: 1rem;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 10px 24px;
+    border-radius: 100px;
+  }
+
+  .hs-item { font-size: 0.85rem; color: #e2e8f0; }
+  .hs-item strong { color: #fff; }
+  .hs-div { width: 1px; height: 16px; background: rgba(255,255,255,0.2); }
+
+  /* Masters */
+  .section { padding: 72px 0; }
+  .section--alt { background: #f8fafc; }
+
+  .section-header { text-align: center; margin-bottom: 40px; }
+  .section-header h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .section-header p { color: #64748b; }
+
+  .masters-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .master-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .master-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+
+  .master-video-stub {
+    background: linear-gradient(135deg, #1e3a5f, #0f172a);
+    aspect-ratio: 16/9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .video-play {
+    width: 52px;
+    height: 52px;
+    background: rgba(255,255,255,0.15);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: background 0.2s;
+  }
+
+  .master-video-stub:hover .video-play { background: rgba(29,78,216,0.6); }
+
+  .video-duration {
+    position: absolute;
+    bottom: 10px;
+    right: 12px;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 4px;
+  }
+
+  .video-label {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    padding: 0 12px;
+    line-height: 1.4;
+  }
+
+  .master-info { padding: 18px; }
+
+  .master-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .master-spec {
+    font-size: 0.82rem;
+    color: #1d4ed8;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .master-exp {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-bottom: 10px;
+  }
+
+  .master-quote {
+    font-size: 0.82rem;
+    color: #475569;
+    font-style: italic;
+    line-height: 1.5;
+    border-left: 3px solid #dbeafe;
+    padding-left: 10px;
+  }
+
+  /* Articles */
+  .articles-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .article-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .article-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 20px rgba(29,78,216,0.07);
+  }
+
+  .article-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .article-cat {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .article-dur {
+    font-size: 0.75rem;
+    color: #94a3b8;
+  }
+
+  .article-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.4;
+  }
+
+  .article-excerpt {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .article-tips { display: flex; flex-direction: column; gap: 6px; }
+
+  .tips-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .article-tips ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .article-tips li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #475569;
+    line-height: 1.5;
+  }
+
+  .article-tips li svg { flex-shrink: 0; margin-top: 3px; }
+
+  .article-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.8rem;
+    color: #92400e;
+    line-height: 1.5;
+  }
+
+  .article-warning svg { flex-shrink: 0; margin-top: 2px; }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 64px 0;
+    text-align: center;
+  }
+
+  .cta-inner h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .cta-inner p { color: #94a3b8; margin-bottom: 28px; }
+
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .cta-btn {
+    padding: 13px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    transition: filter 0.2s;
+  }
+
+  .cta-btn:hover { filter: brightness(1.1); }
+  .cta-btn--tg { background: #0088cc; }
+  .cta-btn--call { background: #1d4ed8; }
+  .cta-btn--calc { background: #16a34a; }
+
+  @media (max-width: 1024px) {
+    .masters-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .articles-grid { grid-template-columns: 1fr; }
+    .masters-grid { grid-template-columns: 1fr; }
+    .hero-stats { flex-direction: column; gap: 8px; border-radius: 12px; }
+    .hs-div { width: 80%; height: 1px; }
+  }
+</style>

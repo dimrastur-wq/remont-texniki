@@ -1,0 +1,356 @@
+---
+import { SITE } from '../data/services';
+---
+
+<!-- Subscription + Trade-in + Before/After -->
+<section class="retention-section">
+  <div class="container">
+
+    <!-- Before / After photos -->
+    <div class="ba-block">
+      <div class="ba-header">
+        <h2>До и после ремонта</h2>
+        <p>Реальные фото наших работ — видим «грязь», устраняем причину</p>
+      </div>
+      <div class="ba-grid">
+        <div class="ba-card">
+          <div class="ba-images">
+            <div class="ba-img ba-img--before">
+              <div class="ba-label">До</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="9"/><line x1="8" y1="9" x2="16" y2="15"/></svg>
+                <span>ТЭН в накипи</span>
+              </div>
+            </div>
+            <div class="ba-arrow">→</div>
+            <div class="ba-img ba-img--after">
+              <div class="ba-label">После</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Новый ТЭН</span>
+              </div>
+            </div>
+          </div>
+          <div class="ba-desc">Стиральная машина LG — замена ТЭНа из-за критической накипи</div>
+        </div>
+
+        <div class="ba-card">
+          <div class="ba-images">
+            <div class="ba-img ba-img--before">
+              <div class="ba-label">До</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="9"/><line x1="8" y1="9" x2="16" y2="15"/></svg>
+                <span>Изношенный подшипник</span>
+              </div>
+            </div>
+            <div class="ba-arrow">→</div>
+            <div class="ba-img ba-img--after">
+              <div class="ba-label">После</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Барабан тихий</span>
+              </div>
+            </div>
+          </div>
+          <div class="ba-desc">Bosch — замена подшипников. Машина работает как новая</div>
+        </div>
+
+        <div class="ba-card">
+          <div class="ba-images">
+            <div class="ba-img ba-img--before">
+              <div class="ba-label">До</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="9"/><line x1="8" y1="9" x2="16" y2="15"/></svg>
+                <span>Обледеневший испаритель</span>
+              </div>
+            </div>
+            <div class="ba-arrow">→</div>
+            <div class="ba-img ba-img--after">
+              <div class="ba-label">После</div>
+              <div class="ba-placeholder">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Система чистая</span>
+              </div>
+            </div>
+          </div>
+          <div class="ba-desc">Атлант — устранена утечка фреона и замена термостата</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two columns: subscription + trade-in -->
+    <div class="rt-grid">
+
+      <!-- Subscription -->
+      <div class="rt-card rt-card--sub">
+        <div class="rt-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <div class="rt-badge">Подписка</div>
+        <h3>«Здоровье техники» — раз в год</h3>
+        <p>Мастер приезжает на профилактический осмотр: чистит стиральную машину, проверяет холодильник, уплотнители, ТЭН. Мелкие проблемы — устраняем на месте.</p>
+        <ul class="rt-list">
+          <li>Чистка барабана стиральной машины</li>
+          <li>Проверка ТЭНа и давления в системе</li>
+          <li>Осмотр уплотнителей холодильника</li>
+          <li>Проверка компрессора и конденсатора</li>
+          <li>Письменный отчёт + рекомендации</li>
+        </ul>
+        <div class="rt-price">от 990 ₽ / год</div>
+        <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="rt-btn">
+          Узнать подробнее в Telegram
+        </a>
+      </div>
+
+      <!-- Trade-in -->
+      <div class="rt-card rt-card--trade">
+        <div class="rt-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <div class="rt-badge rt-badge--green">Трейд-ин</div>
+        <h3>Ремонт слишком дорогой? Трейд-ин</h3>
+        <p>Если стоимость ремонта превышает 50–60% цены нового прибора, предложим выкупить старую технику в зачёт. Доплата минимальная.</p>
+        <ul class="rt-list">
+          <li>Оцениваем вашу технику честно</li>
+          <li>Предлагаем восстановленный прибор</li>
+          <li>Зачёт стоимости: ваша техника как первый взнос</li>
+          <li>Гарантия на восстановленную технику — 3 месяца</li>
+          <li>Доставка и установка включена</li>
+        </ul>
+        <div class="rt-price rt-price--green">Обсуждается индивидуально</div>
+        <a href={`tel:+${SITE.phoneRaw}`} class="rt-btn rt-btn--green">
+          Позвонить и обсудить
+        </a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<style>
+  .retention-section {
+    padding: 72px 0;
+    background: #f8fafc;
+  }
+
+  /* Before / After */
+  .ba-block { margin-bottom: 56px; }
+
+  .ba-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .ba-header h2 {
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .ba-header p { color: #64748b; }
+
+  .ba-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .ba-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow 0.2s;
+  }
+
+  .ba-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+
+  .ba-images {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ba-img {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    position: relative;
+  }
+
+  .ba-img--before { background: #fff1f2; }
+  .ba-img--after { background: #f0fdf4; }
+
+  .ba-label {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .ba-img--before .ba-label { color: #dc2626; }
+  .ba-img--after .ba-label { color: #16a34a; }
+
+  .ba-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 8px;
+  }
+
+  .ba-placeholder span {
+    font-size: 0.7rem;
+    color: #475569;
+    text-align: center;
+    line-height: 1.3;
+    padding: 0 4px;
+  }
+
+  .ba-arrow {
+    color: #94a3b8;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .ba-desc {
+    font-size: 0.8rem;
+    color: #64748b;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  /* Retention grid */
+  .rt-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .rt-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .rt-card--sub { border-top: 3px solid #1d4ed8; }
+  .rt-card--trade { border-top: 3px solid #16a34a; }
+
+  .rt-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rt-card--sub .rt-icon { background: #eff6ff; }
+  .rt-card--trade .rt-icon { background: #f0fdf4; }
+
+  .rt-badge {
+    display: inline-block;
+    background: #dbeafe;
+    color: #1e40af;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 100px;
+    align-self: flex-start;
+  }
+
+  .rt-badge--green { background: #dcfce7; color: #166534; }
+
+  .rt-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+  }
+
+  .rt-card p {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .rt-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex: 1;
+  }
+
+  .rt-list li {
+    font-size: 0.83rem;
+    color: #475569;
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.4;
+  }
+
+  .rt-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  .rt-price {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #1d4ed8;
+  }
+
+  .rt-price--green { color: #16a34a; font-size: 1rem; }
+
+  .rt-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1d4ed8;
+    color: #fff;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    text-align: center;
+  }
+
+  .rt-btn:hover { background: #1e40af; }
+  .rt-btn--green { background: #16a34a; }
+  .rt-btn--green:hover { background: #15803d; }
+
+  @media (max-width: 1024px) {
+    .ba-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
+  }
+
+  @media (max-width: 768px) {
+    .ba-grid { max-width: 100%; }
+    .rt-grid { grid-template-columns: 1fr; }
+    .retention-section { padding: 48px 0; }
+  }
+</style>
