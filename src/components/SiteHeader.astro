@@ -50,6 +50,10 @@ const isActive = (href: string) =>
       <a href="/blog/" class={`nav-link${isActive('/blog/') ? ' active' : ''}`}>Блог</a>
       <a href="/skupka/" class={`nav-link${isActive('/skupka/') ? ' active' : ''}`}>Скупка</a>
       <a href="/baza-znanii/" class={`nav-link${isActive('/baza-znanii/') ? ' active' : ''}`}>База знаний</a>
+      <a href="/diagnostika/" class={`nav-diag${isActive('/diagnostika/') ? ' active' : ''}`}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Диагностика
+      </a>
       <a href="/kalkulator/" class={`nav-calc${isActive('/kalkulator/') ? ' active' : ''}`}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="16" y2="18"/></svg>
         Рассчитать цену
@@ -123,6 +127,10 @@ const isActive = (href: string) =>
       <a href="/baza-znanii/" class={`mobile-link${isActive('/baza-znanii/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         База знаний
+      </a>
+      <a href="/diagnostika/" class={`mobile-link mobile-diag${isActive('/diagnostika/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Диагностика онлайн
       </a>
       <a href="/kalkulator/" class={`mobile-link mobile-calc${isActive('/kalkulator/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/></svg>
@@ -215,6 +223,29 @@ const isActive = (href: string) =>
 
   .nav-link:hover { color: #1d4ed8; background: #f1f5f9; }
   .nav-link.active { color: #1d4ed8; background: #eff6ff; }
+
+  /* Diag pill */
+  .nav-diag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #0369a1;
+    background: #e0f2fe;
+    border: 1px solid #bae6fd;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-diag:hover,
+  .nav-diag.active {
+    background: #0369a1;
+    color: #fff;
+    border-color: #0369a1;
+  }
 
   /* Calc pill */
   .nav-calc {
@@ -551,6 +582,11 @@ const isActive = (href: string) =>
 
   .mobile-link:hover,
   .mobile-link.active { color: #1d4ed8; background: #eff6ff; }
+
+  .mobile-diag {
+    color: #0369a1;
+    font-weight: 600;
+  }
 
   .mobile-calc {
     color: #16a34a;

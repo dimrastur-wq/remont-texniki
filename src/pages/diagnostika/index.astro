@@ -1,0 +1,965 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+
+const title = 'Диагностика техники онлайн — опишите проблему в мессенджере | Master-Tehniki74';
+const description = 'Опишите симптом неисправности в Telegram или WhatsApp — мастер ответит за 5 минут и поставит предварительный диагноз бесплатно.';
+---
+
+<Layout
+  title={title}
+  description={description}
+  keywords="диагностика техники онлайн, диагностика холодильника, ремонт стиральной машины онлайн, мастер в telegram, бесплатная диагностика"
+  canonical="/diagnostika/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <!-- Hero -->
+    <section class="diag-hero">
+      <div class="container">
+        <div class="hero-badge">Бесплатно · Ответ за 5 минут</div>
+        <h1>Диагностика техники<br>через мессенджер</h1>
+        <p class="hero-sub">Опишите, что случилось с техникой — мастер поставит предварительный диагноз и назовёт примерную стоимость ещё до выезда</p>
+        <div class="hero-messengers">
+          <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="btn-messenger btn-tg">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+            Написать в Telegram
+          </a>
+          <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="btn-messenger btn-wa">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+            Написать в WhatsApp
+          </a>
+        </div>
+        <div class="hero-note">Или воспользуйтесь интерактивным помощником ниже — выберите симптом и получите подсказку мгновенно</div>
+      </div>
+    </section>
+
+    <!-- Interactive symptom checker -->
+    <section class="checker-section">
+      <div class="container">
+        <div class="checker-wrap" id="checker">
+
+          <!-- Step 1: appliance -->
+          <div class="step active" id="step-1">
+            <div class="step-num">Шаг 1 из 3</div>
+            <h2>Какая техника не работает?</h2>
+            <div class="opts-grid">
+              <button class="opt-card" data-next="2" data-app="holodilnik" data-app-label="Холодильник">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="4" y1="10" x2="20" y2="10"/></svg>
+                </span>
+                <span>Холодильник</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="stiralnaya" data-app-label="Стиральная машина">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><circle cx="12" cy="13" r="4"/><line x1="3" y1="7" x2="21" y2="7"/></svg>
+                </span>
+                <span>Стиральная машина</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="elektroplita" data-app-label="Электроплита / духовка">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="2"/><circle cx="8" cy="13" r="3"/><circle cx="16" cy="13" r="3"/></svg>
+                </span>
+                <span>Электроплита / духовка</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="mikrovolnovka" data-app-label="Микроволновка">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><rect x="4" y="6" width="12" height="12" rx="1"/></svg>
+                </span>
+                <span>Микроволновка</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="posudomoechnaya" data-app-label="Посудомоечная машина">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M7 10h10M7 14h10"/></svg>
+                </span>
+                <span>Посудомоечная машина</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="pylesos" data-app-label="Пылесос">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>
+                </span>
+                <span>Пылесос</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="kofemasina" data-app-label="Кофемашина">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 0 1 0 8h-1"/><rect x="3" y="8" width="14" height="12" rx="2"/><line x1="3" y1="12" x2="17" y2="12"/></svg>
+                </span>
+                <span>Кофемашина</span>
+              </button>
+              <button class="opt-card" data-next="2" data-app="other" data-app-label="Другая техника">
+                <span class="opt-icon">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+                <span>Другая</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: symptoms (populated dynamically) -->
+          <div class="step" id="step-2">
+            <button class="back-btn" id="back-1">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Назад
+            </button>
+            <div class="step-num">Шаг 2 из 3</div>
+            <h2>Что именно происходит?</h2>
+            <div class="opts-grid" id="symptoms-grid"></div>
+          </div>
+
+          <!-- Step 3: result -->
+          <div class="step" id="step-3">
+            <button class="back-btn" id="back-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              Назад
+            </button>
+            <div class="step-num">Шаг 3 из 3</div>
+            <h2>Уточните несколько деталей</h2>
+            <div class="age-question">
+              <p class="age-label">Сколько лет технике?</p>
+              <div class="age-opts">
+                <button class="age-opt" data-age="до 3 лет">До 3 лет</button>
+                <button class="age-opt" data-age="3–7 лет">3–7 лет</button>
+                <button class="age-opt" data-age="7–12 лет">7–12 лет</button>
+                <button class="age-opt" data-age="более 12 лет">Более 12 лет</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Step 4: diagnosis result -->
+          <div class="step" id="step-4">
+            <div class="result-wrap">
+              <div class="result-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+              <h2 id="result-title">Предварительный диагноз</h2>
+              <div class="result-diagnosis" id="result-diagnosis"></div>
+              <div class="result-price" id="result-price"></div>
+              <p class="result-note">Точную стоимость назовём после осмотра. Диагностика на дому — <strong>бесплатно</strong> при ремонте</p>
+              <div class="result-actions">
+                <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="result-btn result-btn--tg">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                  Уточнить в Telegram
+                </a>
+                <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="result-btn result-btn--wa">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+                  Уточнить в WhatsApp
+                </a>
+                <a href={`tel:+${SITE.phoneRaw}`} class="result-btn result-btn--call">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Позвонить мастеру
+                </a>
+              </div>
+              <button class="restart-btn" id="restart-btn">Начать заново</button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Как работает онлайн-диагностика</h2>
+          <p>Три простых шага до ясности</p>
+        </div>
+        <div class="steps-grid">
+          <div class="how-step">
+            <div class="how-num">1</div>
+            <h3>Опишите симптом</h3>
+            <p>Напишите в мессенджер или пройдите квиз-помощник — укажите технику и что именно происходит</p>
+          </div>
+          <div class="how-step">
+            <div class="how-num">2</div>
+            <h3>Мастер отвечает за 5 минут</h3>
+            <p>Специалист задаст уточняющие вопросы и поставит предварительный диагноз по описанию</p>
+          </div>
+          <div class="how-step">
+            <div class="how-num">3</div>
+            <h3>Называем цену до выезда</h3>
+            <p>Вы узнаёте примерную стоимость ремонта и принимаете решение без обязательств</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Benefits -->
+    <section class="benefits-section">
+      <div class="container">
+        <div class="benefits-grid">
+          <div class="benefit-card">
+            <div class="benefit-icon benefit-icon--green">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>
+              <h4>Диагностика бесплатно</h4>
+              <p>При ремонте — стоимость диагностики включена в счёт</p>
+            </div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon benefit-icon--blue">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h4>Ответ за 5 минут</h4>
+              <p>Работаем ежедневно с 9:00 до 20:00 по Челябинску</p>
+            </div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon benefit-icon--orange">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </div>
+            <div>
+              <h4>14 лет опыта</h4>
+              <p>Мастер знает типичные поломки наизусть — диагностирует по описанию точно</p>
+            </div>
+          </div>
+          <div class="benefit-card">
+            <div class="benefit-icon benefit-icon--teal">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <h4>Без обязательств</h4>
+              <p>Можно узнать стоимость и отказаться — никакого давления</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-box">
+          <h2>Не нашли свою проблему в списке?</h2>
+          <p>Напишите прямо — опишите своими словами, что происходит с техникой</p>
+          <div class="cta-btns">
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--tg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+              Telegram
+            </a>
+            <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--wa">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn cta-btn--call">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              Позвонить
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Hero */
+  .diag-hero {
+    padding: 120px 0 72px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 40%, #f0fdf4 100%);
+    text-align: center;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+    font-size: 0.8rem;
+    font-weight: 700;
+    padding: 6px 16px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+    letter-spacing: 0.02em;
+  }
+
+  .diag-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    color: #0f172a;
+    line-height: 1.15;
+    margin: 0 0 20px;
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: #475569;
+    max-width: 560px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+
+  .hero-messengers {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .btn-messenger {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .btn-tg {
+    background: #0088cc;
+    color: #fff;
+  }
+
+  .btn-tg:hover {
+    background: #0077b6;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0,136,204,0.35);
+  }
+
+  .btn-wa {
+    background: #25d366;
+    color: #fff;
+  }
+
+  .btn-wa:hover {
+    background: #22c55e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(37,211,102,0.35);
+  }
+
+  .hero-note {
+    font-size: 0.85rem;
+    color: #64748b;
+  }
+
+  /* Checker */
+  .checker-section {
+    padding: 72px 0;
+    background: #fff;
+  }
+
+  .checker-wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    padding: 40px 48px;
+    min-height: 380px;
+  }
+
+  .step {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .step.active {
+    display: block;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-num {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .step h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 28px;
+  }
+
+  .opts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px;
+  }
+
+  .opt-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 16px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+  }
+
+  .opt-card:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+    background: #eff6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(29,78,216,0.1);
+  }
+
+  .opt-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    background: #f1f5f9;
+    border-radius: 14px;
+    transition: all 0.18s;
+  }
+
+  .opt-card:hover .opt-icon {
+    background: #dbeafe;
+  }
+
+  /* Symptoms */
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #64748b;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 16px;
+    padding: 6px 0;
+    transition: color 0.15s;
+  }
+
+  .back-btn:hover { color: #1d4ed8; }
+
+  .symptom-opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: left;
+    width: 100%;
+  }
+
+  .symptom-opt:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+    background: #eff6ff;
+  }
+
+  #symptoms-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Age question */
+  .age-question {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 24px;
+  }
+
+  .age-label {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 16px;
+  }
+
+  .age-opts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .age-opt {
+    padding: 14px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    transition: all 0.18s;
+  }
+
+  .age-opt:hover {
+    border-color: #1d4ed8;
+    color: #1d4ed8;
+    background: #eff6ff;
+  }
+
+  /* Result */
+  .result-wrap {
+    text-align: center;
+  }
+
+  .result-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    height: 72px;
+    background: #dcfce7;
+    border-radius: 50%;
+    color: #16a34a;
+    margin-bottom: 20px;
+  }
+
+  .result-wrap h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 16px;
+  }
+
+  .result-diagnosis {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-align: left;
+    font-size: 0.95rem;
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  .result-price {
+    display: inline-block;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 10px 24px;
+    border-radius: 100px;
+    margin-bottom: 16px;
+  }
+
+  .result-note {
+    font-size: 0.82rem;
+    color: #64748b;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .result-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .result-btn--tg { background: #0088cc; color: #fff; }
+  .result-btn--tg:hover { background: #0077b6; }
+  .result-btn--wa { background: #25d366; color: #fff; }
+  .result-btn--wa:hover { background: #22c55e; }
+  .result-btn--call { background: #0f172a; color: #fff; }
+  .result-btn--call:hover { background: #1d4ed8; }
+
+  .restart-btn {
+    background: none;
+    border: none;
+    font-size: 0.82rem;
+    color: #94a3b8;
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.15s;
+  }
+
+  .restart-btn:hover { color: #475569; }
+
+  /* How it works */
+  .how-section {
+    padding: 80px 0;
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-header h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 10px;
+  }
+
+  .section-header p {
+    font-size: 1rem;
+    color: #64748b;
+    margin: 0;
+  }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+  }
+
+  .how-step {
+    text-align: center;
+    padding: 32px 24px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    transition: box-shadow 0.2s;
+  }
+
+  .how-step:hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.06);
+  }
+
+  .how-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 800;
+    border-radius: 50%;
+    margin-bottom: 16px;
+  }
+
+  .how-step h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 10px;
+  }
+
+  .how-step p {
+    font-size: 0.88rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Benefits */
+  .benefits-section {
+    padding: 72px 0;
+    background: #fff;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .benefit-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 24px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+  }
+
+  .benefit-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .benefit-icon--green { background: #dcfce7; color: #16a34a; }
+  .benefit-icon--blue { background: #dbeafe; color: #1d4ed8; }
+  .benefit-icon--orange { background: #ffedd5; color: #ea580c; }
+  .benefit-icon--teal { background: #ccfbf1; color: #0d9488; }
+
+  .benefit-card h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 6px;
+  }
+
+  .benefit-card p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* CTA */
+  .cta-section {
+    padding: 72px 0;
+    background: #f0f9ff;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .cta-box {
+    max-width: 640px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .cta-box h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 12px;
+  }
+
+  .cta-box p {
+    font-size: 1rem;
+    color: #475569;
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+
+  .cta-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 24px;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .cta-btn--tg { background: #0088cc; color: #fff; }
+  .cta-btn--tg:hover { background: #0077b6; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,136,204,0.3); }
+  .cta-btn--wa { background: #25d366; color: #fff; }
+  .cta-btn--wa:hover { background: #22c55e; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(37,211,102,0.3); }
+  .cta-btn--call { background: #0f172a; color: #fff; }
+  .cta-btn--call:hover { background: #1d4ed8; transform: translateY(-2px); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .checker-wrap { padding: 24px 20px; }
+    .opts-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps-grid { grid-template-columns: 1fr; gap: 16px; }
+    .benefits-grid { grid-template-columns: 1fr; }
+    .age-opts { grid-template-columns: 1fr 1fr; }
+    .result-actions { flex-direction: column; align-items: center; }
+  }
+
+  @media (max-width: 480px) {
+    .opts-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .opt-card { padding: 14px 10px; font-size: 0.8rem; }
+    .opt-icon { width: 44px; height: 44px; }
+    .hero-messengers { flex-direction: column; align-items: center; }
+    .btn-messenger { width: 100%; max-width: 300px; justify-content: center; }
+  }
+</style>
+
+<script>
+  const SYMPTOMS: Record<string, Array<{label: string; diagnosis: string; price: string}>> = {
+    holodilnik: [
+      { label: 'Не морозит / греет, но не холодит', diagnosis: 'Вероятнее всего — утечка хладагента или неисправность компрессора. Также возможна засорённость капиллярной трубки.', price: 'Примерная стоимость: 2 500 – 8 000 ₽' },
+      { label: 'Не включается совсем', diagnosis: 'Скорее всего — неисправность пускозащитного реле, компрессора или платы управления.', price: 'Примерная стоимость: 1 500 – 6 000 ₽' },
+      { label: 'Сильно шумит или гремит', diagnosis: 'Типичная причина — износ крепления компрессора или попадание постороннего предмета в испаритель.', price: 'Примерная стоимость: 1 000 – 3 500 ₽' },
+      { label: 'Не закрывается дверь', diagnosis: 'Скорее всего деформирован или изношен уплотнительный резиновый профиль двери. Возможно провисание петель.', price: 'Примерная стоимость: 800 – 2 500 ₽' },
+      { label: 'Морозит, но течёт вода внутри', diagnosis: 'Засорён дренажный канал или разморожена и повреждена трубка отвода конденсата.', price: 'Примерная стоимость: 600 – 2 000 ₽' },
+      { label: 'Намерзает лёд на задней стенке', diagnosis: 'Характерно для поломки системы No Frost: неисправен ТЭН оттайки, таймер или датчик температуры.', price: 'Примерная стоимость: 1 200 – 4 000 ₽' },
+    ],
+    stiralnaya: [
+      { label: 'Не включается', diagnosis: 'Вероятна неисправность сетевого фильтра, платы управления или предохранителя. Реже — неисправность кнопки/замка люка.', price: 'Примерная стоимость: 1 500 – 5 500 ₽' },
+      { label: 'Не сливает воду', diagnosis: 'Засорён фильтр насоса или сам насос вышел из строя. Реже — засор сливного шланга.', price: 'Примерная стоимость: 800 – 3 500 ₽' },
+      { label: 'Сильно трясётся при отжиме', diagnosis: 'Изношены или порваны ремень / опорный подшипник барабана. Возможна разбалансировка противовесов.', price: 'Примерная стоимость: 1 500 – 5 000 ₽' },
+      { label: 'Не набирает воду', diagnosis: 'Вероятнее всего — засорён или неисправен клапан подачи воды, либо засорён фильтр входного шланга.', price: 'Примерная стоимость: 800 – 3 000 ₽' },
+      { label: 'Течёт снизу', diagnosis: 'Повреждена манжета люка, разболтались хомуты шлангов или треснул бак. Чаще всего — манжета.', price: 'Примерная стоимость: 1 200 – 4 500 ₽' },
+      { label: 'Выдаёт ошибку на дисплее', diagnosis: 'Ошибки кода указывают на конкретный узел — нужна расшифровка по марке и модели машины.', price: 'Примерная стоимость: 1 000 – 6 000 ₽ (зависит от кода)' },
+    ],
+    elektroplita: [
+      { label: 'Не греет одна конфорка', diagnosis: 'Скорее всего перегорел нагревательный элемент (ТЭН) или регулятор мощности этой конфорки.', price: 'Примерная стоимость: 800 – 2 500 ₽' },
+      { label: 'Не работает духовка', diagnosis: 'Типично — перегорел ТЭН нагрева или термостат духовки. Реже — неисправен переключатель.', price: 'Примерная стоимость: 1 000 – 3 500 ₽' },
+      { label: 'Выбивает автомат при включении', diagnosis: 'Короткое замыкание в ТЭН, нагревательном элементе или проводке — требует немедленной диагностики.', price: 'Примерная стоимость: 1 200 – 4 000 ₽' },
+      { label: 'Стеклокерамика треснула', diagnosis: 'Требуется замена стеклокерамической панели — это плановая работа, зависит от модели.', price: 'Примерная стоимость: 2 500 – 9 000 ₽' },
+      { label: 'Не регулируется температура', diagnosis: 'Неисправен терморегулятор или потенциометр. На индукционных — возможна поломка платы управления.', price: 'Примерная стоимость: 1 000 – 4 000 ₽' },
+    ],
+    mikrovolnovka: [
+      { label: 'Не греет, но включается', diagnosis: 'Вышел из строя магнетрон — основной элемент нагрева. Также возможна неисправность конденсатора или диода.', price: 'Примерная стоимость: 1 500 – 4 500 ₽' },
+      { label: 'Не включается совсем', diagnosis: 'Вероятнее всего — сгорел предохранитель или неисправна плата управления.', price: 'Примерная стоимость: 600 – 3 000 ₽' },
+      { label: 'Искрит внутри', diagnosis: 'Поврежден слюдяной экран (слюда), накрывающий магнетрон — требует замены детали.', price: 'Примерная стоимость: 400 – 1 200 ₽' },
+      { label: 'Не вращается тарелка', diagnosis: 'Неисправен мотор вращения поддона или повреждена муфта-крестовина.', price: 'Примерная стоимость: 600 – 2 000 ₽' },
+    ],
+    posudomoechnaya: [
+      { label: 'Не отмывает посуду', diagnosis: 'Засорены форсунки разбрызгивателя или неисправен насос циркуляции воды.', price: 'Примерная стоимость: 800 – 3 500 ₽' },
+      { label: 'Не сливает воду', diagnosis: 'Засорён фильтр или неисправен сливной насос — аналогично стиральной машине.', price: 'Примерная стоимость: 800 – 3 000 ₽' },
+      { label: 'Течёт снизу', diagnosis: 'Повреждена прокладка уплотнителя двери или трескнулся шланг.', price: 'Примерная стоимость: 1 000 – 3 500 ₽' },
+      { label: 'Не нагревает воду', diagnosis: 'Перегорел ТЭН нагрева или неисправен термостат — типичная поломка посудомойки.', price: 'Примерная стоимость: 1 200 – 4 000 ₽' },
+      { label: 'Не включается', diagnosis: 'Проблема с платой управления, кнопкой включения или дверным замком.', price: 'Примерная стоимость: 1 500 – 5 000 ₽' },
+    ],
+    pylesos: [
+      { label: 'Слабая тяга / плохо тянет', diagnosis: 'Засорён фильтр или мешок. Если замена не помогает — неисправен мотор всасывания.', price: 'Примерная стоимость: 300 – 3 500 ₽' },
+      { label: 'Не включается', diagnosis: 'Неисправны кнопка, шнур питания или конденсатор пускового модуля.', price: 'Примерная стоимость: 600 – 2 500 ₽' },
+      { label: 'Воняет горелым', diagnosis: 'Перегрелся или сгорел мотор. Требует срочной остановки и проверки.', price: 'Примерная стоимость: 1 500 – 4 000 ₽' },
+      { label: 'Робот-пылесос не заряжается', diagnosis: 'Неисправна база зарядки, контакты или аккумулятор. Возможна программная ошибка навигации.', price: 'Примерная стоимость: 800 – 4 500 ₽' },
+    ],
+    kofemasina: [
+      { label: 'Не варит кофе (нет воды)', diagnosis: 'Засорена или неисправна помпа подачи воды. Также возможно накипеобразование трактов.', price: 'Примерная стоимость: 1 000 – 4 000 ₽' },
+      { label: 'Течёт снизу', diagnosis: 'Трещина в поддоне, повреждение шланга или прокладки группы.', price: 'Примерная стоимость: 800 – 3 000 ₽' },
+      { label: 'Не молет кофе', diagnosis: 'Засор или износ жерновов кофемолки. Могут быть повреждены шестерни привода.', price: 'Примерная стоимость: 1 200 – 5 000 ₽' },
+      { label: 'Не включается', diagnosis: 'Неисправна плата управления или термопредохранитель.', price: 'Примерная стоимость: 1 500 – 6 000 ₽' },
+    ],
+    other: [
+      { label: 'Не включается', diagnosis: 'Для точного диагноза нужно знать тип техники. Напишите нам — ответим в течение 5 минут.', price: 'Стоимость уточняется после описания' },
+      { label: 'Шум / посторонние звуки', diagnosis: 'Напишите нам с указанием модели — мастер поставит диагноз по описанию.', price: 'Стоимость уточняется после описания' },
+      { label: 'Другая проблема', diagnosis: 'Опишите проблему своими словами в мессенджере — мастер разберётся.', price: 'Стоимость уточняется после описания' },
+    ],
+  };
+
+  let selectedApp = '';
+  let selectedAppLabel = '';
+  let selectedSymptom: {label: string; diagnosis: string; price: string} | null = null;
+  let selectedAge = '';
+
+  function showStep(id: string) {
+    document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.add('active');
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function buildSymptoms() {
+    const grid = document.getElementById('symptoms-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+    const symptoms = SYMPTOMS[selectedApp] || SYMPTOMS.other;
+    symptoms.forEach((s, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'symptom-opt';
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg> ${s.label}`;
+      btn.addEventListener('click', () => {
+        selectedSymptom = s;
+        showStep('step-3');
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  // Step 1 -> 2
+  document.querySelectorAll('.opt-card').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedApp = (btn as HTMLElement).dataset.app || 'other';
+      selectedAppLabel = (btn as HTMLElement).dataset.appLabel || '';
+      buildSymptoms();
+      showStep('step-2');
+    });
+  });
+
+  // Age -> result
+  document.querySelectorAll('.age-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedAge = (btn as HTMLElement).dataset.age || '';
+      showResult();
+      showStep('step-4');
+    });
+  });
+
+  function showResult() {
+    if (!selectedSymptom) return;
+    const titleEl = document.getElementById('result-title');
+    const diagEl = document.getElementById('result-diagnosis');
+    const priceEl = document.getElementById('result-price');
+
+    if (titleEl) titleEl.textContent = `Диагноз: ${selectedAppLabel}`;
+    if (diagEl) diagEl.innerHTML = `<strong>${selectedSymptom.label}</strong><br><br>${selectedSymptom.diagnosis}`;
+    if (priceEl) {
+      let priceText = selectedSymptom.price;
+      if (selectedAge === 'более 12 лет') {
+        priceText += ' (возможна надбавка за сложность разборки)';
+      }
+      priceEl.textContent = priceText;
+    }
+  }
+
+  // Back buttons
+  document.getElementById('back-1')?.addEventListener('click', () => showStep('step-1'));
+  document.getElementById('back-2')?.addEventListener('click', () => showStep('step-2'));
+
+  // Restart
+  document.getElementById('restart-btn')?.addEventListener('click', () => {
+    selectedApp = '';
+    selectedAppLabel = '';
+    selectedSymptom = null;
+    selectedAge = '';
+    showStep('step-1');
+  });
+</script>
