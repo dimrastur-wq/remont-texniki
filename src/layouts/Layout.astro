@@ -14,7 +14,7 @@ const {
   title = 'Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле | Master-Tehniki74',
   description = 'Профессиональный ремонт холодильников, стиральных машин и микроволновок в Миассе, Златоусте и Чебаркуле. Выезд мастера, доступные цены, гарантия. Звоните: 8 (951) 257-77-57',
   keywords = 'ремонт техники Миасс, вызвать мастера Златоуст, ремонт холодильников Чебаркуль, ремонт стиральных машин Миасс, ремонт микроволновок Златоуст, мастер по ремонту бытовой техники, ремонт бытовой техники Миасс',
-  canonical = Astro.url.href,
+  canonical,
   schema,
   ogImage = '/og-image.jpg',
   geoRegion = 'RU-CHE',
@@ -22,7 +22,23 @@ const {
 } = Astro.props;
 
 const siteUrl = 'https://master-tehniki74.store';
-const canonicalUrl = canonical.startsWith('http') ? canonical : `${siteUrl}${canonical}`;
+
+// Always build canonical from the production domain + current pathname.
+// This prevents wrong-host duplicates (http, www, staging, localhost).
+// Normalize: ensure exactly one trailing slash.
+const rawPath = canonical
+  ? (canonical.startsWith('http') ? new URL(canonical).pathname : canonical)
+  : Astro.url.pathname;
+
+// Normalize trailing slash: always add it unless this is a file URL (has extension)
+const hasExtension = /\.[a-z]{2,4}$/i.test(rawPath);
+const normalizedPath = hasExtension
+  ? rawPath
+  : rawPath.endsWith('/')
+    ? rawPath
+    : `${rawPath}/`;
+
+const canonicalUrl = `${siteUrl}${normalizedPath}`;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
 ---
 <!doctype html>
