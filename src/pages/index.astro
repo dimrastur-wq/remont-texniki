@@ -463,7 +463,6 @@ const serviceKeys = Object.keys(SERVICES);
 
   .phone-overlay {
     position: absolute;
-    /* Позиция подобрана под место номера на фото */
     bottom: 10%;
     left: 3%;
     width: 42%;
@@ -477,6 +476,12 @@ const serviceKeys = Object.keys(SERVICES);
     line-height: 1.4;
     pointer-events: none;
     user-select: none;
+  }
+
+  @media (min-width: 900px) {
+    .phone-overlay {
+      bottom: 22%;
+    }
   }
 
   .master-badge-online {
