@@ -1,17 +1,15 @@
 ---
-import { SITE } from '../data/services';
+import { SITE, CITIES, SERVICES } from '../data/services';
 
-const navLinks = [
-  { href: '/', label: 'Главная' },
-  { href: '/miass/', label: 'Миасс' },
-  { href: '/zlatoust/', label: 'Златоуст' },
-  { href: '/chebarkul/', label: 'Чебаркуль' },
-  { href: '/zapchasti/', label: 'Запчасти' },
-];
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
 ---
 
-<header class="header">
+<header class="header" id="site-header">
   <div class="container header-inner">
+
+    <!-- Logo -->
     <a href="/" class="logo">
       <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="32" height="32" rx="8" fill="#1d4ed8" />
@@ -21,36 +19,114 @@ const navLinks = [
       <span class="logo-text">Master-Tehniki74</span>
     </a>
 
-    <nav class="nav">
-      {navLinks.map(link => (
-        <a href={link.href} class={Astro.url.pathname === link.href || (link.href !== '/' && Astro.url.pathname.startsWith(link.href)) ? 'active' : ''}>
-          {link.label}
-        </a>
-      ))}
+    <!-- Desktop Nav -->
+    <nav class="nav" role="navigation" aria-label="Основная навигация">
+
+      <!-- Cities dropdown -->
+      <div class="nav-dropdown">
+        <button class={`nav-btn${['/miass/', '/zlatoust/', '/chebarkul/'].some(p => pathname.startsWith(p)) ? ' active' : ''}`} aria-haspopup="true" aria-expanded="false" id="cities-btn">
+          Города
+          <svg class="chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+        <div class="dropdown-panel" id="cities-panel" role="menu">
+          {Object.values(CITIES).map(city => (
+            <div class="dropdown-group">
+              <a href={`/${city.slug}/`} class={`dropdown-city${pathname.startsWith(`/${city.slug}/`) ? ' active' : ''}`} role="menuitem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {city.name}
+              </a>
+              <div class="dropdown-services">
+                {Object.values(SERVICES).slice(0, 3).map(s => (
+                  <a href={`/${city.slug}/${s.slug}/`} class="dropdown-service" role="menuitem">{s.name}</a>
+                ))}
+                <a href={`/${city.slug}/`} class="dropdown-service dropdown-all">Все услуги →</a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <a href="/zapchasti/" class={`nav-link${isActive('/zapchasti/') ? ' active' : ''}`}>Запчасти</a>
+      <a href="/blog/" class={`nav-link${isActive('/blog/') ? ' active' : ''}`}>Блог</a>
+
+      <!-- B2B pill link -->
+      <a href="/b2b/" class={`nav-b2b${isActive('/b2b/') ? ' active' : ''}`}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Для бизнеса
+      </a>
     </nav>
 
+    <!-- Phone -->
     <a href={`tel:+${SITE.phoneRaw}`} class="phone-link">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
       </svg>
       {SITE.phone}
     </a>
 
-    <button class="burger" aria-label="Меню" id="burger">
+    <!-- Burger -->
+    <button class="burger" aria-label="Открыть меню" id="burger" aria-expanded="false" aria-controls="mobile-nav">
       <span></span>
       <span></span>
       <span></span>
     </button>
   </div>
-
-  <nav class="mobile-nav" id="mobile-nav">
-    {navLinks.map(link => (
-      <a href={link.href}>{link.label}</a>
-    ))}
-    <a href={`tel:+${SITE.phoneRaw}`} class="mobile-phone">{SITE.phone}</a>
-    <a href={SITE.telegram} target="_blank" class="mobile-telegram">Написать в Telegram</a>
-  </nav>
 </header>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+  <div class="mobile-nav-inner">
+
+    <div class="mobile-section">
+      <div class="mobile-section-label">Города</div>
+      {Object.values(CITIES).map(city => (
+        <div class="mobile-city-group">
+          <a href={`/${city.slug}/`} class={`mobile-city${pathname.startsWith(`/${city.slug}/`) ? ' active' : ''}`}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {city.name}
+          </a>
+          <div class="mobile-city-services">
+            {Object.values(SERVICES).map(s => (
+              <a href={`/${city.slug}/${s.slug}/`} class="mobile-service">{s.name}</a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div class="mobile-section">
+      <div class="mobile-section-label">Разделы</div>
+      <a href="/zapchasti/" class={`mobile-link${isActive('/zapchasti/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Запчасти
+      </a>
+      <a href="/blog/" class={`mobile-link${isActive('/blog/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        Блог
+      </a>
+      <a href="/b2b/" class={`mobile-link mobile-b2b${isActive('/b2b/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        Для бизнеса
+      </a>
+    </div>
+
+    <div class="mobile-contacts">
+      <a href={`tel:+${SITE.phoneRaw}`} class="mobile-phone">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        {SITE.phone}
+      </a>
+      <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="mobile-telegram">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Telegram
+      </a>
+      <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="mobile-whatsapp">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</div>
+<div class="mobile-overlay" id="mobile-overlay"></div>
 
 <style>
   .header {
@@ -58,146 +134,472 @@ const navLinks = [
     top: 0;
     left: 0;
     right: 0;
-    z-index: 100;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
+    z-index: 200;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid #e2e8f0;
+    transition: box-shadow 0.3s;
+  }
+
+  .header.scrolled {
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
   }
 
   .header-inner {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    gap: 8px;
     height: 72px;
   }
 
+  /* Logo */
   .logo {
     display: flex;
     align-items: center;
     gap: 10px;
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #1e293b;
+    flex-shrink: 0;
+    margin-right: 8px;
   }
 
-  .logo-text {
+  .logo-text { white-space: nowrap; }
+
+  /* Nav */
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .nav-link {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: all 0.2s;
     white-space: nowrap;
   }
 
-  .nav {
-    display: flex;
-    gap: 24px;
+  .nav-link:hover { color: #1d4ed8; background: #f1f5f9; }
+  .nav-link.active { color: #1d4ed8; background: #eff6ff; }
+
+  /* B2B pill */
+  .nav-b2b {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    margin-left: 4px;
   }
 
-  .nav a {
-    font-size: 0.9rem;
+  .nav-b2b:hover,
+  .nav-b2b.active {
+    background: #1d4ed8;
+    color: #fff;
+    border-color: #1d4ed8;
+  }
+
+  /* Dropdown */
+  .nav-dropdown {
+    position: relative;
+  }
+
+  .nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: #475569;
-    transition: color 0.2s;
-    padding: 4px 0;
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
   }
 
-  .nav a:hover,
-  .nav a.active {
-    color: #1d4ed8;
+  .nav-btn:hover,
+  .nav-btn.active { color: #1d4ed8; background: #f1f5f9; }
+  .nav-btn.active { background: #eff6ff; }
+
+  .chevron {
+    transition: transform 0.2s;
   }
 
-  .nav a.active {
-    border-bottom: 2px solid #1d4ed8;
+  .nav-dropdown.open .chevron {
+    transform: rotate(180deg);
   }
 
+  .dropdown-panel {
+    display: none;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12);
+    min-width: 560px;
+    padding: 16px;
+    gap: 8px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: all 0.2s;
+    z-index: 300;
+  }
+
+  .nav-dropdown.open .dropdown-panel {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateY(0);
+  }
+
+  .dropdown-city {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: all 0.15s;
+    margin-bottom: 4px;
+  }
+
+  .dropdown-city:hover { color: #1d4ed8; background: #eff6ff; }
+  .dropdown-city.active { color: #1d4ed8; }
+
+  .dropdown-services {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .dropdown-service {
+    font-size: 0.78rem;
+    color: #64748b;
+    padding: 5px 10px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .dropdown-service:hover { color: #1d4ed8; background: #f8fafc; }
+  .dropdown-all { color: #1d4ed8; font-weight: 500; }
+
+  /* Phone */
   .phone-link {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-weight: 600;
-    font-size: 1rem;
-    color: #1d4ed8;
-    transition: color 0.2s;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: #0f172a;
     white-space: nowrap;
+    padding: 8px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    transition: all 0.2s;
+    margin-left: 8px;
+    flex-shrink: 0;
   }
 
   .phone-link:hover {
-    color: #1e40af;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1d4ed8;
   }
 
+  /* Burger */
   .burger {
     display: none;
     flex-direction: column;
     gap: 5px;
     background: none;
-    border: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
     cursor: pointer;
-    padding: 4px;
+    padding: 8px 10px;
+    margin-left: auto;
   }
 
   .burger span {
     display: block;
-    width: 24px;
+    width: 20px;
     height: 2px;
     background: #1e293b;
     border-radius: 2px;
     transition: transform 0.3s, opacity 0.3s;
   }
 
-  .mobile-nav {
+  .burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .burger.open span:nth-child(2) { opacity: 0; }
+  .burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  /* Mobile Nav */
+  .mobile-overlay {
     display: none;
-    flex-direction: column;
-    gap: 0;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 190;
+    backdrop-filter: blur(2px);
+  }
+
+  .mobile-overlay.show { display: block; }
+
+  .mobile-nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(360px, 90vw);
     background: #fff;
-    border-bottom: 1px solid #e2e8f0;
+    z-index: 195;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    padding-top: 72px;
   }
 
   .mobile-nav.open {
-    display: flex;
+    transform: translateX(0);
   }
 
-  .mobile-nav a {
-    padding: 16px 24px;
-    font-size: 1rem;
+  .mobile-nav-inner {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 32px;
+  }
+
+  .mobile-section {
+    padding: 20px 20px 12px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .mobile-section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .mobile-city-group {
+    margin-bottom: 16px;
+  }
+
+  .mobile-city {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    transition: all 0.2s;
+  }
+
+  .mobile-city:hover,
+  .mobile-city.active { color: #1d4ed8; background: #eff6ff; }
+
+  .mobile-city-services {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+    padding-left: 8px;
+  }
+
+  .mobile-service {
+    font-size: 0.78rem;
+    color: #64748b;
+    padding: 5px 8px;
+    border-radius: 6px;
+    transition: all 0.15s;
+  }
+
+  .mobile-service:hover { color: #1d4ed8; background: #f8fafc; }
+
+  .mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
     font-weight: 500;
     color: #475569;
-    border-bottom: 1px solid #f1f5f9;
-    transition: background 0.2s;
+    padding: 10px 10px;
+    border-radius: 10px;
+    margin-bottom: 4px;
+    transition: all 0.2s;
   }
 
-  .mobile-nav a:hover {
-    background: #f8fafc;
+  .mobile-link:hover,
+  .mobile-link.active { color: #1d4ed8; background: #eff6ff; }
+
+  .mobile-b2b {
     color: #1d4ed8;
+    font-weight: 600;
+  }
+
+  .mobile-contacts {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .mobile-phone {
-    color: #1d4ed8 !important;
-    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: #0f172a;
+    color: #fff;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: all 0.2s;
   }
 
+  .mobile-phone:hover { background: #1d4ed8; }
+
   .mobile-telegram {
-    color: #0088cc !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: #0088cc;
+    color: #fff;
+    border-radius: 14px;
+    font-size: 0.95rem;
     font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .mobile-telegram:hover { background: #0077b6; }
+
+  .mobile-whatsapp {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: #25d366;
+    color: #fff;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+
+  .mobile-whatsapp:hover { background: #22c55e; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .nav-link, .nav-btn { font-size: 0.82rem; padding: 6px 8px; }
+    .nav-b2b { font-size: 0.78rem; }
+    .phone-link { font-size: 0.88rem; padding: 7px 12px; }
   }
 
   @media (max-width: 768px) {
-    .nav,
-    .phone-link {
-      display: none;
-    }
-
-    .burger {
-      display: flex;
-    }
+    .nav, .phone-link { display: none; }
+    .burger { display: flex; }
   }
 </style>
 
 <script>
+  // Scroll shadow
+  const header = document.getElementById('site-header');
+  window.addEventListener('scroll', () => {
+    header?.classList.toggle('scrolled', window.scrollY > 10);
+  }, { passive: true });
+
+  // Burger / mobile nav
   const burger = document.getElementById('burger');
   const mobileNav = document.getElementById('mobile-nav');
+  const overlay = document.getElementById('mobile-overlay');
+
+  const openMenu = () => {
+    burger?.classList.add('open');
+    burger?.setAttribute('aria-expanded', 'true');
+    mobileNav?.classList.add('open');
+    mobileNav?.setAttribute('aria-hidden', 'false');
+    overlay?.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeMenu = () => {
+    burger?.classList.remove('open');
+    burger?.setAttribute('aria-expanded', 'false');
+    mobileNav?.classList.remove('open');
+    mobileNav?.setAttribute('aria-hidden', 'true');
+    overlay?.classList.remove('show');
+    document.body.style.overflow = '';
+  };
+
   burger?.addEventListener('click', () => {
-    mobileNav?.classList.toggle('open');
+    mobileNav?.classList.contains('open') ? closeMenu() : openMenu();
   });
 
-  mobileNav?.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      mobileNav?.classList.remove('open');
-    });
+  overlay?.addEventListener('click', closeMenu);
+
+  mobileNav?.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', closeMenu);
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeMenu();
+  });
+
+  // Cities dropdown
+  const citiesBtn = document.getElementById('cities-btn');
+  const citiesPanel = document.getElementById('cities-panel');
+  const dropdown = citiesBtn?.closest('.nav-dropdown');
+
+  citiesBtn?.addEventListener('click', () => {
+    const isOpen = dropdown?.classList.contains('open');
+    dropdown?.classList.toggle('open', !isOpen);
+    citiesBtn.setAttribute('aria-expanded', String(!isOpen));
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', (e) => {
+    if (!dropdown?.contains(e.target as Node)) {
+      dropdown?.classList.remove('open');
+      citiesBtn?.setAttribute('aria-expanded', 'false');
+    }
+  });
+
+  // Close dropdown on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      dropdown?.classList.remove('open');
+      citiesBtn?.setAttribute('aria-expanded', 'false');
+    }
   });
 </script>
