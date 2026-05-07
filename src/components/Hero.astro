@@ -31,50 +31,31 @@ const phoneRaw = '79512577757';
       </div>
     </div>
     <div class="hero-visual">
-      <div class="hero-card">
-        <div class="hero-icon-group">
-          <div class="icon-item fridge">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="4" y="2" width="16" height="20" rx="2" />
-              <line x1="4" y1="10" x2="20" y2="10" />
-              <circle cx="16" cy="6" r="1" fill="#1d4ed8" />
-              <circle cx="16" cy="14" r="1" fill="#1d4ed8" />
-            </svg>
-          </div>
-          <div class="icon-item washer">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="2" width="18" height="20" rx="2" />
-              <circle cx="12" cy="14" r="4" />
-              <circle cx="12" cy="14" r="1.5" fill="#1d4ed8" />
-              <line x1="3" y1="7" x2="21" y2="7" />
-              <circle cx="7" cy="4.5" r="0.8" fill="#1d4ed8" />
-              <circle cx="10" cy="4.5" r="0.8" fill="#1d4ed8" />
-            </svg>
-          </div>
-          <div class="icon-item microwave">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2" />
-              <rect x="4" y="6" width="12" height="12" rx="1" />
-              <circle cx="19" cy="9" r="1" fill="#1d4ed8" />
-              <circle cx="19" cy="13" r="1" fill="#1d4ed8" />
-              <circle cx="19" cy="17" r="0.5" fill="#1d4ed8" />
-            </svg>
+      <div class="hero-master-card">
+        <div class="master-photo-wrap">
+          <img src="/дима_мастер.png" alt="Мастер Дмитрий" class="master-photo" />
+          <div class="master-badge">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Дипломированный специалист
           </div>
         </div>
-        <div class="hero-stats">
-          <div class="stat">
-            <span class="stat-value">3</span>
-            <span class="stat-label">мастера</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat">
-            <span class="stat-value">500+</span>
-            <span class="stat-label">ремонтов</span>
-          </div>
-          <div class="stat-divider"></div>
-          <div class="stat">
-            <span class="stat-value">1</span>
-            <span class="stat-label">день</span>
+        <div class="master-meta">
+          <div class="master-name-hero">Дмитрий — ведущий мастер</div>
+          <div class="master-stats-row">
+            <div class="mstat">
+              <span class="mstat-val">14+</span>
+              <span class="mstat-lbl">лет опыта</span>
+            </div>
+            <div class="mstat-div"></div>
+            <div class="mstat">
+              <span class="mstat-val">500+</span>
+              <span class="mstat-lbl">ремонтов</span>
+            </div>
+            <div class="mstat-div"></div>
+            <div class="mstat">
+              <span class="mstat-val">1</span>
+              <span class="mstat-lbl">день</span>
+            </div>
           </div>
         </div>
       </div>
@@ -204,66 +185,87 @@ const phoneRaw = '79512577757';
     justify-content: center;
   }
 
-  .hero-card {
+  .hero-master-card {
     background: #fff;
     border-radius: 24px;
-    padding: 40px;
-    box-shadow: 0 20px 60px rgba(29, 78, 216, 0.1), 0 4px 16px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 20px 60px rgba(29, 78, 216, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
     width: 100%;
-    max-width: 420px;
+    max-width: 400px;
+    overflow: hidden;
   }
 
-  .hero-icon-group {
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    margin-bottom: 40px;
+  .master-photo-wrap {
+    position: relative;
+    aspect-ratio: 4/5;
+    overflow: hidden;
   }
 
-  .icon-item {
-    width: 72px;
-    height: 72px;
+  .master-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
+
+  .master-badge {
+    position: absolute;
+    bottom: 14px;
+    left: 14px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    background: #eff6ff;
-    border-radius: 16px;
-    transition: transform 0.3s, box-shadow 0.3s;
+    gap: 5px;
+    letter-spacing: 0.02em;
+    box-shadow: 0 2px 8px rgba(29,78,216,0.35);
   }
 
-  .icon-item:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(29, 78, 216, 0.15);
+  .master-meta {
+    padding: 20px 24px;
   }
 
-  .hero-stats {
+  .master-name-hero {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+
+  .master-stats-row {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 24px;
+    justify-content: space-between;
+    gap: 12px;
   }
 
-  .stat {
+  .mstat {
     display: flex;
     flex-direction: column;
     align-items: center;
+    flex: 1;
   }
 
-  .stat-value {
-    font-size: 1.75rem;
+  .mstat-val {
+    font-size: 1.5rem;
     font-weight: 700;
     color: #1d4ed8;
+    line-height: 1;
   }
 
-  .stat-label {
-    font-size: 0.8rem;
+  .mstat-lbl {
+    font-size: 0.75rem;
     color: #64748b;
-    margin-top: 2px;
+    margin-top: 3px;
   }
 
-  .stat-divider {
+  .mstat-div {
     width: 1px;
-    height: 40px;
+    height: 36px;
     background: #e2e8f0;
   }
 
