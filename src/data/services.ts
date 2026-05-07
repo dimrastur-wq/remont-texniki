@@ -4,6 +4,7 @@ export const SITE = {
   phoneRaw: '79512577757',
   telegram: 'https://t.me/Drugan1900',
   whatsapp: 'https://wa.me/79512577757',
+  vk: 'https://vk.com/maastermiass174',
   address: 'г. Миасс, ул. Победы, д. 18, цоколь',
   workHours: 'Ежедневно с 9:00 до 20:00',
   url: 'https://master-tehniki74.store',
