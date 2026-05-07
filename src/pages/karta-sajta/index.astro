@@ -1,0 +1,701 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { SITE, CITIES, SERVICES, VILLAGES } from '../../data/services';
+import { BLOG_ARTICLES } from '../../data/blog';
+import { ERROR_CODES, ERROR_BRANDS } from '../../data/errors';
+
+const cityEntries = Object.entries(CITIES);
+const serviceEntries = Object.entries(SERVICES);
+const villageEntries = Object.entries(VILLAGES);
+
+const errorByBrand = ERROR_BRANDS.map(brand => ({
+  brand,
+  codes: ERROR_CODES.filter(e => e.brand === brand),
+}));
+
+const blogByCategory = BLOG_ARTICLES.reduce<Record<string, typeof BLOG_ARTICLES>>((acc, a) => {
+  if (!acc[a.category]) acc[a.category] = [];
+  acc[a.category].push(a);
+  return acc;
+}, {});
+
+const mainPages = [
+  { href: '/', label: 'Главная', desc: 'Ремонт бытовой техники в Миассе' },
+  { href: '/remont-kofemashiny/', label: 'Ремонт кофемашин', desc: 'Все бренды, обслуживание, декальцинация' },
+  { href: '/diagnostika/', label: 'Диагностика', desc: 'Бесплатная диагностика неисправностей' },
+  { href: '/kalkulator/', label: 'Калькулятор стоимости', desc: 'Рассчитайте стоимость ремонта онлайн' },
+  { href: '/zapchasti/', label: 'Запчасти', desc: 'Каталог запчастей в наличии' },
+  { href: '/skupka/', label: 'Скупка техники', desc: 'Выкуп б/у бытовой техники' },
+  { href: '/b2b/', label: 'Для организаций (B2B)', desc: 'Обслуживание юридических лиц' },
+  { href: '/blog/', label: 'Блог', desc: 'Советы по эксплуатации и ремонту' },
+  { href: '/baza-znanii/', label: 'База знаний', desc: 'Справочные материалы' },
+  { href: '/oshibki/', label: 'Коды ошибок', desc: 'Расшифровка ошибок всех марок техники' },
+  { href: '/status/', label: 'Статус заказа', desc: 'Проверить состояние вашего ремонта' },
+];
+---
+
+<Layout
+  title="Карта сайта — Центр восстановления бытовой техники"
+  description="Полная карта сайта: все страницы ремонта, коды ошибок, статьи блога, города и посёлки. Центр восстановления бытовой техники — Миасс, Златоуст, Чебаркуль."
+  keywords="карта сайта, все страницы, ремонт бытовой техники миасс"
+  canonical="/karta-sajta/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main class="sitemap-main">
+    <section class="hero">
+      <div class="container">
+        <nav class="breadcrumbs">
+          <a href="/">Главная</a>
+          <span>/</span>
+          <span>Карта сайта</span>
+        </nav>
+        <h1>Карта сайта</h1>
+        <p>Все страницы в одном месте — найдите нужный раздел быстро</p>
+        <div class="hero-stats">
+          <div class="hs-item">
+            <strong>{mainPages.length + cityEntries.length + cityEntries.length * serviceEntries.length + villageEntries.length + ERROR_CODES.length + BLOG_ARTICLES.length + cityEntries.length}+</strong>
+            <span>страниц</span>
+          </div>
+          <div class="hs-div"></div>
+          <div class="hs-item"><strong>{cityEntries.length}</strong><span>города</span></div>
+          <div class="hs-div"></div>
+          <div class="hs-item"><strong>{serviceEntries.length}</strong><span>услуг</span></div>
+          <div class="hs-div"></div>
+          <div class="hs-item"><strong>{ERROR_CODES.length}</strong><span>кодов ошибок</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="container sitemap-body">
+
+      <!-- Main pages -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <h2>Основные разделы</h2>
+          <span class="sm-count">{mainPages.length}</span>
+        </div>
+        <div class="sm-grid sm-grid--main">
+          {mainPages.map(p => (
+            <a href={p.href} class="sm-card sm-card--main">
+              <span class="sm-card-label">{p.label}</span>
+              <span class="sm-card-desc">{p.desc}</span>
+              <span class="sm-card-url">{p.href}</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <!-- Cities + Services -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon sm-icon--blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          </div>
+          <h2>Ремонт по городам</h2>
+          <span class="sm-count">{cityEntries.length + cityEntries.length * serviceEntries.length}</span>
+        </div>
+        <div class="cities-layout">
+          {cityEntries.map(([, city]) => (
+            <div class="city-block">
+              <a href={`/${city.slug}/`} class="city-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {city.name}
+              </a>
+              <div class="city-services">
+                {serviceEntries.map(([, service]) => (
+                  <a href={`/${city.slug}/${service.slug}/`} class="city-service-link">
+                    <div class="cs-icon" set:html={service.icon} />
+                    <span>{service.name}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Villages -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon sm-icon--green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+          </div>
+          <h2>Посёлки и пригороды</h2>
+          <span class="sm-count">{villageEntries.length}</span>
+        </div>
+        <div class="sm-grid sm-grid--villages">
+          {villageEntries.map(([, v]) => (
+            <a href={`/posyolki/${v.slug}/`} class="sm-card sm-card--village">
+              <span class="sm-card-label">{v.name}</span>
+              <span class="sm-card-desc">{v.distanceKm} км от {v.nearCity}</span>
+              <span class="sm-card-url">/posyolki/{v.slug}/</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <!-- Skupka by city -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon sm-icon--amber">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h2>Скупка по городам</h2>
+          <span class="sm-count">{cityEntries.length + 1}</span>
+        </div>
+        <div class="sm-grid sm-grid--skupka">
+          <a href="/skupka/" class="sm-card sm-card--skupka">
+            <span class="sm-card-label">Скупка техники — общая</span>
+            <span class="sm-card-url">/skupka/</span>
+          </a>
+          {cityEntries.map(([, city]) => (
+            <a href={`/skupka/${city.slug}/`} class="sm-card sm-card--skupka">
+              <span class="sm-card-label">Скупка в {city.namePrepositional}</span>
+              <span class="sm-card-url">/skupka/{city.slug}/</span>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <!-- Error codes -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon sm-icon--red">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+          <h2>Коды ошибок техники</h2>
+          <span class="sm-count">{ERROR_CODES.length + 1}</span>
+        </div>
+        <div class="errors-index">
+          <a href="/oshibki/" class="errors-index-main">
+            Все коды ошибок — общий каталог
+            <span class="eim-count">{ERROR_CODES.length} кодов</span>
+          </a>
+          {errorByBrand.map(group => (
+            <div class="error-brand-group">
+              <div class="ebg-name">{group.brand}</div>
+              <div class="ebg-codes">
+                {group.codes.map(e => (
+                  <a href={`/oshibki/${e.slug}/`} class="ebg-code-link" title={e.meaning}>
+                    {e.code}
+                    <span class="ebg-appliance">{e.applianceSlug === 'stiralnaya-mashina' ? 'стир.' : e.applianceSlug === 'holodilnik' ? 'хол.' : e.applianceSlug === 'posudomoechnaya-mashina' ? 'посуд.' : e.applianceSlug === 'mikrovolnovka' ? 'мвч.' : e.applianceSlug === 'kofemashina' ? 'кофе' : ''}</span>
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Blog -->
+      <section class="sm-section">
+        <div class="sm-section-header">
+          <div class="sm-icon sm-icon--teal">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h2>Статьи блога</h2>
+          <span class="sm-count">{BLOG_ARTICLES.length + 1}</span>
+        </div>
+        <a href="/blog/" class="blog-index-link">Все статьи блога &rarr;</a>
+        {Object.entries(blogByCategory).map(([cat, articles]) => (
+          <div class="blog-cat-group">
+            <div class="blog-cat-name">{cat}</div>
+            <div class="blog-articles-list">
+              {articles.map(a => (
+                <a href={`/blog/${a.slug}/`} class="blog-article-link">
+                  <span class="ba-date">{new Date(a.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                  <span class="ba-title">{a.title}</span>
+                  <span class="ba-time">{a.readTime} мин</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <!-- XML sitemap link -->
+      <section class="sm-section sm-section--xml">
+        <div class="xml-block">
+          <div class="xml-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div>
+            <div class="xml-title">XML-карта сайта для поисковых роботов</div>
+            <div class="xml-desc">Используется Яндексом и Google для индексации всех страниц сайта</div>
+          </div>
+          <a href="/sitemap.xml" target="_blank" rel="noopener noreferrer" class="xml-link">
+            Открыть sitemap.xml
+          </a>
+        </div>
+        <div class="xml-block" style="margin-top:12px">
+          <div class="xml-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <div class="xml-title">Файл robots.txt</div>
+            <div class="xml-desc">Инструкции для поисковых роботов — что индексировать, а что нет</div>
+          </div>
+          <a href="/robots.txt" target="_blank" rel="noopener noreferrer" class="xml-link">
+            Открыть robots.txt
+          </a>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .sitemap-main { background: #f8fafc; min-height: 100vh; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 64px 0 48px;
+    color: #fff;
+  }
+
+  .breadcrumbs {
+    display: flex;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 16px;
+  }
+
+  .breadcrumbs a { color: #94a3b8; }
+  .breadcrumbs a:hover { color: #fff; }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .hero > .container > p {
+    color: #94a3b8;
+    font-size: 1rem;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 12px 24px;
+    border-radius: 100px;
+  }
+
+  .hs-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .hs-item strong { color: #fff; font-size: 1.2rem; font-weight: 800; line-height: 1; }
+  .hs-item span { color: #94a3b8; font-size: 0.72rem; }
+  .hs-div { width: 1px; height: 28px; background: rgba(255,255,255,0.15); }
+
+  /* Body */
+  .sitemap-body {
+    padding-top: 40px;
+    padding-bottom: 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Section */
+  .sm-section {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 28px 32px;
+  }
+
+  .sm-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .sm-section-header h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    flex: 1;
+  }
+
+  .sm-icon {
+    width: 40px;
+    height: 40px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    flex-shrink: 0;
+  }
+
+  .sm-icon--blue { background: #eff6ff; color: #1d4ed8; }
+  .sm-icon--green { background: #f0fdf4; color: #16a34a; }
+  .sm-icon--amber { background: #fffbeb; color: #d97706; }
+  .sm-icon--red { background: #fef2f2; color: #dc2626; }
+  .sm-icon--teal { background: #f0fdfa; color: #0d9488; }
+
+  .sm-count {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  /* Main grid */
+  .sm-grid--main {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .sm-card {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.18s;
+  }
+
+  .sm-card:hover {
+    border-color: #1d4ed8;
+    background: #eff6ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(29,78,216,0.08);
+  }
+
+  .sm-card--main { background: #f8fafc; }
+
+  .sm-card-label {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+  }
+
+  .sm-card-desc {
+    font-size: 0.75rem;
+    color: #64748b;
+    line-height: 1.4;
+  }
+
+  .sm-card-url {
+    font-size: 0.7rem;
+    color: #1d4ed8;
+    font-family: monospace;
+    margin-top: 4px;
+    opacity: 0.7;
+  }
+
+  /* Cities */
+  .cities-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .city-block {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+  }
+
+  .city-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .city-title:hover { color: #1e40af; }
+
+  .city-services { display: flex; flex-direction: column; gap: 6px; }
+
+  .city-service-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 0.84rem;
+    color: #475569;
+    transition: all 0.15s;
+  }
+
+  .city-service-link:hover {
+    background: #eff6ff;
+    color: #1d4ed8;
+  }
+
+  .cs-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1d4ed8;
+    flex-shrink: 0;
+  }
+
+  /* Villages */
+  .sm-grid--villages {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  .sm-card--village { background: #f0fdf4; border-color: #bbf7d0; }
+  .sm-card--village:hover { border-color: #16a34a; background: #dcfce7; }
+  .sm-card--village .sm-card-label { color: #166534; }
+  .sm-card--village .sm-card-url { color: #16a34a; }
+
+  /* Skupka */
+  .sm-grid--skupka {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  .sm-card--skupka { background: #fffbeb; border-color: #fde68a; }
+  .sm-card--skupka:hover { border-color: #d97706; background: #fef3c7; }
+  .sm-card--skupka .sm-card-label { color: #92400e; }
+  .sm-card--skupka .sm-card-url { color: #d97706; }
+
+  /* Errors */
+  .errors-index { display: flex; flex-direction: column; gap: 16px; }
+
+  .errors-index-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #991b1b;
+    transition: all 0.18s;
+  }
+
+  .errors-index-main:hover { background: #fee2e2; }
+
+  .eim-count {
+    margin-left: auto;
+    font-size: 0.75rem;
+    background: #fecaca;
+    color: #991b1b;
+    padding: 2px 10px;
+    border-radius: 100px;
+  }
+
+  .error-brand-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+  }
+
+  .ebg-name {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #0f172a;
+    min-width: 80px;
+    padding-top: 4px;
+  }
+
+  .ebg-codes { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .ebg-code-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    font-family: monospace;
+    transition: all 0.15s;
+  }
+
+  .ebg-code-link:hover {
+    background: #eff6ff;
+    border-color: #1d4ed8;
+  }
+
+  .ebg-appliance {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    font-weight: 400;
+    font-family: sans-serif;
+  }
+
+  /* Blog */
+  .blog-index-link {
+    display: inline-block;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0d9488;
+    margin-bottom: 18px;
+  }
+
+  .blog-index-link:hover { text-decoration: underline; }
+
+  .blog-cat-group { margin-bottom: 18px; }
+
+  .blog-cat-name {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #94a3b8;
+    margin-bottom: 8px;
+  }
+
+  .blog-articles-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .blog-article-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    transition: all 0.15s;
+  }
+
+  .blog-article-link:hover {
+    background: #f0fdfa;
+    border-color: #0d9488;
+  }
+
+  .ba-date {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    min-width: 90px;
+  }
+
+  .ba-title {
+    font-size: 0.88rem;
+    color: #0f172a;
+    font-weight: 500;
+    flex: 1;
+    line-height: 1.35;
+  }
+
+  .ba-time {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+  }
+
+  /* XML block */
+  .sm-section--xml { background: #eff6ff; border-color: #bfdbfe; }
+
+  .xml-block {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .xml-icon {
+    width: 44px;
+    height: 44px;
+    background: #fff;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .xml-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 2px;
+  }
+
+  .xml-desc { font-size: 0.78rem; color: #64748b; }
+
+  .xml-link {
+    margin-left: auto;
+    padding: 9px 18px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background 0.2s;
+    flex-shrink: 0;
+  }
+
+  .xml-link:hover { background: #1e40af; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .sm-grid--main { grid-template-columns: repeat(3, 1fr); }
+    .sm-grid--villages { grid-template-columns: repeat(4, 1fr); }
+    .sm-grid--skupka { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 800px) {
+    .sm-section { padding: 20px; }
+    .sm-grid--main { grid-template-columns: repeat(2, 1fr); }
+    .cities-layout { grid-template-columns: 1fr; }
+    .sm-grid--villages { grid-template-columns: repeat(3, 1fr); }
+    .sm-grid--skupka { grid-template-columns: repeat(2, 1fr); }
+    .hero-stats { flex-wrap: wrap; gap: 12px; border-radius: 16px; padding: 16px; }
+    .hs-div { display: none; }
+    .xml-block { flex-wrap: wrap; }
+    .xml-link { margin-left: 0; }
+  }
+
+  @media (max-width: 500px) {
+    .sm-grid--main { grid-template-columns: 1fr; }
+    .sm-grid--villages { grid-template-columns: repeat(2, 1fr); }
+    .sm-grid--skupka { grid-template-columns: 1fr; }
+    .blog-article-link { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .ba-date, .ba-time { min-width: unset; }
+    .error-brand-group { flex-direction: column; gap: 8px; }
+  }
+</style>

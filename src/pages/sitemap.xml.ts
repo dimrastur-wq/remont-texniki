@@ -19,6 +19,7 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/skupka/`, changefreq: 'weekly', priority: '0.8' });
   pages.push({ loc: `${siteUrl}/oshibki/`, changefreq: 'weekly', priority: '0.9' });
   pages.push({ loc: `${siteUrl}/remont-kofemashiny/`, changefreq: 'monthly', priority: '0.9', lastmod: today });
+  pages.push({ loc: `${siteUrl}/karta-sajta/`, changefreq: 'weekly', priority: '0.6' });
 
   for (const err of ERROR_CODES) {
     pages.push({ loc: `${siteUrl}/oshibki/${err.slug}/`, changefreq: 'monthly', priority: '0.8', lastmod: today });
