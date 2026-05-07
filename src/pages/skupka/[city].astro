@@ -1,0 +1,759 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE, CITIES, SKUPKA } from '../../data/services';
+import type { CityKey } from '../../data/services';
+
+export function getStaticPaths() {
+  return Object.keys(CITIES).map(key => ({
+    params: { city: CITIES[key as CityKey].slug },
+    props: { cityKey: key as CityKey },
+  }));
+}
+
+const { cityKey } = Astro.props;
+const city = CITIES[cityKey];
+
+const title = `Скупка бытовой техники в ${city.namePrepositional} — дорого, наличные, выезд в день обращения`;
+const description = `Покупаем б/у бытовую технику в ${city.namePrepositional}: холодильники, стиральные машины, телевизоры, пылесосы. Физическим и юридическим лицам. Выезд сегодня, наличные при сделке.`;
+const keywords = `скупка бытовой техники ${city.name}, скупка холодильников ${city.name}, скупка стиральных машин ${city.name}, купить б/у технику ${city.name}, сдать технику за деньги ${city.name}`;
+
+const otherCities = Object.values(CITIES).filter(c => c.slug !== city.slug);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: `${SITE.name} — Скупка техники в ${city.namePrepositional}`,
+  telephone: SITE.phone,
+  url: `${SITE.url}/skupka/${city.slug}/`,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: city.address,
+    addressLocality: city.name,
+    addressRegion: 'Челябинская область',
+    addressCountry: 'RU',
+  },
+  sameAs: [SKUPKA.vkGroup],
+  description,
+};
+---
+
+<Layout
+  title={title}
+  description={description}
+  keywords={keywords}
+  canonical={`/skupka/${city.slug}/`}
+  schema={JSON.stringify(schema)}
+  geoRegion="RU-CHE"
+  geoPlace={city.name}
+>
+  <SiteHeader />
+
+  <main>
+    <!-- Breadcrumbs -->
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+      <div class="container">
+        <a href="/">Главная</a>
+        <span>›</span>
+        <a href="/skupka/">Скупка техники</a>
+        <span>›</span>
+        <span>{city.name}</span>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <div class="hero-badge">Скупка техники · {city.name}</div>
+            <h1>Скупка бытовой техники в {city.namePrepositional}</h1>
+            <p class="hero-lead">Покупаем рабочую и неисправную технику в {city.namePrepositional}. Выезд на оценку — в день обращения. Наличные сразу при сделке. Работаем с физлицами и организациями.</p>
+
+            <div class="hero-addr">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              {city.name}: {city.address}
+            </div>
+
+            <div class="hero-zones">
+              {city.landmarks.map(l => <span class="zone-tag">{l}</span>)}
+            </div>
+
+            <div class="hero-actions">
+              <a href={`tel:+${SITE.phoneRaw}`} class="btn-primary">Позвонить: {SITE.phone}</a>
+              <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="btn-tg">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.546c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.15 14.18l-2.946-.92c-.64-.203-.653-.64.136-.948l11.498-4.433c.532-.194 1 .13.724.37z"/></svg>
+                Написать в Telegram
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-title">Получите оценку за 15 минут</div>
+            <p class="card-desc">Пришлите фото в мессенджер — ответим быстро и назовём цену</p>
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="card-btn card-btn--tg">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.546c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.15 14.18l-2.946-.92c-.64-.203-.653-.64.136-.948l11.498-4.433c.532-.194 1 .13.724.37z"/></svg>
+              Telegram
+            </a>
+            <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="card-btn card-btn--wa">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              WhatsApp
+            </a>
+            <a href={`tel:+${SITE.phoneRaw}`} class="card-phone">{SITE.phone}</a>
+            <a href={SKUPKA.vkGroup} target="_blank" rel="noopener noreferrer" class="card-vk">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-.9-1.738-.9-.354 0-.457.103-.457.6v1.574c0 .426-.136.68-1.254.68-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.716 4 8.302c0-.248.103-.48.6-.48h1.744c.447 0 .617.204.79.682.871 2.508 2.325 4.706 2.927 4.706.225 0 .328-.103.328-.668V9.945c-.068-1.202-.703-1.305-.703-1.732 0-.205.168-.411.438-.411h2.744c.377 0 .51.2.51.631v3.39c0 .375.168.51.274.51.225 0 .413-.135.826-.548 1.287-1.443 2.203-3.664 2.203-3.664.12-.248.328-.48.775-.48h1.744c.526 0 .64.27.526.637-.218.98-2.34 4.006-2.34 4.006-.187.307-.255.443 0 .786.187.255.8.786 1.207 1.266.748.857 1.32 1.574 1.473 2.073.137.49-.12.74-.63.74z"/></svg>
+              ВКонтакте: vk.com/miass02
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What we buy in this city -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Что покупаем в {city.namePrepositional}</h2>
+          <p>Принимаем все виды бытовой техники в любом состоянии</p>
+        </div>
+        <div class="buy-grid">
+          {SKUPKA.appliances.map(item => (
+            <div class="buy-card">
+              <div class="buy-name">{item.name}</div>
+              <div class="buy-price">от {item.minPrice.toLocaleString('ru-RU')} до {item.maxPrice.toLocaleString('ru-RU')} ₽</div>
+              <div class="buy-brands">{item.brands.slice(0, 4).join(', ')}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- For whom -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Кому подходит скупка в {city.namePrepositional}</h2>
+        </div>
+        <div class="whom-grid">
+          <div class="whom-card">
+            <h3>Физические лица</h3>
+            <ul>
+              <li>Переезд — не хочется везти старую технику</li>
+              <li>Купили новое, надо сдать старое</li>
+              <li>Техника сломалась, ремонт нецелесообразен</li>
+              <li>Разбор квартиры, наследство</li>
+              <li>Просто не нужна — нужны деньги</li>
+            </ul>
+            <div class="whom-docs">
+              <strong>Нужен только паспорт</strong> — составим договор купли-продажи на месте
+            </div>
+          </div>
+          <div class="whom-card whom-card--accent">
+            <h3>Юридические лица и ИП</h3>
+            <ul>
+              <li>Ликвидация кафе, ресторана, столовой</li>
+              <li>Закрытие офиса, магазина, склада</li>
+              <li>Обновление оборудования — сдать старый парк</li>
+              <li>Закрытие гостиницы, хостела, детсада</li>
+              <li>Продажа нескольких единиц по выгодной цене</li>
+            </ul>
+            <div class="whom-docs">
+              Оформляем <strong>договор, акт приёма-передачи</strong> и документы для бухгалтерии
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Как проходит сделка в {city.namePrepositional}</h2>
+        </div>
+        <div class="process-grid">
+          <div class="process-step">
+            <div class="ps-num">1</div>
+            <div class="ps-body">
+              <h3>Позвоните или напишите</h3>
+              <p>Опишите технику или пришлите фото в Telegram / WhatsApp. Дадим предварительную цену за 15 минут.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="ps-num">2</div>
+            <div class="ps-body">
+              <h3>Выезд мастера</h3>
+              <p>Приедем в {city.namePrepositional} в день обращения. Сами заберём крупногабаритную технику — холодильники, стиральные машины.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="ps-num">3</div>
+            <div class="ps-body">
+              <h3>Осмотр и оценка</h3>
+              <p>Назовём реальную цену после осмотра. Честно объясним, из чего складывается стоимость. Принуждений нет.</p>
+            </div>
+          </div>
+          <div class="process-step">
+            <div class="ps-num">4</div>
+            <div class="ps-body">
+              <h3>Деньги сразу</h3>
+              <p>Подпишем договор и сразу выплатим наличными. Или переводом на карту — как вам удобнее.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- VK -->
+    <section class="vk-strip">
+      <div class="container">
+        <div class="vk-strip-inner">
+          <div>
+            <strong>Актуальные закупки в {city.namePrepositional}</strong> — следите в нашей группе ВКонтакте
+          </div>
+          <a href={SKUPKA.vkGroup} target="_blank" rel="noopener noreferrer" class="vk-strip-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-.9-1.738-.9-.354 0-.457.103-.457.6v1.574c0 .426-.136.68-1.254.68-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.716 4 8.302c0-.248.103-.48.6-.48h1.744c.447 0 .617.204.79.682.871 2.508 2.325 4.706 2.927 4.706.225 0 .328-.103.328-.668V9.945c-.068-1.202-.703-1.305-.703-1.732 0-.205.168-.411.438-.411h2.744c.377 0 .51.2.51.631v3.39c0 .375.168.51.274.51.225 0 .413-.135.826-.548 1.287-1.443 2.203-3.664 2.203-3.664.12-.248.328-.48.775-.48h1.744c.526 0 .64.27.526.637-.218.98-2.34 4.006-2.34 4.006-.187.307-.255.443 0 .786.187.255.8.786 1.207 1.266.748.857 1.32 1.574 1.473 2.073.137.49-.12.74-.63.74z"/></svg>
+            vk.com/miass02
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Other cities -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Скупка в других городах</h2>
+        </div>
+        <div class="other-cities">
+          {otherCities.map(c => (
+            <a href={`/skupka/${c.slug}/`} class="other-city-card">
+              <h3>Скупка в {c.namePrepositional}</h3>
+              <p>{c.address}</p>
+              <span class="oc-link">Подробнее →</span>
+            </a>
+          ))}
+          <a href="/skupka/" class="other-city-card other-city-card--all">
+            <h3>Все города</h3>
+            <p>Общая страница скупки</p>
+            <span class="oc-link">Перейти →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <h2>Продайте технику в {city.namePrepositional} сегодня</h2>
+        <p>Выезд в день обращения, наличные при сделке</p>
+        <div class="cta-btns">
+          <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn cta-btn--call">{SITE.phone}</a>
+          <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--tg">Telegram</a>
+          <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--wa">WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  .breadcrumbs {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 12px 0;
+    font-size: 0.85rem;
+    color: #94a3b8;
+  }
+
+  .breadcrumbs .container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumbs a { color: #475569; }
+  .breadcrumbs a:hover { color: #1d4ed8; }
+
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    color: #fff;
+    padding: 72px 0 60px;
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #93c5fd;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 20px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    color: #fff;
+  }
+
+  .hero-lead {
+    font-size: 1rem;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    max-width: 540px;
+  }
+
+  .hero-addr {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    color: #60a5fa;
+    margin-bottom: 16px;
+  }
+
+  .hero-zones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 28px;
+  }
+
+  .zone-tag {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 13px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: #1e40af; }
+
+  .btn-tg {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #0088cc;
+    color: #fff;
+    padding: 13px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+  }
+
+  .btn-tg:hover { background: #0077b5; }
+
+  /* Hero card */
+  .hero-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    color: #1e293b;
+    position: sticky;
+    top: 80px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .card-desc {
+    font-size: 0.82rem;
+    color: #64748b;
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 11px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    color: #fff;
+    transition: filter 0.2s;
+  }
+
+  .card-btn:hover { filter: brightness(1.1); }
+  .card-btn--tg { background: #0088cc; }
+  .card-btn--wa { background: #25d366; }
+
+  .card-phone {
+    display: block;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1d4ed8;
+    padding: 10px 0;
+    border-top: 1px solid #e2e8f0;
+    margin-top: 8px;
+    transition: color 0.2s;
+  }
+
+  .card-phone:hover { color: #1e40af; }
+
+  .card-vk {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #4680c2;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #e2e8f0;
+    transition: color 0.2s;
+  }
+
+  .card-vk:hover { color: #3b6fa8; }
+
+  /* Sections */
+  .section { padding: 64px 0; }
+  .section--alt { background: #f8fafc; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+
+  .section-header p { color: #64748b; }
+
+  /* Buy grid */
+  .buy-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .buy-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    transition: border-color 0.2s;
+  }
+
+  .buy-card:hover { border-color: #1d4ed8; }
+
+  .buy-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .buy-price {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #16a34a;
+    background: #dcfce7;
+    padding: 2px 8px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 6px;
+  }
+
+  .buy-brands {
+    font-size: 0.77rem;
+    color: #94a3b8;
+  }
+
+  /* Whom */
+  .whom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 860px;
+    margin: 0 auto;
+  }
+
+  .whom-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 28px;
+  }
+
+  .whom-card--accent {
+    border-color: #1d4ed8;
+    box-shadow: 0 6px 24px rgba(29,78,216,0.1);
+  }
+
+  .whom-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 14px;
+  }
+
+  .whom-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .whom-card li {
+    font-size: 0.88rem;
+    color: #475569;
+    padding-left: 14px;
+    position: relative;
+  }
+
+  .whom-card li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #94a3b8;
+  }
+
+  .whom-docs {
+    font-size: 0.82rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 10px 14px;
+    border-radius: 8px;
+    line-height: 1.5;
+  }
+
+  /* Process */
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .process-step {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .ps-num {
+    width: 36px;
+    height: 36px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .ps-body h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .ps-body p {
+    font-size: 0.85rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  /* VK strip */
+  .vk-strip {
+    background: #eff6ff;
+    padding: 20px 0;
+  }
+
+  .vk-strip-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 0.9rem;
+    color: #1e293b;
+  }
+
+  .vk-strip-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #4680c2;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .vk-strip-btn:hover { background: #3b6fa8; }
+
+  /* Other cities */
+  .other-cities {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .other-city-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    display: block;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .other-city-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 16px rgba(29,78,216,0.1);
+  }
+
+  .other-city-card--all {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+  }
+
+  .other-city-card h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .other-city-card p {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 12px;
+  }
+
+  .oc-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 64px 0;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .cta-section p {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    margin-bottom: 28px;
+  }
+
+  .cta-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-btn {
+    padding: 13px 26px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    transition: filter 0.2s;
+  }
+
+  .cta-btn:hover { filter: brightness(1.1); }
+  .cta-btn--call { background: #1d4ed8; }
+  .cta-btn--tg { background: #0088cc; }
+  .cta-btn--wa { background: #25d366; }
+
+  @media (max-width: 1024px) {
+    .buy-grid { grid-template-columns: repeat(2, 1fr); }
+    .process-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 56px 0 48px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-card { position: static; }
+    .buy-grid { grid-template-columns: 1fr 1fr; }
+    .whom-grid { grid-template-columns: 1fr; }
+    .process-grid { grid-template-columns: 1fr; }
+    .other-cities { grid-template-columns: 1fr; }
+    .vk-strip-inner { flex-direction: column; gap: 12px; text-align: center; }
+    .vk-strip-btn { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .buy-grid { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; }
+    .btn-primary, .btn-tg { width: 100%; justify-content: center; text-align: center; }
+  }
+</style>

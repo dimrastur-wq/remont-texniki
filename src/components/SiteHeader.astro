@@ -48,6 +48,7 @@ const isActive = (href: string) =>
 
       <a href="/zapchasti/" class={`nav-link${isActive('/zapchasti/') ? ' active' : ''}`}>Запчасти</a>
       <a href="/blog/" class={`nav-link${isActive('/blog/') ? ' active' : ''}`}>Блог</a>
+      <a href="/skupka/" class={`nav-link${isActive('/skupka/') ? ' active' : ''}`}>Скупка</a>
 
       <!-- B2B pill link -->
       <a href="/b2b/" class={`nav-b2b${isActive('/b2b/') ? ' active' : ''}`}>
@@ -103,6 +104,10 @@ const isActive = (href: string) =>
       <a href="/blog/" class={`mobile-link${isActive('/blog/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         Блог
+      </a>
+      <a href="/skupka/" class={`mobile-link${isActive('/skupka/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        Скупка техники
       </a>
       <a href="/b2b/" class={`mobile-link mobile-b2b${isActive('/b2b/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>

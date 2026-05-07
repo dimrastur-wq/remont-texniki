@@ -180,6 +180,35 @@ export const SERVICE_FAQ: Record<string, { question: string; answer: string }[]>
   ],
 };
 
+export const SKUPKA = {
+  vkGroup: 'https://vk.com/miass02',
+  appliances: [
+    { name: 'Холодильники', icon: 'fridge', minPrice: 500, maxPrice: 8000, brands: ['Атлант', 'Indesit', 'Bosch', 'Samsung', 'LG', 'Beko', 'Haier', 'Stinol'] },
+    { name: 'Стиральные машины', icon: 'washer', minPrice: 500, maxPrice: 6000, brands: ['Bosch', 'LG', 'Samsung', 'Indesit', 'Beko', 'Hotpoint', 'AEG', 'Electrolux'] },
+    { name: 'Электроплиты и духовки', icon: 'stove', minPrice: 300, maxPrice: 4000, brands: ['Bosch', 'Electrolux', 'Gorenje', 'Indesit', 'Samsung', 'Kaiser', 'Gefest'] },
+    { name: 'Микроволновые печи', icon: 'microwave', minPrice: 200, maxPrice: 2000, brands: ['Samsung', 'LG', 'Bosch', 'Panasonic', 'Sharp', 'Whirlpool'] },
+    { name: 'Пылесосы', icon: 'vacuum', minPrice: 200, maxPrice: 3000, brands: ['Dyson', 'Samsung', 'LG', 'Philips', 'Miele', 'Xiaomi', 'iRobot'] },
+    { name: 'Посудомоечные машины', icon: 'dishwasher', minPrice: 500, maxPrice: 5000, brands: ['Bosch', 'Siemens', 'Electrolux', 'AEG', 'Smeg', 'Whirlpool'] },
+    { name: 'Кондиционеры', icon: 'ac', minPrice: 1000, maxPrice: 10000, brands: ['Daikin', 'Mitsubishi', 'Panasonic', 'Samsung', 'LG', 'Gree', 'Haier'] },
+    { name: 'Телевизоры', icon: 'tv', minPrice: 300, maxPrice: 5000, brands: ['Samsung', 'LG', 'Sony', 'Philips', 'Hisense', 'TCL', 'Haier'] },
+  ],
+  conditions: [
+    { label: 'Рабочая', desc: 'Без неисправностей, полный набор функций', priceModifier: 1.0 },
+    { label: 'Требует ремонта', desc: 'Не запускается, выдаёт ошибки, частичный отказ', priceModifier: 0.5 },
+    { label: 'На запчасти', desc: 'Не подлежит ремонту, нужны отдельные детали', priceModifier: 0.2 },
+  ],
+  faq: [
+    { question: 'Принимаете ли б/у технику без документов?', answer: 'Да, документы на технику не нужны. Мы принимаем технику по закону — составляем договор купли-продажи на месте, который защищает обе стороны. Понадобится только ваш паспорт.' },
+    { question: 'Как быстро вы приедете на оценку?', answer: 'В Миассе — в течение 1-2 часов. В Златоуст и Чебаркуль — в день обращения или на следующий день. Можете прислать фото техники в Telegram или WhatsApp для предварительной оценки.' },
+    { question: 'Платите ли вы наличными?', answer: 'Да, расчёт наличными сразу при сделке. Также возможен перевод на карту по вашему желанию.' },
+    { question: 'Берёте ли вы технику, которую нельзя отремонтировать?', answer: 'Да, принимаем технику на запчасти. Многие запчасти стоят дороже лома, поэтому мы можем предложить хорошую цену даже за неработающую технику.' },
+    { question: 'Забираете ли крупногабаритную технику (холодильники, стиральные машины)?', answer: 'Да, сами приедем и заберём. Вам не нужно ничего везти. Бесплатный вывоз при покупке. Тяжёлую технику наш мастер упакует и погрузит самостоятельно.' },
+    { question: 'Можно ли продать несколько единиц техники сразу?', answer: 'Конечно. Мы активно закупаем наборы — например, технику при переезде или ликвидации офиса. За несколько единиц сразу предложим лучшую цену.' },
+    { question: 'Вы работаете с юридическими лицами?', answer: 'Да, оформляем все необходимые документы для юридических лиц: договор купли-продажи, акт приёма-передачи, документы для бухгалтерии. Принимаем технику при ликвидации, обновлении парка оборудования, закрытии кафе, офисов, магазинов.' },
+    { question: 'Покупаете ли вы технику в рассрочку?', answer: 'Нет, мы выплачиваем полную сумму сразу при сделке.' },
+  ],
+};
+
 export const PARTS = [
   { name: 'Компрессор для холодильника Атлант', condition: 'Новый', price: '4 500 ₽', inStock: true, category: 'Холодильники' },
   { name: 'ТЭН для стиральной машины LG', condition: 'Новый', price: '1 200 ₽', inStock: true, category: 'Стиральные машины' },

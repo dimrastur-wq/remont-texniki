@@ -1,0 +1,991 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE, CITIES, SKUPKA } from '../../data/services';
+
+const title = 'Скупка бытовой техники в Миассе, Златоусте, Чебаркуле — дорого, выезд, наличные';
+const description = 'Покупаем б/у бытовую технику дорого: холодильники, стиральные машины, телевизоры, пылесосы. Работаем с физическими и юридическими лицами. Выезд в день обращения, наличные. ВКонтакте: vk.com/miass02';
+const keywords = 'скупка бытовой техники Миасс, скупка холодильников, скупка стиральных машин, купить б/у технику, скупка техники юридическим лицам, сдать технику за деньги';
+
+const cityList = Object.values(CITIES);
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Скупка бытовой техники',
+  provider: {
+    '@type': 'LocalBusiness',
+    name: SITE.name,
+    telephone: SITE.phone,
+    url: SITE.url,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: SITE.address,
+      addressLocality: 'Миасс',
+      addressRegion: 'Челябинская область',
+      addressCountry: 'RU',
+    },
+    sameAs: [SKUPKA.vkGroup],
+  },
+  areaServed: cityList.map(c => ({ '@type': 'City', name: c.name })),
+  description,
+};
+---
+
+<Layout
+  title={title}
+  description={description}
+  keywords={keywords}
+  canonical="/skupka/"
+  schema={JSON.stringify(schema)}
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-inner">
+          <div class="hero-content">
+            <div class="hero-badge">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+              Скупка бытовой техники
+            </div>
+            <h1>Продайте технику дорого — приедем сами</h1>
+            <p class="hero-lead">Покупаем рабочую и неисправную бытовую технику в Миассе, Златоусте и Чебаркуле. Наличные при сделке. Работаем с физическими и юридическими лицами.</p>
+
+            <ul class="hero-checks">
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Выезд в день обращения
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Оплата наличными на месте
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Бесплатный вывоз крупногабарита
+              </li>
+              <li>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Документы для юридических лиц
+              </li>
+            </ul>
+
+            <div class="hero-actions">
+              <a href={`tel:+${SITE.phoneRaw}`} class="btn-primary">Позвонить: {SITE.phone}</a>
+              <a href={SKUPKA.vkGroup} target="_blank" rel="noopener noreferrer" class="btn-vk">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-.9-1.738-.9-.354 0-.457.103-.457.6v1.574c0 .426-.136.68-1.254.68-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.716 4 8.302c0-.248.103-.48.6-.48h1.744c.447 0 .617.204.79.682.871 2.508 2.325 4.706 2.927 4.706.225 0 .328-.103.328-.668V9.945c-.068-1.202-.703-1.305-.703-1.732 0-.205.168-.411.438-.411h2.744c.377 0 .51.2.51.631v3.39c0 .375.168.51.274.51.225 0 .413-.135.826-.548 1.287-1.443 2.203-3.664 2.203-3.664.12-.248.328-.48.775-.48h1.744c.526 0 .64.27.526.637-.218.98-2.34 4.006-2.34 4.006-.187.307-.255.443 0 .786.187.255.8.786 1.207 1.266.748.857 1.32 1.574 1.473 2.073.137.49-.12.74-.63.74z"/></svg>
+                ВКонтакте
+              </a>
+            </div>
+          </div>
+
+          <div class="hero-card">
+            <div class="card-header">Получите оценку сейчас</div>
+            <p class="card-sub">Пришлите фото в Telegram или WhatsApp — ответим за 15 минут</p>
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="card-btn card-btn--tg">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.026 9.546c-.148.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L6.15 14.18l-2.946-.92c-.64-.203-.653-.64.136-.948l11.498-4.433c.532-.194 1 .13.724.37z"/></svg>
+              Написать в Telegram
+            </a>
+            <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="card-btn card-btn--wa">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Написать в WhatsApp
+            </a>
+            <div class="card-cities">
+              {cityList.map(city => (
+                <a href={`/skupka/${city.slug}/`} class="city-chip">{city.name}</a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <section class="stats">
+      <div class="container">
+        <div class="stats-grid">
+          <div class="stat">
+            <span class="stat-num">10+</span>
+            <span class="stat-label">лет на рынке</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">500+</span>
+            <span class="stat-label">единиц куплено</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">3</span>
+            <span class="stat-label">города охвата</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num">день в день</span>
+            <span class="stat-label">выезд на оценку</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- What we buy -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Что мы покупаем</h2>
+          <p>Принимаем рабочую, требующую ремонта и технику на запчасти</p>
+        </div>
+        <div class="appliances-grid">
+          {SKUPKA.appliances.map(item => (
+            <div class="appliance-card">
+              <div class="appliance-price">от {item.minPrice.toLocaleString('ru-RU')} до {item.maxPrice.toLocaleString('ru-RU')} ₽</div>
+              <h3 class="appliance-name">{item.name}</h3>
+              <div class="appliance-brands">{item.brands.slice(0, 5).join(', ')} и др.</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Who we work with -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Работаем с физическими и юридическими лицами</h2>
+          <p>Разные условия и документы — под ваш запрос</p>
+        </div>
+        <div class="clients-grid">
+          <div class="client-card">
+            <div class="client-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </div>
+            <h3>Физические лица</h3>
+            <ul class="client-list">
+              <li>Старая техника при переезде</li>
+              <li>Техника после ремонта, которую проще продать</li>
+              <li>Наследство и разбор квартиры</li>
+              <li>Просто не нужна — освободить место</li>
+            </ul>
+            <div class="client-docs">
+              <span class="doc-badge">Паспорт</span>
+              <span class="doc-badge">Договор купли-продажи</span>
+            </div>
+          </div>
+
+          <div class="client-card client-card--featured">
+            <div class="client-badge-top">Юридическим лицам</div>
+            <div class="client-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/></svg>
+            </div>
+            <h3>Юридические лица и ИП</h3>
+            <ul class="client-list">
+              <li>Ликвидация кафе, ресторана, магазина</li>
+              <li>Обновление парка оборудования</li>
+              <li>Закрытие гостиницы, хостела, детсада</li>
+              <li>Продажа нескольких единиц сразу</li>
+              <li>Офисная техника при переезде/закрытии</li>
+            </ul>
+            <div class="client-docs">
+              <span class="doc-badge">Договор</span>
+              <span class="doc-badge">Акт приёма-передачи</span>
+              <span class="doc-badge">Документы для бухгалтерии</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Как проходит сделка</h2>
+          <p>Просто, быстро, честно</p>
+        </div>
+        <div class="steps">
+          <div class="step">
+            <div class="step-num">1</div>
+            <h3>Свяжитесь с нами</h3>
+            <p>Позвоните или напишите в мессенджер. Пришлите фото техники — дадим предварительную оценку за 15 минут.</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <h3>Приедем и осмотрим</h3>
+            <p>Выезд в Миассе — 1-2 часа, в Златоуст и Чебаркуль — день в день. Сами заберём крупногабаритную технику.</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <h3>Оценка на месте</h3>
+            <p>Назовём точную цену после осмотра. Торг уместен — работаем честно. Не понравится — ни к чему не обязываем.</p>
+          </div>
+          <div class="step-arrow">→</div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <h3>Деньги сразу</h3>
+            <p>Составим договор, подпишем и сразу выплатим наличными или переводом — как вам удобнее.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Conditions -->
+    <section class="section section--alt">
+      <div class="container">
+        <div class="section-header">
+          <h2>Покупаем технику в любом состоянии</h2>
+          <p>Даже если она не работает — у нас найдётся применение</p>
+        </div>
+        <div class="conditions-grid">
+          {SKUPKA.conditions.map((c, i) => (
+            <div class={`condition-card condition-card--${i === 0 ? 'good' : i === 1 ? 'mid' : 'low'}`}>
+              <div class="condition-label">{c.label}</div>
+              <div class="condition-desc">{c.desc}</div>
+              <div class="condition-price">
+                {i === 0 && 'Полная стоимость'}
+                {i === 1 && '~50% от рабочей цены'}
+                {i === 2 && 'Цена за запчасти'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- Cities -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Скупка по городам</h2>
+          <p>Работаем в трёх городах Южного Урала</p>
+        </div>
+        <div class="cities-grid">
+          {cityList.map(city => (
+            <a href={`/skupka/${city.slug}/`} class="city-card">
+              <div class="city-card-head">
+                <h3>{city.name}</h3>
+                {city.hasWorkshop && <span class="workshop-badge">Мастерская</span>}
+              </div>
+              <p>{city.address}</p>
+              <div class="city-card-zones">{city.landmarks.slice(0, 3).join(' · ')}</div>
+              <span class="city-link">Подробнее →</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- VK promo -->
+    <section class="vk-section">
+      <div class="container">
+        <div class="vk-inner">
+          <div class="vk-text">
+            <h2>Следите за объявлениями в ВКонтакте</h2>
+            <p>Актуальные закупки, цены и последние купленные единицы — публикуем в нашей группе. Подписывайтесь, чтобы не пропустить выгодное предложение.</p>
+          </div>
+          <a href={SKUPKA.vkGroup} target="_blank" rel="noopener noreferrer" class="vk-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-.9-1.738-.9-.354 0-.457.103-.457.6v1.574c0 .426-.136.68-1.254.68-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4 8.716 4 8.302c0-.248.103-.48.6-.48h1.744c.447 0 .617.204.79.682.871 2.508 2.325 4.706 2.927 4.706.225 0 .328-.103.328-.668V9.945c-.068-1.202-.703-1.305-.703-1.732 0-.205.168-.411.438-.411h2.744c.377 0 .51.2.51.631v3.39c0 .375.168.51.274.51.225 0 .413-.135.826-.548 1.287-1.443 2.203-3.664 2.203-3.664.12-.248.328-.48.775-.48h1.744c.526 0 .64.27.526.637-.218.98-2.34 4.006-2.34 4.006-.187.307-.255.443 0 .786.187.255.8.786 1.207 1.266.748.857 1.32 1.574 1.473 2.073.137.49-.12.74-.63.74z"/></svg>
+            Группа ВКонтакте vk.com/miass02
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Часто задаваемые вопросы</h2>
+        </div>
+        <div class="faq-list">
+          {SKUPKA.faq.map((item, i) => (
+            <details class="faq-item">
+              <summary class="faq-q">{item.question}</summary>
+              <div class="faq-a">{item.answer}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-inner">
+          <h2>Готовы продать технику?</h2>
+          <p>Позвоните или напишите — ответим быстро, приедем в день обращения</p>
+          <div class="cta-actions">
+            <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn cta-btn--call">{SITE.phone}</a>
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--tg">Telegram</a>
+            <a href={SITE.whatsapp} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--wa">WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    color: #fff;
+    padding: 80px 0 64px;
+  }
+
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #93c5fd;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 24px;
+  }
+
+  .hero-content h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    color: #fff;
+  }
+
+  .hero-lead {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    line-height: 1.7;
+    margin-bottom: 28px;
+    max-width: 560px;
+  }
+
+  .hero-checks {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .hero-checks li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    color: #e2e8f0;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: #1d4ed8;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: background 0.2s;
+    white-space: nowrap;
+  }
+
+  .btn-primary:hover { background: #1e40af; }
+
+  .btn-vk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #4680c2;
+    color: #fff;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+  }
+
+  .btn-vk:hover { background: #3b6fa8; }
+
+  /* Hero card */
+  .hero-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    color: #1e293b;
+    position: sticky;
+    top: 80px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+
+  .card-header {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .card-sub {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .card-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 13px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    transition: filter 0.2s;
+    color: #fff;
+  }
+
+  .card-btn:hover { filter: brightness(1.1); }
+  .card-btn--tg { background: #0088cc; }
+  .card-btn--wa { background: #25d366; }
+
+  .card-cities {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .city-chip {
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 5px 12px;
+    border-radius: 100px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .city-chip:hover { background: #1d4ed8; color: #fff; }
+
+  /* Stats */
+  .stats {
+    background: #1d4ed8;
+    padding: 32px 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    text-align: center;
+  }
+
+  .stat-num {
+    display: block;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .stat-label {
+    display: block;
+    font-size: 0.85rem;
+    color: #bfdbfe;
+    margin-top: 4px;
+  }
+
+  /* Sections */
+  .section { padding: 72px 0; }
+  .section--alt { background: #f8fafc; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .section-header h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+  }
+
+  .section-header p {
+    color: #64748b;
+    font-size: 1rem;
+  }
+
+  /* Appliances */
+  .appliances-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .appliance-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+  }
+
+  .appliance-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 16px rgba(29,78,216,0.08);
+  }
+
+  .appliance-price {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #16a34a;
+    background: #dcfce7;
+    padding: 3px 10px;
+    border-radius: 100px;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  .appliance-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 6px;
+  }
+
+  .appliance-brands {
+    font-size: 0.8rem;
+    color: #94a3b8;
+  }
+
+  /* Clients */
+  .clients-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .client-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+  }
+
+  .client-card--featured {
+    border-color: #1d4ed8;
+    box-shadow: 0 8px 32px rgba(29,78,216,0.12);
+  }
+
+  .client-badge-top {
+    position: absolute;
+    top: -12px;
+    left: 24px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 14px;
+    border-radius: 100px;
+    letter-spacing: 0.03em;
+  }
+
+  .client-icon {
+    width: 56px;
+    height: 56px;
+    background: #eff6ff;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1d4ed8;
+    margin-bottom: 16px;
+  }
+
+  .client-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 16px;
+  }
+
+  .client-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .client-list li {
+    font-size: 0.9rem;
+    color: #475569;
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .client-list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: #94a3b8;
+  }
+
+  .client-docs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .doc-badge {
+    font-size: 0.75rem;
+    background: #f1f5f9;
+    color: #475569;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  /* Steps */
+  .steps {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .step {
+    flex: 1;
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  .step-num {
+    width: 48px;
+    height: 48px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0 auto 16px;
+  }
+
+  .step h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .step p {
+    font-size: 0.88rem;
+    color: #64748b;
+    line-height: 1.6;
+  }
+
+  .step-arrow {
+    flex: 0 0 auto;
+    color: #cbd5e1;
+    font-size: 1.5rem;
+    margin-top: 14px;
+    padding: 0 4px;
+  }
+
+  /* Conditions */
+  .conditions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .condition-card {
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+  }
+
+  .condition-card--good { background: #dcfce7; }
+  .condition-card--mid { background: #fef9c3; }
+  .condition-card--low { background: #fee2e2; }
+
+  .condition-label {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+  }
+
+  .condition-desc {
+    font-size: 0.85rem;
+    color: #475569;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .condition-price {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  /* Cities grid */
+  .cities-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+
+  .city-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    display: block;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .city-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 20px rgba(29,78,216,0.1);
+  }
+
+  .city-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .city-card h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .workshop-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 100px;
+  }
+
+  .city-card p {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-bottom: 8px;
+  }
+
+  .city-card-zones {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    margin-bottom: 16px;
+  }
+
+  .city-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  /* VK section */
+  .vk-section {
+    background: #f0f4ff;
+    padding: 56px 0;
+  }
+
+  .vk-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .vk-text h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 10px;
+  }
+
+  .vk-text p {
+    color: #64748b;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-width: 500px;
+  }
+
+  .vk-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #4680c2;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .vk-btn:hover { background: #3b6fa8; }
+
+  /* FAQ */
+  .faq-list {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .faq-item {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .faq-q {
+    padding: 18px 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #0f172a;
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .faq-q::-webkit-details-marker { display: none; }
+
+  .faq-q::after {
+    content: '+';
+    font-size: 1.3rem;
+    color: #1d4ed8;
+    flex-shrink: 0;
+    margin-left: 16px;
+  }
+
+  details[open] .faq-q::after { content: '−'; }
+
+  .faq-a {
+    padding: 0 20px 18px;
+    font-size: 0.9rem;
+    color: #475569;
+    line-height: 1.7;
+  }
+
+  /* CTA */
+  .cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 72px 0;
+    text-align: center;
+  }
+
+  .cta-inner h2 {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .cta-inner p {
+    color: #94a3b8;
+    font-size: 1rem;
+    margin-bottom: 32px;
+  }
+
+  .cta-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-btn {
+    padding: 14px 28px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: filter 0.2s;
+    color: #fff;
+  }
+
+  .cta-btn:hover { filter: brightness(1.1); }
+  .cta-btn--call { background: #1d4ed8; }
+  .cta-btn--tg { background: #0088cc; }
+  .cta-btn--wa { background: #25d366; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .appliances-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 768px) {
+    .hero { padding: 60px 0 48px; }
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-card { position: static; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .appliances-grid { grid-template-columns: 1fr 1fr; }
+    .clients-grid { grid-template-columns: 1fr; }
+    .steps { flex-direction: column; gap: 16px; }
+    .step-arrow { transform: rotate(90deg); margin: 0 auto; }
+    .conditions-grid { grid-template-columns: 1fr; }
+    .cities-grid { grid-template-columns: 1fr; }
+    .vk-inner { flex-direction: column; text-align: center; }
+    .vk-btn { width: 100%; justify-content: center; }
+  }
+
+  @media (max-width: 480px) {
+    .appliances-grid { grid-template-columns: 1fr; }
+    .hero-actions { flex-direction: column; }
+    .btn-primary, .btn-vk { width: 100%; justify-content: center; text-align: center; }
+  }
+</style>

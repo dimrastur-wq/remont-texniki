@@ -12,6 +12,11 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/blog/`, changefreq: 'weekly', priority: '0.9' });
   pages.push({ loc: `${siteUrl}/b2b/`, changefreq: 'monthly', priority: '0.8' });
   pages.push({ loc: `${siteUrl}/zapchasti/`, changefreq: 'weekly', priority: '0.7' });
+  pages.push({ loc: `${siteUrl}/skupka/`, changefreq: 'weekly', priority: '0.8' });
+
+  for (const city of Object.values(CITIES)) {
+    pages.push({ loc: `${siteUrl}/skupka/${city.slug}/`, changefreq: 'weekly', priority: '0.8' });
+  }
 
   for (const article of BLOG_ARTICLES) {
     pages.push({ loc: `${siteUrl}/blog/${article.slug}/`, changefreq: 'monthly', priority: '0.7', lastmod: article.date });
