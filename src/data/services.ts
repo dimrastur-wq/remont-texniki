@@ -1,5 +1,5 @@
 export const SITE = {
-  name: 'Master-Tehniki74',
+  name: 'Центр восстановления бытовой техники',
   phone: '8 (951) 257-77-57',
   phoneRaw: '79512577757',
   telegram: 'https://t.me/Drugan1900',

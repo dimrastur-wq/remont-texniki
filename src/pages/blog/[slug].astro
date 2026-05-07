@@ -32,8 +32,8 @@ const articleSchema = JSON.stringify({
   "description": article.description,
   "datePublished": article.date,
   "dateModified": article.date,
-  "author": { "@type": "Organization", "name": "Master-Tehniki74", "url": siteUrl },
-  "publisher": { "@type": "Organization", "name": "Master-Tehniki74", "url": siteUrl },
+  "author": { "@type": "Organization", "name": "Центр восстановления бытовой техники", "url": siteUrl },
+  "publisher": { "@type": "Organization", "name": "Центр восстановления бытовой техники", "url": siteUrl },
   "image": article.image,
   "keywords": article.keywords.join(', '),
 });
@@ -57,7 +57,7 @@ const relatedArticles = [
 ---
 
 <Layout
-  title={`${article.title} | Master-Tehniki74`}
+  title={`${article.title} | Центр восстановления бытовой техники`}
   description={article.description}
   keywords={article.keywords.join(', ')}
   canonical={`/blog/${article.slug}/`}

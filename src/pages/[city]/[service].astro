@@ -27,7 +27,7 @@ const { cityKey, serviceKey } = Astro.props;
 const city = CITIES[cityKey as CityKey];
 const service = SERVICES[serviceKey as ServiceKey];
 
-const title = `${service.name} в ${city.namePrepositional} на дому — недорого, гарантия | Master-Tehniki74`;
+const title = `${service.name} в ${city.namePrepositional} на дому — недорого, гарантия | Центр восстановления бытовой техники`;
 const description = `${service.name} в ${city.namePrepositional} с выездом на дом. Опытные мастера, оригинальные запчасти, гарантия до 12 месяцев. Звоните: ${SITE.phone}`;
 const keywords = `${service.name.toLowerCase()} ${city.namePrepositional.toLowerCase()}, ремонт бытовой техники ${city.name}, вызвать мастера ${city.name}, ${service.lsiKeywords.join(', ')}`;
 
@@ -38,7 +38,7 @@ const schema = JSON.stringify({
   "description": description,
   "provider": {
     "@type": "LocalBusiness",
-    "name": "Master-Tehniki74",
+    "name": "Центр восстановления бытовой техники",
     "telephone": SITE.phone,
     "address": {
       "@type": "PostalAddress",

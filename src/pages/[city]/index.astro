@@ -21,14 +21,14 @@ const { cityKey } = Astro.props;
 const city = CITIES[cityKey as CityKey];
 const serviceKeys = Object.keys(SERVICES);
 
-const title = `Ремонт бытовой техники в ${city.namePrepositional} — выезд на дом, гарантия | Master-Tehniki74`;
+const title = `Ремонт бытовой техники в ${city.namePrepositional} — выезд на дом, гарантия | Центр восстановления бытовой техники`;
 const description = `Ремонт холодильников, стиральных машин, электроплит, микроволновок и пылесосов в ${city.namePrepositional}. Выезд мастера на дом, доступные цены, гарантия. Звоните: ${SITE.phone}`;
 const keywords = `ремонт бытовой техники ${city.name}, вызвать мастера ${city.namePrepositional}, ремонт холодильников ${city.namePrepositional}, ремонт стиральных машин ${city.name}, мастер ${city.name}`;
 
 const schema = JSON.stringify({
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": `Master-Tehniki74 — ${city.name}`,
+  "name": `Центр восстановления бытовой техники — ${city.name}`,
   "description": `Ремонт бытовой техники в ${city.namePrepositional}`,
   "telephone": SITE.phone,
   "url": `${SITE.url}/${city.slug}/`,
