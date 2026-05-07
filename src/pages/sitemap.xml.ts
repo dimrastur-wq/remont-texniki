@@ -1,5 +1,6 @@
-import { CITIES, SERVICES } from '../data/services';
+import { CITIES, SERVICES, VILLAGES } from '../data/services';
 import { BLOG_ARTICLES } from '../data/blog';
+import { ERROR_CODES } from '../data/errors';
 
 const siteUrl = 'https://master-tehniki74.store';
 
@@ -16,6 +17,15 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/status/`, changefreq: 'monthly', priority: '0.7' });
   pages.push({ loc: `${siteUrl}/baza-znanii/`, changefreq: 'weekly', priority: '0.8' });
   pages.push({ loc: `${siteUrl}/skupka/`, changefreq: 'weekly', priority: '0.8' });
+  pages.push({ loc: `${siteUrl}/oshibki/`, changefreq: 'weekly', priority: '0.9' });
+
+  for (const err of ERROR_CODES) {
+    pages.push({ loc: `${siteUrl}/oshibki/${err.slug}/`, changefreq: 'monthly', priority: '0.8', lastmod: today });
+  }
+
+  for (const village of Object.values(VILLAGES)) {
+    pages.push({ loc: `${siteUrl}/posyolki/${village.slug}/`, changefreq: 'monthly', priority: '0.7' });
+  }
 
   for (const city of Object.values(CITIES)) {
     pages.push({ loc: `${siteUrl}/skupka/${city.slug}/`, changefreq: 'weekly', priority: '0.8' });

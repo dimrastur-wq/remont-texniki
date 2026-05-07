@@ -1,0 +1,277 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+import { ERROR_CODES, ERROR_BRANDS, ERROR_APPLIANCES } from '../../data/errors';
+
+const urgencyLabel: Record<string, string> = {
+  high: 'Срочно',
+  medium: 'Не срочно',
+  low: 'Сами справитесь',
+};
+const urgencyColor: Record<string, string> = {
+  high: '#dc2626',
+  medium: '#d97706',
+  low: '#16a34a',
+};
+
+const brandGroups = ERROR_BRANDS.map(brand => ({
+  brand,
+  errors: ERROR_CODES.filter(e => e.brand === brand),
+}));
+---
+
+<Layout
+  title="Коды ошибок бытовой техники — расшифровка и ремонт | Центр восстановления бытовой техники"
+  description="База кодов ошибок стиральных машин, холодильников, микроволновок и посудомоечных машин. Bosch, LG, Samsung, Indesit и другие бренды. Что делать и когда звать мастера."
+  keywords="коды ошибок стиральных машин, ошибка bosch, ошибка lg, ошибка samsung, расшифровка ошибок бытовой техники"
+  canonical="/oshibki/"
+  geoRegion="RU-CHE"
+  geoPlace="Миасс"
+>
+  <SiteHeader />
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <div class="hero-badge">База ошибок</div>
+        <h1>Коды ошибок бытовой техники</h1>
+        <p>Расшифровка, причины и что делать — по каждому коду</p>
+        <div class="hero-stats">
+          <div class="hs-item"><strong>{ERROR_CODES.length}</strong> кодов ошибок</div>
+          <div class="hs-div"></div>
+          <div class="hs-item"><strong>{ERROR_BRANDS.length}</strong> брендов</div>
+          <div class="hs-div"></div>
+          <div class="hs-item"><strong>{ERROR_APPLIANCES.length}</strong> типа техники</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        {brandGroups.map(group => (
+          <div class="brand-group">
+            <div class="brand-header">
+              <h2>{group.brand}</h2>
+              <span class="brand-count">{group.errors.length} ошибок</span>
+            </div>
+            <div class="errors-grid">
+              {group.errors.map(err => (
+                <a href={`/oshibki/${err.slug}/`} class="error-card">
+                  <div class="error-top">
+                    <span class="error-code">{err.code}</span>
+                    <span class="error-urgency" style={`color:${urgencyColor[err.urgency]};background:${urgencyColor[err.urgency]}18`}>
+                      {urgencyLabel[err.urgency]}
+                    </span>
+                  </div>
+                  <div class="error-appliance">{err.appliance}</div>
+                  <div class="error-meaning">{err.meaning}</div>
+                  <div class="error-price">{err.repairPrice}</div>
+                  <div class="error-link">Подробнее &rarr;</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-inner">
+          <h2>Не нашли свой код ошибки?</h2>
+          <p>Опишите ситуацию мастеру — ответим в течение 15 минут</p>
+          <div class="cta-btns">
+            <a href={SITE.telegram} target="_blank" rel="noopener noreferrer" class="cta-btn cta-btn--tg">Написать в Telegram</a>
+            <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn cta-btn--call">{SITE.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+  <FloatingButton />
+</Layout>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 80px 0 64px;
+    color: #fff;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #93c5fd;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    margin-bottom: 18px;
+  }
+
+  .hero h1 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .hero p {
+    color: #94a3b8;
+    font-size: 1rem;
+    margin-bottom: 28px;
+  }
+
+  .hero-stats {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 10px 24px;
+    border-radius: 100px;
+  }
+
+  .hs-item { font-size: 0.85rem; color: #e2e8f0; }
+  .hs-item strong { color: #fff; }
+  .hs-div { width: 1px; height: 16px; background: rgba(255,255,255,0.2); }
+
+  .section { padding: 64px 0; }
+
+  .brand-group { margin-bottom: 56px; }
+
+  .brand-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .brand-header h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  .brand-count {
+    font-size: 0.78rem;
+    color: #64748b;
+    background: #f1f5f9;
+    padding: 3px 10px;
+    border-radius: 100px;
+  }
+
+  .errors-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+
+  .error-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px 20px;
+    transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+
+  .error-card:hover {
+    border-color: #1d4ed8;
+    box-shadow: 0 6px 24px rgba(29,78,216,0.1);
+    transform: translateY(-2px);
+  }
+
+  .error-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .error-code {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1d4ed8;
+    font-family: monospace;
+    letter-spacing: 0.03em;
+  }
+
+  .error-urgency {
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 100px;
+  }
+
+  .error-appliance {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-transform: capitalize;
+  }
+
+  .error-meaning {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .error-price {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #16a34a;
+  }
+
+  .error-link {
+    font-size: 0.8rem;
+    color: #1d4ed8;
+    font-weight: 500;
+  }
+
+  .cta-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 64px 0;
+    text-align: center;
+  }
+
+  .cta-inner h2 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); font-weight: 700; color: #fff; margin-bottom: 10px; }
+  .cta-inner p { color: #94a3b8; margin-bottom: 28px; }
+  .cta-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .cta-btn {
+    padding: 13px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    transition: filter 0.2s;
+  }
+
+  .cta-btn:hover { filter: brightness(1.1); }
+  .cta-btn--tg { background: #0088cc; }
+  .cta-btn--call { background: #1d4ed8; }
+
+  @media (max-width: 768px) {
+    .errors-grid { grid-template-columns: 1fr 1fr; }
+    .hero-stats { flex-direction: column; gap: 8px; border-radius: 12px; }
+    .hs-div { width: 80%; height: 1px; }
+  }
+
+  @media (max-width: 480px) {
+    .errors-grid { grid-template-columns: 1fr; }
+  }
+</style>
