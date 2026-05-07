@@ -69,7 +69,11 @@ const serviceKeys = Object.keys(SERVICES);
         <div class="hero-visual">
           <div class="hero-master-card">
             <div class="master-photo-wrap">
-              <img src="/master-dmitriy.png" alt="Мастер Дмитрий — ремонт бытовой техники" class="master-photo" loading="eager" />
+              <div class="master-photo-container">
+                <img src="/ChatGPT_Image_7_мая_2026_г.,_21_24_38.png" alt="Мастер Дмитрий — ремонт бытовой техники" class="master-photo" loading="eager" />
+                <!-- Перекрываем старый номер на фото новым -->
+                <div class="phone-overlay">8-951-257-75-57</div>
+              </div>
               <div class="master-badge-online">
                 <span class="online-dot"></span>
                 На связи
@@ -446,10 +450,33 @@ const serviceKeys = Object.keys(SERVICES);
     overflow: hidden;
   }
 
+  .master-photo-container {
+    position: relative;
+    display: block;
+  }
+
   .master-photo {
     display: block;
     width: 100%;
     height: auto;
+  }
+
+  .phone-overlay {
+    position: absolute;
+    /* Позиция подобрана под место номера на фото */
+    bottom: 22%;
+    left: 3%;
+    width: 42%;
+    background: #1a1a1a;
+    color: #fff;
+    font-size: clamp(0.55rem, 1.4vw, 0.85rem);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 2px 6px 3px;
+    border-radius: 3px;
+    line-height: 1.4;
+    pointer-events: none;
+    user-select: none;
   }
 
   .master-badge-online {
