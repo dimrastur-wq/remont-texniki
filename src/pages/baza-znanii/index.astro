@@ -210,6 +210,26 @@ const categoryTextColors: Record<string, string> = {
               <div class="master-quote">"Ремонт роботов-пылесосов — моя специализация. Dyson, iRobot, Xiaomi."</div>
             </div>
           </div>
+
+          <div class="master-card master-card--featured">
+            <div class="master-video-stub">
+              <div class="video-play">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              </div>
+              <div class="video-duration">0:38</div>
+              <div class="video-label">Скоро — видео-визитка мастера</div>
+              <div class="diploma-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Дипломированный специалист
+              </div>
+            </div>
+            <div class="master-info">
+              <div class="master-name">Дмитрий</div>
+              <div class="master-spec">Стиральные и посудомоечные машины, холодильники, микроволновки, кофемашины</div>
+              <div class="master-exp">14+ лет опыта · все бренды</div>
+              <div class="master-quote">"Ремонтирую технику любой сложности — от простой стиралки до профессиональной кофемашины."</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -334,7 +354,7 @@ const categoryTextColors: Record<string, string> = {
 
   .masters-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 20px;
   }
 
@@ -347,6 +367,27 @@ const categoryTextColors: Record<string, string> = {
   }
 
   .master-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+
+  .master-card--featured {
+    border-color: #1d4ed8;
+    box-shadow: 0 0 0 1px #bfdbfe;
+  }
+
+  .diploma-badge {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 4px 9px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.02em;
+  }
 
   .master-video-stub {
     background: linear-gradient(135deg, #1e3a5f, #0f172a);
@@ -550,7 +591,7 @@ const categoryTextColors: Record<string, string> = {
   .cta-btn--call { background: #1d4ed8; }
   .cta-btn--calc { background: #16a34a; }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     .masters-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
