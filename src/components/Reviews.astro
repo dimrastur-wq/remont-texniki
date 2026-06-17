@@ -253,6 +253,10 @@ const reviewsSchema = JSON.stringify({
 </style>
 
 <script>
+  const SUPABASE_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
+  const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/dimrastur@gmail.com';
+
   const form = document.getElementById('review-form') as HTMLFormElement;
   const submitBtn = document.getElementById('review-submit') as HTMLButtonElement;
 
@@ -267,16 +271,28 @@ const reviewsSchema = JSON.stringify({
     submitBtn.textContent = 'Отправка...';
 
     try {
-      const response = await fetch('https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E',
-        },
-        body: JSON.stringify({ name, city, text, type: 'review' }),
-      });
+      const [telegramRes, emailRes] = await Promise.allSettled([
+        fetch(SUPABASE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+          body: JSON.stringify({ name, city, text, type: 'review' }),
+        }),
+        fetch(FORMSUBMIT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name,
+            city,
+            review: text,
+            _subject: 'Новый отзыв с сайта — master-tehniki74.store',
+          }),
+        }),
+      ]);
 
-      if (response.ok) {
+      const success = telegramRes.status === 'fulfilled' && telegramRes.value.ok
+        || emailRes.status === 'fulfilled' && emailRes.value.ok;
+
+      if (success) {
         submitBtn.textContent = 'Отзыв отправлен! Спасибо';
         submitBtn.style.background = '#16a34a';
         form.reset();

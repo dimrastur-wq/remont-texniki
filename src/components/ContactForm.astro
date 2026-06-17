@@ -306,6 +306,10 @@ const phoneRaw = '79512577757';
 </style>
 
 <script>
+  const SUPABASE_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
+  const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/dimrastur@gmail.com';
+
   const form = document.getElementById('request-form') as HTMLFormElement;
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -322,16 +326,29 @@ const phoneRaw = '79512577757';
     btn.disabled = true;
 
     try {
-      const res = await fetch('https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E',
-        },
-        body: JSON.stringify({ name, phone, city, problem: `${appliance}: ${message}` }),
-      });
+      const [telegramRes, emailRes] = await Promise.allSettled([
+        fetch(SUPABASE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+          body: JSON.stringify({ name, phone, city, problem: `${appliance}: ${message}` }),
+        }),
+        fetch(FORMSUBMIT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            name,
+            phone,
+            city,
+            problem: `${appliance}: ${message}`,
+            _subject: 'Новая заявка на ремонт — master-tehniki74.store',
+          }),
+        }),
+      ]);
 
-      if (res.ok) {
+      const success = telegramRes.status === 'fulfilled' && telegramRes.value.ok
+        || emailRes.status === 'fulfilled' && emailRes.value.ok;
+
+      if (success) {
         btn.innerHTML = 'Заявка отправлена!';
         btn.style.background = '#16a34a';
         btn.style.boxShadow = '0 4px 14px rgba(22, 163, 74, 0.35)';
@@ -339,10 +356,11 @@ const phoneRaw = '79512577757';
           btn.innerHTML = originalText;
           btn.style.background = '';
           btn.style.boxShadow = '';
+          btn.disabled = false;
           form.reset();
         }, 3000);
       } else {
-        throw new Error('Server error');
+        throw new Error('Both delivery channels failed');
       }
     } catch {
       btn.innerHTML = 'Ошибка. Позвоните нам!';
