@@ -1,0 +1,96 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { SITE } from '../../data/services';
+import { SEO_WORKS } from '../../data/seo-pages';
+
+const title = 'Виды работ по ремонту бытовой техники — цены и сроки';
+const description = 'Замена подшипника, заправка фреоном, замена ТЭНа и другие виды работ. Цены от 1 000 ₽, гарантия 12 месяцев.';
+
+const worksByAppliance = SEO_WORKS.reduce<Record<string, typeof SEO_WORKS>>((acc, w) => {
+  const key = w.appliances[0] || 'Другое';
+  if (!acc[key]) acc[key] = [];
+  acc[key].push(w);
+  return acc;
+}, {});
+---
+
+<Layout title={title} description={description}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main class="works-page">
+    <section class="hero-works">
+      <div class="container">
+        <Breadcrumbs items={[
+          { label: 'Главная', href: '/' },
+          { label: 'Виды работ' },
+        ]} />
+        <h1>Виды работ по ремонту техники</h1>
+        <p>Конкретные услуги с указанием цены и срока выполнения. Выберите нужную работу или позвоните — мастер проконсультирует.</p>
+      </div>
+    </section>
+
+    <section class="works-list">
+      <div class="container">
+        {Object.entries(worksByAppliance).map(([appliance, works]) => (
+          <div class="works-group">
+            <h2>{appliance}</h2>
+            <div class="works-grid">
+              {works.map(w => (
+                <a href={`/raboty/${w.slug}/`} class="work-card">
+                  <h3>{w.name}</h3>
+                  <p>{w.description.slice(0, 100)}...</p>
+                  <div class="work-meta">
+                    <span class="wm-price">от {w.priceFrom.toLocaleString()} ₽</span>
+                    <span class="wm-time">{w.time}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="cta-section">
+      <div class="container">
+        <div class="cta-content">
+          <h2>Не нашли нужную работу?</h2>
+          <p>Позвоните — мастер подскажет</p>
+          <a href={`tel:+${SITE.phoneRaw}`} class="cta-phone">{SITE.phone}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .works-page { background: #f8fafc; }
+  .hero-works { padding: 100px 0 48px; background: #fff; }
+  .hero-works h1 { font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; }
+  .hero-works p { font-size: 1.1rem; color: #475569; max-width: 700px; }
+  .works-list { padding: 48px 0 80px; }
+  .works-group { margin-bottom: 48px; }
+  .works-group h2 { font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e2e8f0; }
+  .works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .work-card { padding: 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; }
+  .work-card:hover { border-color: #1d4ed8; }
+  .work-card h3 { font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .work-card p { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
+  .work-meta { display: flex; gap: 16px; }
+  .wm-price { font-weight: 700; color: #1d4ed8; }
+  .wm-time { color: #64748b; font-size: 0.85rem; }
+  .cta-section { padding: 64px 0; background: #fff; }
+  .cta-content { text-align: center; }
+  .cta-section h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .cta-section p { color: #64748b; margin-bottom: 20px; }
+  .cta-phone { font-size: 1.5rem; font-weight: 800; color: #1d4ed8; }
+  @media (max-width: 900px) { .works-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .works-grid { grid-template-columns: 1fr; } }
+</style>

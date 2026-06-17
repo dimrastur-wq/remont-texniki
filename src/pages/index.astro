@@ -8,6 +8,7 @@ import Reviews from '../components/Reviews.astro';
 import MasterTips from '../components/MasterTips.astro';
 import RetentionBlock from '../components/RetentionBlock.astro';
 import { SITE, CITIES, SERVICES } from '../data/services';
+import { SERVICE_BRANDS } from '../data/seo-pages';
 
 const title = 'Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле | Центр восстановления бытовой техники';
 const description = 'Профессиональный ремонт холодильников, стиральных машин, электроплит, микроволновок и пылесосов. Выезд мастера на дом, доступные цены, гарантия до 12 месяцев. Звоните: 8 (951) 257-77-57';
@@ -249,6 +250,31 @@ const serviceKeys = Object.keys(SERVICES);
     <MasterTips />
     <RetentionBlock />
     <Reviews />
+
+    <!-- SEO Links Section -->
+    <section class="seo-links">
+      <div class="container">
+        <h2>Ремонт по брендам</h2>
+        <div class="seo-grid">
+          {Object.entries(SERVICE_BRANDS).slice(0, 4).map(([serviceSlug, brands]) => {
+            const service = Object.values(SERVICES).find(s => s.slug === serviceSlug);
+            const popularBrands = brands.filter(b => b.popular).slice(0, 4);
+            return popularBrands.length > 0 && (
+              <div class="seo-col">
+                <div class="seo-title">{service?.name}</div>
+                <div class="seo-links-list">
+                  {popularBrands.map(b => (
+                    <a href={`/${serviceSlug}/${b.slug}/`}>{b.name}</a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <a href="/raboty/" class="seo-works-link">Все виды работ &rarr;</a>
+      </div>
+    </section>
+
     <section class="contact" id="contact">
       <div class="container">
         <div class="contact-layout">
@@ -1086,6 +1112,78 @@ const serviceKeys = Object.keys(SERVICES);
     }
 
     .cities-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  /* SEO Links Section */
+  .seo-links {
+    padding: 64px 0;
+    background: #f8fafc;
+  }
+
+  .seo-links h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .seo-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .seo-col {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+  }
+
+  .seo-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .seo-links-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .seo-links-list a {
+    font-size: 0.85rem;
+    color: #1d4ed8;
+    font-weight: 500;
+  }
+
+  .seo-links-list a:hover {
+    text-decoration: underline;
+  }
+
+  .seo-works-link {
+    display: block;
+    text-align: center;
+    font-weight: 600;
+    color: #1d4ed8;
+  }
+
+  @media (max-width: 768px) {
+    .seo-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 500px) {
+    .seo-grid {
       grid-template-columns: 1fr;
     }
   }

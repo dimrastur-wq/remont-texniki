@@ -1,6 +1,7 @@
 import { CITIES, SERVICES, VILLAGES } from '../data/services';
 import { BLOG_ARTICLES } from '../data/blog';
 import { ERROR_CODES } from '../data/errors';
+import { SERVICE_BRANDS, SEO_WORKS } from '../data/seo-pages';
 
 const siteUrl = 'https://master-tehniki74.store';
 
@@ -20,6 +21,24 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/oshibki/`, changefreq: 'weekly', priority: '0.9' });
   pages.push({ loc: `${siteUrl}/remont-kofemashiny/`, changefreq: 'monthly', priority: '0.9', lastmod: today });
   pages.push({ loc: `${siteUrl}/karta-sajta/`, changefreq: 'weekly', priority: '0.6' });
+  pages.push({ loc: `${siteUrl}/raboty/`, changefreq: 'weekly', priority: '0.7' });
+
+  // SEO work pages
+  for (const work of SEO_WORKS) {
+    pages.push({ loc: `${siteUrl}/raboty/${work.slug}/`, changefreq: 'monthly', priority: '0.75' });
+  }
+
+  // Service pages (general)
+  for (const service of Object.values(SERVICES)) {
+    pages.push({ loc: `${siteUrl}/${service.slug}/`, changefreq: 'weekly', priority: '0.85' });
+  }
+
+  // Brand pages per service
+  for (const [serviceSlug, brands] of Object.entries(SERVICE_BRANDS)) {
+    for (const brand of brands) {
+      pages.push({ loc: `${siteUrl}/${serviceSlug}/${brand.slug}/`, changefreq: 'weekly', priority: '0.8' });
+    }
+  }
 
   for (const err of ERROR_CODES) {
     pages.push({ loc: `${siteUrl}/oshibki/${err.slug}/`, changefreq: 'monthly', priority: '0.8', lastmod: today });

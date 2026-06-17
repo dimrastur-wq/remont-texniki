@@ -1,0 +1,201 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import { SITE, CITIES, SERVICES } from '../../data/services';
+import { SERVICE_BRANDS, SEO_WORKS } from '../../data/seo-pages';
+
+export function getStaticPaths() {
+  return Object.keys(SERVICES).map(key => ({
+    params: { service: SERVICES[key].slug },
+    props: { service: SERVICES[key] },
+  }));
+}
+
+const { service } = Astro.props;
+const brands = SERVICE_BRANDS[service.slug] || [];
+const relatedWorks = SEO_WORKS.filter(w => w.appliances.some(a => service.name.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(service.name.toLowerCase())));
+
+const serviceNameRod = service.slug === 'holodilnik' ? 'холодильников' :
+  service.slug === 'stiralnaya-mashina' ? 'стиральных машин' :
+  service.slug === 'mikrovolnovka' ? 'микроволновок' :
+  service.slug === 'elektroplita' ? 'электроплит' :
+  service.slug === 'pylesos' ? 'пылесосов' :
+  service.slug === 'kofemashina' ? 'кофемашин' : service.name.toLowerCase();
+
+const title = `Ремонт ${serviceNameRod} в Миассе, Златоусте, Чебаркуле — цены`;
+const description = `Ремонт ${serviceNameRod} всех брендов. Выезд мастера за 1-2 часа, гарантия 12 месяцев.`;
+---
+
+<Layout title={title} description={description}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main class="service-page">
+    <section class="hero-service">
+      <div class="container">
+        <Breadcrumbs items={[
+          { label: 'Главная', href: '/' },
+          { label: service.name },
+        ]} />
+
+        <div class="hero-grid">
+          <div>
+            <h1>Ремонт {serviceNameRod}</h1>
+            <p class="hero-desc">Ремонтируем {serviceNameRod} всех марок. Выезд на дом, оригинальные запчасти, гарантия 12 месяцев.</p>
+            <div class="hero-stats">
+              <div class="hs"><span class="hs-val">500+</span><span class="hs-lbl">ремонтов</span></div>
+              <div class="hs"><span class="hs-val">1-2 ч</span><span class="hs-lbl">выезд</span></div>
+              <div class="hs"><span class="hs-val">12 мес</span><span class="hs-lbl">гарантия</span></div>
+            </div>
+            <TelegramButtons context={`Здравствуйте! Нужен ремонт ${serviceNameRod}.`} />
+          </div>
+          <div class="hero-cta">
+            <div class="cta-box">
+              <div class="cta-label">Стоимость от</div>
+              <div class="cta-price">{service.commonProblems[0]?.price || '1 000 ₽'}</div>
+              <div class="cta-note">Диагностика бесплатно</div>
+              <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn">Позвонить</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {brands.length > 0 && (
+      <section class="brands-section">
+        <div class="container">
+          <h2>Ремонт {serviceNameRod} по брендам</h2>
+          <div class="brands-grid">
+            {brands.map(b => (
+              <a href={`/${service.slug}/${b.slug}/`} class={`brand-card ${b.popular ? 'popular' : ''}`}>
+                <span class="brand-name">{b.name}</span>
+                <span class="brand-country">{b.country}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section class="problems-section">
+      <div class="container">
+        <h2>Типичные неисправности {serviceNameRod}</h2>
+        <div class="problems-grid">
+          {service.commonProblems.slice(0, 6).map(p => (
+            <div class="problem-card">
+              <h3>{p.problem}</h3>
+              <p class="problem-cause">{p.cause}</p>
+              <div class="problem-meta">
+                <span class="pm-price">{p.price}</span>
+                <span class="pm-time">{p.time}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {relatedWorks.length > 0 && (
+      <section class="works-section">
+        <div class="container">
+          <h2>Виды работ по ремонту {serviceNameRod}</h2>
+          <div class="works-grid">
+            {relatedWorks.slice(0, 8).map(w => (
+              <a href={`/raboty/${w.slug}/`} class="work-card">
+                <h3>{w.name}</h3>
+                <span class="wc-price">от {w.priceFrom.toLocaleString()} ₽</span>
+              </a>
+            ))}
+          </div>
+          <a href="/raboty/" class="all-works">Все виды работ &rarr;</a>
+        </div>
+      </section>
+    )}
+
+    <section class="cities-section">
+      <div class="container">
+        <h2>Ремонт {serviceNameRod} по городам</h2>
+        <div class="cities-grid">
+          {Object.values(CITIES).map(city => (
+            <a href={`/${city.slug}/${service.slug}/`} class="city-card">
+              <span class="city-name">{city.name}</span>
+              <span class="city-note">Выезд за 1-2 часа</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cta-final">
+      <div class="container">
+        <div class="cta-content">
+          <h2>Нужен ремонт {serviceNameRod}?</h2>
+          <p>Позвоните или напишите — мастер ответит за 10 минут</p>
+          <a href={`tel:+${SITE.phoneRaw}`} class="cta-phone">{SITE.phone}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .service-page { background: #f8fafc; }
+  .hero-service { padding: 100px 0 60px; background: #fff; }
+  .hero-grid { display: grid; grid-template-columns: 1fr 280px; gap: 48px; }
+  .hero-service h1 { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; }
+  .hero-desc { font-size: 1.1rem; color: #475569; line-height: 1.7; margin-bottom: 24px; }
+  .hero-stats { display: flex; gap: 24px; margin-bottom: 24px; }
+  .hs { display: flex; flex-direction: column; gap: 2px; }
+  .hs-val { font-size: 1.3rem; font-weight: 800; color: #1d4ed8; }
+  .hs-lbl { font-size: 0.8rem; color: #64748b; }
+  .cta-box { background: #0f172a; padding: 24px; border-radius: 20px; color: #fff; }
+  .cta-label { font-size: 0.85rem; color: #94a3b8; }
+  .cta-price { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+  .cta-note { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+  .cta-btn { display: block; text-align: center; padding: 14px; background: #1d4ed8; border-radius: 10px; font-weight: 600; }
+  .brands-section { padding: 64px 0; background: #f8fafc; }
+  .brands-section h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .brands-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
+  .brand-card { padding: 12px 20px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; }
+  .brand-card:hover { border-color: #1d4ed8; }
+  .brand-card.popular { border-color: #bfdbfe; background: #eff6ff; }
+  .brand-name { font-weight: 600; color: #0f172a; }
+  .brand-country { display: block; font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+  .problems-section { padding: 64px 0; background: #fff; }
+  .problems-section h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .problems-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .problem-card { padding: 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; }
+  .problem-card h3 { font-size: 0.95rem; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+  .problem-cause { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
+  .problem-meta { display: flex; gap: 16px; }
+  .pm-price { font-weight: 700; color: #1d4ed8; }
+  .pm-time { color: #64748b; font-size: 0.85rem; }
+  .works-section { padding: 64px 0; background: #f8fafc; }
+  .works-section h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; text-align: center; }
+  .works-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  .work-card { padding: 16px; background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; }
+  .work-card:hover { border-color: #1d4ed8; }
+  .work-card h3 { font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+  .wc-price { font-size: 0.85rem; color: #1d4ed8; font-weight: 600; }
+  .all-works { display: block; text-align: center; font-weight: 600; color: #1d4ed8; }
+  .cities-section { padding: 64px 0; background: #fff; }
+  .cities-section h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; text-align: center; }
+  .cities-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .city-card { display: flex; flex-direction: column; gap: 4px; padding: 16px 24px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; }
+  .city-card:hover { border-color: #1d4ed8; }
+  .city-name { font-weight: 600; color: #0f172a; }
+  .city-note { font-size: 0.8rem; color: #64748b; }
+  .cta-final { padding: 80px 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+  .cta-content { text-align: center; }
+  .cta-final h2 { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .cta-final p { color: #94a3b8; margin-bottom: 20px; }
+  .cta-phone { font-size: 1.6rem; font-weight: 800; color: #fff; }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } .problems-grid { grid-template-columns: repeat(2, 1fr); } .works-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .problems-grid, .works-grid { grid-template-columns: 1fr; } }
+</style>

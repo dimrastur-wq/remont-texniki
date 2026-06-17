@@ -1,0 +1,255 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import TelegramButtons from '../../components/TelegramButtons.astro';
+import FAQ from '../../components/FAQ.astro';
+import { SITE, CITIES, SERVICES } from '../../data/services';
+import { SERVICE_BRANDS, SEO_WORKS } from '../../data/seo-pages';
+
+export function getStaticPaths() {
+  const paths: { params: { service: string; brand: string }; props: { brand: any } }[] = [];
+
+  for (const [serviceSlug, brands] of Object.entries(SERVICE_BRANDS)) {
+    for (const brand of brands) {
+      paths.push({
+        params: { service: serviceSlug, brand: brand.slug },
+        props: { brand },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { service: serviceSlug, brand: brandSlug } = Astro.params;
+const brand = Astro.props.brand;
+const serviceKey = Object.keys(SERVICES).find(k => SERVICES[k].slug === serviceSlug);
+const service = serviceKey ? SERVICES[serviceKey] : null;
+
+if (!brand || !service) {
+  return Astro.redirect('/404');
+}
+
+const problems = service.commonProblems.slice(0, 5);
+const relatedWorks = SEO_WORKS.filter(w => w.appliances.some(a => service.name.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(service.name.toLowerCase())));
+const cityList = Object.values(CITIES);
+
+const serviceNameRod = service.slug === 'holodilnik' ? 'холодильника' :
+  service.slug === 'stiralnaya-mashina' ? 'стиральной машины' :
+  service.slug === 'mikrovolnovka' ? 'микроволновки' :
+  service.slug === 'elektroplita' ? 'электроплиты' :
+  service.slug === 'pylesos' ? 'пылесоса' :
+  service.slug === 'kofemashina' ? 'кофемашины' : service.name.toLowerCase();
+
+const title = `Ремонт ${brand.name} в Миассе, Златоусте, Чебаркуле — частный мастер`;
+const description = `Ремонт ${serviceNameRod} ${brand.name} на дому. Выезд мастера за 1-2 часа, оригинальные запчасти, гарантия 12 месяцев. Работаем в Миассе, Златоусте, Чебаркуле.`;
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": `Ремонт ${serviceNameRod} ${brand.name}`,
+  "description": description,
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Центр восстановления бытовой техники",
+    "telephone": SITE.phone,
+  },
+  "areaServed": cityList.map(c => ({ "@type": "City", "name": c.name })),
+  "serviceType": "Ремонт бытовой техники",
+  "brand": { "@type": "Brand", "name": brand.name },
+  "offers": { "@type": "Offer", "priceCurrency": "RUB", "price": problems[0]?.price?.replace(/[^0-9]/g, '') || "1000" }
+});
+---
+
+<Layout title={title} description={description} schema={schema}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main class="brand-page">
+    <section class="hero-brand">
+      <div class="container">
+        <Breadcrumbs items={[
+          { label: 'Главная', href: '/' },
+          { label: service.name, href: `/${service.slug}/` },
+          { label: brand.name },
+        ]} />
+
+        <div class="hero-brand-grid">
+          <div class="hero-brand-text">
+            <div class="brand-badge">{brand.country}</div>
+            <h1>Ремонт {serviceNameRod} <span class="brand-name">{brand.name}</span></h1>
+            <p class="hero-desc">Частный мастер по ремонту техники {brand.name}. Работаю в Миассе, Златоусте и Чебаркуле. Выезжаю на дом в день звонка.</p>
+            <TelegramButtons context={`Здравствуйте! Нужен ремонт ${serviceNameRod} ${brand.name}.`} />
+            <div class="hero-features">
+              <div class="hf"><span class="hf-icon">✓</span>Выезд за 1-2 часа</div>
+              <div class="hf"><span class="hf-icon">✓</span>Гарантия 12 мес</div>
+              <div class="hf"><span class="hf-icon">✓</span>Оригинальные запчасти</div>
+            </div>
+          </div>
+          <div class="hero-brand-cta">
+            <div class="cta-card">
+              <div class="cta-label">Стоимость ремонта</div>
+              <div class="cta-price">от {problems[0]?.price || '1 000 ₽'}</div>
+              <div class="cta-note">Диагностика бесплатная при заказе ремонта</div>
+              <a href={`tel:+${SITE.phoneRaw}`} class="cta-btn">Позвонить мастеру</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="problems-section">
+      <div class="container">
+        <h2>Частые неисправности {serviceNameRod} {brand.name}</h2>
+        <div class="problems-grid">
+          {problems.map(p => (
+            <div class="problem-card">
+              <div class="problem-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="problem-content">
+                <h3>{p.problem}</h3>
+                <p class="problem-cause">{p.cause}</p>
+                <div class="problem-meta">
+                  <span class="problem-price">{p.price}</span>
+                  <span class="problem-time">{p.time}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="cities-brand">
+      <div class="container">
+        <h2>Ремонт {serviceNameRod} {brand.name} по городам</h2>
+        <div class="cities-brand-grid">
+          {cityList.map(city => (
+            <a href={`/${city.slug}/${service.slug}/`} class="city-brand-card">
+              <span>{city.name}</span>
+              <span class="cbc-note">Выезд за 1-2 часа</span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    {relatedWorks.length > 0 && (
+      <section class="works-section">
+        <div class="container">
+          <h2>Виды работ по ремонту {serviceNameRod} {brand.name}</h2>
+          <div class="works-grid">
+            {relatedWorks.slice(0, 6).map(w => (
+              <a href={`/raboty/${w.slug}/`} class="work-card">
+                <h3>{w.name}</h3>
+                <p>{w.description.slice(0, 80)}...</p>
+                <div class="work-meta">
+                  <span>от {w.priceFrom.toLocaleString()} ₽</span>
+                  <span>{w.time}</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    )}
+
+    <section class="other-brands">
+      <div class="container">
+        <h2>Ремонт {serviceNameRod} других брендов</h2>
+        <div class="brands-grid">
+          {(SERVICE_BRANDS[service.slug] || []).filter(b => b.slug !== brand.slug).slice(0, 12).map(b => (
+            <a href={`/${service.slug}/${b.slug}/`} class="brand-link">
+              {b.name}
+              {b.popular && <span class="popular-badge">Популярный</span>}
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-section">
+      <div class="container">
+        <h2>Вопросы о ремонте {serviceNameRod} {brand.name}</h2>
+        <FAQ items={[
+          { q: `Как быстро мастер приедет?`, a: 'В день звонка. Обычно за 1-2 часа.' },
+          { q: 'Запчасти есть в наличии?', a: `Для популярных моделей ${brand.name} — есть с собой.` },
+          { q: 'Даёте гарантию?', a: 'Да, 12 месяцев на работу и запчасти.' },
+          { q: 'Можно починить на месте?', a: `В 90% случаев да. Сложный ремонт ${brand.name} делаю в мастерской.` },
+        ]} />
+      </div>
+    </section>
+
+    <section class="cta-final">
+      <div class="container">
+        <div class="cta-final-content">
+          <h2>Нужен ремонт {serviceNameRod} {brand.name}?</h2>
+          <p>Позвоните или напишите — мастер ответит за 10 минут</p>
+          <a href={`tel:+${SITE.phoneRaw}`} class="cta-phone">{SITE.phone}</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .brand-page { background: #f8fafc; }
+  .hero-brand { padding: 100px 0 60px; background: #fff; }
+  .hero-brand-grid { display: grid; grid-template-columns: 1fr 320px; gap: 48px; align-items: start; }
+  .brand-badge { display: inline-block; padding: 4px 12px; background: #eff6ff; color: #1d4ed8; border-radius: 100px; font-size: 0.8rem; font-weight: 600; margin-bottom: 12px; }
+  .hero-brand h1 { font-size: 2.2rem; font-weight: 800; color: #0f172a; margin-bottom: 16px; line-height: 1.2; }
+  .brand-name { color: #1d4ed8; }
+  .hero-desc { font-size: 1.05rem; color: #475569; line-height: 1.7; margin-bottom: 24px; }
+  .hero-features { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 24px; }
+  .hf { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #166534; font-weight: 500; }
+  .hf-icon { color: #16a34a; font-weight: 700; }
+  .cta-card { background: #0f172a; color: #fff; padding: 28px; border-radius: 20px; }
+  .cta-label { font-size: 0.85rem; color: #94a3b8; margin-bottom: 4px; }
+  .cta-price { font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+  .cta-note { font-size: 0.8rem; color: #94a3b8; margin-bottom: 20px; }
+  .cta-btn { display: block; text-align: center; padding: 14px; background: #1d4ed8; color: #fff; border-radius: 12px; font-weight: 600; }
+  .problems-section { padding: 64px 0; background: #f8fafc; }
+  .problems-section h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 32px; text-align: center; }
+  .problems-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .problem-card { display: flex; gap: 16px; padding: 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; }
+  .problem-icon { width: 44px; height: 44px; background: #fef2f2; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #dc2626; flex-shrink: 0; }
+  .problem-content h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 6px; }
+  .problem-cause { font-size: 0.85rem; color: #64748b; margin-bottom: 10px; }
+  .problem-meta { display: flex; gap: 16px; }
+  .problem-price { font-weight: 700; color: #1d4ed8; }
+  .problem-time { color: #64748b; font-size: 0.85rem; }
+  .cities-brand { padding: 64px 0; background: #fff; }
+  .cities-brand h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .cities-brand-grid { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  .city-brand-card { display: flex; flex-direction: column; gap: 4px; padding: 14px 20px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; font-weight: 600; color: #0f172a; }
+  .cbc-note { font-size: 0.75rem; color: #64748b; font-weight: 400; }
+  .works-section { padding: 64px 0; background: #f8fafc; }
+  .works-section h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .works-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .work-card { padding: 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; }
+  .work-card h3 { font-size: 1rem; font-weight: 600; color: #0f172a; margin-bottom: 8px; }
+  .work-card p { font-size: 0.85rem; color: #64748b; margin-bottom: 12px; }
+  .work-meta { display: flex; gap: 16px; font-size: 0.85rem; }
+  .work-meta span:first-child { font-weight: 700; color: #1d4ed8; }
+  .other-brands { padding: 64px 0; background: #fff; }
+  .other-brands h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .brands-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
+  .brand-link { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; font-weight: 500; color: #475569; }
+  .brand-link:hover { border-color: #1d4ed8; color: #1d4ed8; }
+  .popular-badge { font-size: 0.7rem; background: #dcfce7; color: #166534; padding: 2px 8px; border-radius: 100px; }
+  .faq-section { padding: 64px 0; background: #f8fafc; }
+  .faq-section h2 { font-size: 1.6rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; text-align: center; }
+  .cta-final { padding: 80px 0; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+  .cta-final-content { text-align: center; }
+  .cta-final h2 { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 12px; }
+  .cta-final p { color: #94a3b8; margin-bottom: 24px; }
+  .cta-phone { font-size: 1.8rem; font-weight: 800; color: #fff; }
+  @media (max-width: 900px) { .hero-brand-grid { grid-template-columns: 1fr; } .works-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .problems-grid { grid-template-columns: 1fr; } .works-grid { grid-template-columns: 1fr; } }
+</style>
