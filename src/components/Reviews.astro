@@ -1,6 +1,6 @@
 ---
 import { REVIEWS } from '../data/reviews';
-import { CITIES, SITE, type CityKey } from '../data/services';
+import { CITIES, SITE } from '../data/services';
 
 interface Props {
   city?: string;
@@ -10,25 +10,25 @@ interface Props {
 const { city, service } = Astro.props;
 
 let filteredReviews = REVIEWS;
-if (city) {
-  filteredReviews = filteredReviews.filter(r => r.city === city);
-}
-if (service) {
-  filteredReviews = filteredReviews.filter(r => r.service === service);
-}
-if (filteredReviews.length < 3) {
-  filteredReviews = REVIEWS.slice(0, 6);
-}
+if (city) filteredReviews = filteredReviews.filter(r => r.city === city);
+if (service) filteredReviews = filteredReviews.filter(r => r.service === service);
+if (filteredReviews.length < 3) filteredReviews = REVIEWS.slice(0, 6);
+
+const displayReviews = filteredReviews.slice(0, 6);
 
 const formatDate = (dateStr: string) => {
   const d = new Date(dateStr);
   return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
 };
 
-const cityOptions = Object.values(CITIES);
-
 const avgRating = 4.9;
-const reviewCount = filteredReviews.length;
+const totalCount = REVIEWS.length;
+
+const sourceLabels: Record<string, string> = {
+  yandex: 'Яндекс Карты',
+  google: 'Google Maps',
+  '2gis': '2ГИС',
+};
 
 const aggregateRatingSchema = JSON.stringify({
   "@context": "https://schema.org",
@@ -41,46 +41,93 @@ const aggregateRatingSchema = JSON.stringify({
   "ratingValue": avgRating,
   "bestRating": 5,
   "worstRating": 1,
-  "reviewCount": reviewCount,
+  "reviewCount": totalCount,
+});
+
+const reviewsSchema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": displayReviews.map((r, i) => ({
+    "@type": "ListItem",
+    "position": i + 1,
+    "item": {
+      "@type": "Review",
+      "reviewRating": { "@type": "Rating", "ratingValue": r.rating, "bestRating": 5 },
+      "author": { "@type": "Person", "name": r.name },
+      "reviewBody": r.text,
+      "datePublished": r.date,
+    }
+  }))
 });
 ---
 
 <section class="reviews-section" id="reviews">
   <div class="container">
     <script type="application/ld+json" set:html={aggregateRatingSchema} />
+    <script type="application/ld+json" set:html={reviewsSchema} />
+
     <div class="section-header">
-      <span class="section-label">Отзывы</span>
-      <h2>Отзывы наших клиентов</h2>
-      <div class="rating-badge">
-        <span class="rating-value">{avgRating}</span>
-        <div class="rating-stars">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="section-label">Отзывы клиентов</span>
+      <h2>Что говорят о нас на картах</h2>
+      <div class="sources-row">
+        <div class="source-badge yandex">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.04 12c0-5.523 4.476-10 9.999-10C17.523 2 22 6.477 22 12s-4.477 10-10.001 10S2.04 17.523 2.04 12zm9.966 3.5h-1.5V8.5h1.5c1.93 0 2.989 1.01 2.989 2.4 0 1.03-.537 1.73-1.3 2.07l1.73 2.53h-1.82l-1.46-2.26h-.14V15.5zm0-3.36h-.15V9.86h.15c.86 0 1.33.36 1.33.99 0 .62-.45 1.29-1.33 1.29z"/></svg>
+          4.9 · Яндекс Карты
         </div>
-        <span class="rating-count">на основе {reviewCount} отзывов</span>
+        <div class="source-badge google">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          4.9 · Google Maps
+        </div>
+        <div class="source-badge twogis">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" fill="#1ba24f"/><text x="12" y="16" text-anchor="middle" fill="#fff" font-size="9" font-weight="bold">2ГИС</text></svg>
+          4.9 · 2ГИС
+        </div>
       </div>
-      <p class="section-desc">Реальные отзывы от жителей Миасса, Златоуста и Чебаркуля</p>
+      <div class="rating-total">
+        <div class="rating-stars">
+          {[1,2,3,4,5].map(() => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          ))}
+        </div>
+        <span class="rating-num">{avgRating}</span>
+        <span class="rating-count">· {totalCount} отзывов</span>
+      </div>
     </div>
 
     <div class="reviews-grid">
-      {filteredReviews.slice(0, 6).map(review => (
+      {displayReviews.map(review => (
         <div class="review-card">
-          <div class="review-header">
-            <div class="review-avatar">{review.name.charAt(0)}</div>
-            <div>
+          <div class="review-top">
+            <div class="review-avatar" style={`background: hsl(${review.name.charCodeAt(0) * 13 % 360}, 60%, 50%)`}>
+              {review.name.charAt(0)}
+            </div>
+            <div class="review-author">
               <span class="review-name">{review.name}</span>
-              <span class="review-meta">{review.city} &middot; {formatDate(review.date)}</span>
+              <span class="review-meta">{review.city}</span>
             </div>
-            <div class="review-stars">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <div class="review-source-icon">
+              {review.source === 'yandex' && (
+                <div class="source-icon-wrap yandex-icon" title="Яндекс Карты">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M2.04 12c0-5.523 4.476-10 9.999-10C17.523 2 22 6.477 22 12s-4.477 10-10.001 10S2.04 17.523 2.04 12zm9.966 3.5h-1.5V8.5h1.5c1.93 0 2.989 1.01 2.989 2.4 0 1.03-.537 1.73-1.3 2.07l1.73 2.53h-1.82l-1.46-2.26h-.14V15.5zm0-3.36h-.15V9.86h.15c.86 0 1.33.36 1.33.99 0 .62-.45 1.29-1.33 1.29z"/></svg>
+                </div>
+              )}
+              {review.source === 'google' && (
+                <div class="source-icon-wrap google-icon" title="Google Maps">
+                  <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                </div>
+              )}
+              {review.source === '2gis' && (
+                <div class="source-icon-wrap twogis-icon" title="2ГИС">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><circle cx="12" cy="12" r="12" fill="#1ba24f"/><text x="12" y="16" text-anchor="middle" fill="#fff" font-size="8" font-weight="bold">2ГИС</text></svg>
+                </div>
+              )}
             </div>
+          </div>
+          <div class="review-stars">
+            {Array.from({length: review.rating}).map(() => (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            ))}
+            <span class="review-date">{formatDate(review.date)}</span>
           </div>
           <p class="review-text">{review.text}</p>
           <span class="review-service">{review.service}</span>
@@ -88,321 +135,120 @@ const aggregateRatingSchema = JSON.stringify({
       ))}
     </div>
 
-    <div class="review-form-block">
-      <h3>Оставить отзыв</h3>
-      <p class="form-desc">Расскажите о своём опыте — это поможет другим выбрать мастера</p>
-      <form class="review-form" id="review-form">
-        <div class="form-row">
-          <div class="form-group">
-            <label for="review-name">Ваше имя</label>
-            <input type="text" id="review-name" name="name" placeholder="Иван Иванов" required />
+    <div class="reviews-bottom">
+      <div class="review-form-block">
+        <div class="form-block-header">
+          <div class="form-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
           </div>
-          <div class="form-group">
-            <label for="review-city">Город</label>
-            <select id="review-city" name="city" required>
-              <option value="" disabled selected>Выберите город</option>
-              {cityOptions.map(c => (
-                <option value={c.name}>{c.name}</option>
-              ))}
-            </select>
+          <div>
+            <h3>Оставить отзыв</h3>
+            <p class="form-desc">Ваш отзыв поможет другим выбрать мастера</p>
           </div>
         </div>
-        <div class="form-group">
-          <label for="review-text">Ваш отзыв</label>
-          <textarea id="review-text" name="text" rows="3" placeholder="Расскажите, какую технику чинили и как прошёл ремонт..." required></textarea>
-        </div>
-        <button type="submit" class="submit-btn" id="review-submit">
-          Отправить отзыв
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-          </svg>
-        </button>
-        <p class="form-note">Отзыв будет опубликован после проверки модератором</p>
-      </form>
+        <form class="review-form" id="review-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="review-name">Ваше имя</label>
+              <input type="text" id="review-name" name="name" placeholder="Иван Иванов" required />
+            </div>
+            <div class="form-group">
+              <label for="review-city">Город</label>
+              <select id="review-city" name="city" required>
+                <option value="" disabled selected>Выберите город</option>
+                {Object.values(CITIES).map(c => (
+                  <option value={c.name}>{c.name}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="review-text">Ваш отзыв</label>
+            <textarea id="review-text" name="text" rows="3" placeholder="Расскажите, какую технику чинили и как прошёл ремонт..." required></textarea>
+          </div>
+          <button type="submit" class="submit-btn" id="review-submit">
+            Отправить отзыв
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+          <p class="form-note">Отзыв модерируется перед публикацией</p>
+        </form>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  .reviews-section {
-    padding: 80px 0;
-    background: #f8fafc;
-  }
+  .reviews-section { padding: 80px 0; background: #f8fafc; }
 
-  .section-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 48px;
-  }
+  .section-header { text-align: center; max-width: 680px; margin: 0 auto 48px; }
+  .section-label { display: inline-block; padding: 4px 14px; background: #eff6ff; color: #1d4ed8; border-radius: 100px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px; }
+  .section-header h2 { font-size: 2rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
 
-  .section-label {
-    display: inline-block;
-    padding: 4px 14px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-radius: 100px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 16px;
-  }
+  .sources-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+  .source-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 100px; font-size: 0.82rem; font-weight: 600; }
+  .source-badge.yandex { background: #fff3cd; color: #b45309; }
+  .source-badge.google { background: #fff; border: 1px solid #e2e8f0; color: #374151; }
+  .source-badge.twogis { background: #d1fae5; color: #065f46; }
 
-  .section-header h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 12px;
-  }
+  .rating-total { display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .rating-stars { display: flex; gap: 2px; }
+  .rating-num { font-size: 1.4rem; font-weight: 800; color: #0f172a; }
+  .rating-count { font-size: 0.9rem; color: #94a3b8; }
 
-  .section-desc {
-    font-size: 1.05rem;
-    color: #64748b;
-  }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 40px; }
 
-  .rating-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 12px;
-  }
+  .review-card { padding: 24px; background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; transition: all 0.25s; display: flex; flex-direction: column; gap: 12px; }
+  .review-card:hover { border-color: #bfdbfe; box-shadow: 0 6px 24px rgba(29,78,216,0.07); transform: translateY(-2px); }
 
-  .rating-value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
+  .review-top { display: flex; align-items: center; gap: 12px; }
+  .review-avatar { width: 40px; height: 40px; min-width: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: #fff; font-weight: 700; font-size: 1rem; }
+  .review-author { flex: 1; }
+  .review-name { display: block; font-size: 0.95rem; font-weight: 700; color: #0f172a; }
+  .review-meta { display: block; font-size: 0.75rem; color: #94a3b8; margin-top: 1px; }
 
-  .rating-stars {
-    display: flex;
-    gap: 2px;
-  }
+  .review-source-icon { margin-left: auto; }
+  .source-icon-wrap { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 8px; }
+  .yandex-icon { background: #fff3cd; color: #b45309; }
+  .google-icon { background: #fff; border: 1px solid #e2e8f0; }
+  .twogis-icon { overflow: hidden; }
 
-  .rating-count {
-    font-size: 0.85rem;
-    color: #94a3b8;
-  }
+  .review-stars { display: flex; align-items: center; gap: 2px; }
+  .review-date { font-size: 0.75rem; color: #94a3b8; margin-left: auto; }
+  .review-text { font-size: 0.9rem; color: #475569; line-height: 1.65; flex: 1; }
+  .review-service { display: inline-block; padding: 3px 10px; background: #eff6ff; color: #1d4ed8; border-radius: 6px; font-size: 0.75rem; font-weight: 500; align-self: flex-start; }
 
-  .reviews-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 48px;
-  }
+  .reviews-bottom { display: flex; justify-content: center; }
 
-  .review-card {
-    padding: 24px;
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    transition: all 0.3s;
-  }
+  .review-form-block { background: #fff; padding: 40px; border-radius: 20px; border: 1px solid #e2e8f0; box-shadow: 0 8px 32px rgba(0,0,0,0.04); max-width: 700px; width: 100%; }
+  .form-block-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+  .form-icon { width: 48px; height: 48px; background: #eff6ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #1d4ed8; flex-shrink: 0; }
+  .review-form-block h3 { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+  .form-desc { font-size: 0.9rem; color: #64748b; }
 
-  .review-card:hover {
-    border-color: #bfdbfe;
-    box-shadow: 0 4px 16px rgba(29, 78, 216, 0.06);
-  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 0.85rem; font-weight: 500; color: #475569; margin-bottom: 6px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; color: #0f172a; background: #f8fafc; transition: border-color 0.2s, box-shadow 0.2s; font-family: inherit; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.1); background: #fff; }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: #94a3b8; }
+  .form-group select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+  .form-group textarea { resize: vertical; min-height: 90px; }
 
-  .review-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-
-  .review-avatar {
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #1d4ed8;
-    color: #fff;
-    border-radius: 50%;
-    font-weight: 700;
-    font-size: 1rem;
-  }
-
-  .review-name {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: #0f172a;
-  }
-
-  .review-meta {
-    display: block;
-    font-size: 0.75rem;
-    color: #94a3b8;
-  }
-
-  .review-stars {
-    display: flex;
-    gap: 2px;
-    margin-left: auto;
-  }
-
-  .review-text {
-    font-size: 0.9rem;
-    color: #475569;
-    line-height: 1.6;
-    margin-bottom: 12px;
-  }
-
-  .review-service {
-    display: inline-block;
-    padding: 3px 10px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 500;
-  }
-
-  .review-form-block {
-    background: #fff;
-    padding: 40px;
-    border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
-  }
-
-  .review-form-block h3 {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 8px;
-  }
-
-  .form-desc {
-    font-size: 0.95rem;
-    color: #64748b;
-    margin-bottom: 24px;
-  }
-
-  .form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-  }
-
-  .form-group {
-    margin-bottom: 16px;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #475569;
-    margin-bottom: 6px;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    font-size: 0.95rem;
-    color: #0f172a;
-    background: #f8fafc;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    font-family: inherit;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: #1d4ed8;
-    box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.1);
-    background: #fff;
-  }
-
-  .form-group input::placeholder,
-  .form-group textarea::placeholder {
-    color: #94a3b8;
-  }
-
-  .form-group select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    min-height: 80px;
-  }
-
-  .submit-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 14px 28px;
-    background: #1d4ed8;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.25s;
-    box-shadow: 0 4px 14px rgba(29, 78, 216, 0.35);
-    font-family: inherit;
-  }
-
-  .submit-btn:hover {
-    background: #1e40af;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(29, 78, 216, 0.45);
-  }
-
-  .submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .form-note {
-    margin-top: 12px;
-    font-size: 0.75rem;
-    color: #94a3b8;
-  }
+  .submit-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 28px; background: #1d4ed8; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.25s; box-shadow: 0 4px 14px rgba(29,78,216,0.35); font-family: inherit; }
+  .submit-btn:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29,78,216,0.45); }
+  .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .form-note { margin-top: 12px; font-size: 0.75rem; color: #94a3b8; }
 
   @media (max-width: 768px) {
-    .reviews-section {
-      padding: 48px 0;
-    }
-
-    .section-header h2 {
-      font-size: 1.5rem;
-    }
-
-    .reviews-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .review-form-block {
-      padding: 24px;
-    }
+    .reviews-section { padding: 48px 0; }
+    .section-header h2 { font-size: 1.5rem; }
+    .reviews-grid { grid-template-columns: 1fr; }
+    .form-row { grid-template-columns: 1fr; }
+    .review-form-block { padding: 24px; }
   }
 
   @media (min-width: 769px) and (max-width: 1024px) {
-    .reviews-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .reviews-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 
@@ -418,7 +264,7 @@ const aggregateRatingSchema = JSON.stringify({
     const text = (document.getElementById('review-text') as HTMLTextAreaElement).value;
 
     submitBtn.disabled = true;
-    submitBtn.innerHTML = 'Отправка...';
+    submitBtn.textContent = 'Отправка...';
 
     try {
       const response = await fetch('https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram', {
@@ -431,22 +277,20 @@ const aggregateRatingSchema = JSON.stringify({
       });
 
       if (response.ok) {
-        submitBtn.innerHTML = 'Спасибо! Мастер свяжется с вами в течение 10 минут';
+        submitBtn.textContent = 'Отзыв отправлен! Спасибо';
         submitBtn.style.background = '#16a34a';
-        submitBtn.style.boxShadow = '0 4px 14px rgba(22, 163, 74, 0.35)';
         form.reset();
       } else {
-        throw new Error('Ошибка отправки');
+        throw new Error('error');
       }
     } catch {
-      submitBtn.innerHTML = 'Ошибка. Попробуйте позже';
+      submitBtn.textContent = 'Ошибка. Попробуйте позже';
       submitBtn.style.background = '#dc2626';
     }
 
     setTimeout(() => {
-      submitBtn.innerHTML = 'Отправить отзыв <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+      submitBtn.textContent = 'Отправить отзыв';
       submitBtn.style.background = '';
-      submitBtn.style.boxShadow = '';
       submitBtn.disabled = false;
     }, 4000);
   });
