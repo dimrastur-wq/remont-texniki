@@ -113,39 +113,75 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   <!-- ORDERS TAB -->
   <div id="tab-orders" class="tab-content active">
     <div class="tab-inner">
-      <!-- Stats -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon stat-revenue">💰</div>
-          <div class="stat-data">
-            <div id="stat-revenue" class="stat-value">0 ₽</div>
-            <div class="stat-label">Выручка (выполнено)</div>
+
+      <!-- ── ANALYTICS PANEL ── -->
+      <div class="analytics-panel">
+
+        <!-- Month nav -->
+        <div class="analytics-header">
+          <div class="analytics-title-row">
+            <h2 class="analytics-title">Финансовая аналитика</h2>
+            <div class="month-nav">
+              <button class="month-btn" id="month-prev">‹</button>
+              <span id="month-label" class="month-label">Июнь 2026</span>
+              <button class="month-btn" id="month-next">›</button>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-expense">🛒</div>
-          <div class="stat-data">
-            <div id="stat-expenses" class="stat-value">0 ₽</div>
-            <div class="stat-label">Расходы на запчасти</div>
+
+        <!-- KPI row -->
+        <div class="kpi-row">
+          <div class="kpi-card kpi-revenue">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-body">
+              <div id="kpi-revenue" class="kpi-value">0 ₽</div>
+              <div class="kpi-label">Выручка</div>
+              <div id="kpi-revenue-trend" class="kpi-trend"></div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-expense">
+            <div class="kpi-icon">🔩</div>
+            <div class="kpi-body">
+              <div id="kpi-expenses" class="kpi-value">0 ₽</div>
+              <div class="kpi-label">Запчасти</div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-profit">
+            <div class="kpi-icon">📈</div>
+            <div class="kpi-body">
+              <div id="kpi-profit" class="kpi-value">0 ₽</div>
+              <div class="kpi-label">Прибыль</div>
+              <div id="kpi-margin" class="kpi-trend kpi-margin-label"></div>
+            </div>
+          </div>
+          <div class="kpi-card kpi-count">
+            <div class="kpi-icon">📋</div>
+            <div class="kpi-body">
+              <div id="kpi-count" class="kpi-value">0</div>
+              <div class="kpi-label">Выполнено</div>
+              <div id="kpi-total-count" class="kpi-trend"></div>
+            </div>
           </div>
         </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-profit">📈</div>
-          <div class="stat-data">
-            <div id="stat-profit" class="stat-value">0 ₽</div>
-            <div class="stat-label">Чистая прибыль</div>
+
+        <!-- CSS bar chart -->
+        <div class="chart-section">
+          <div class="chart-legend">
+            <span class="legend-dot legend-revenue"></span><span>Выручка</span>
+            <span class="legend-dot legend-profit"></span><span>Прибыль</span>
           </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon stat-count">📋</div>
-          <div class="stat-data">
-            <div id="stat-count" class="stat-value">0</div>
-            <div class="stat-label">Всего заказов</div>
+          <div class="bar-chart" id="bar-chart">
+            <div class="bar-chart-empty">Добавьте выполненные заказы — здесь появится график</div>
           </div>
+          <div class="bar-chart-labels" id="bar-chart-labels"></div>
         </div>
+
+        <!-- Status breakdown -->
+        <div class="status-breakdown" id="status-breakdown"></div>
+
       </div>
 
-      <!-- Add order -->
+      <!-- ── ADD ORDER ── -->
       <div class="section-card">
         <div class="section-header" id="toggle-add-order">
           <h2 class="section-title">+ Добавить заказ</h2>
@@ -165,8 +201,8 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Город</label>
-                <input type="text" name="client_city" placeholder="Челябинск" />
+                <label>Адрес / Город</label>
+                <input type="text" name="client_city" placeholder="Миасс, ул. Ленина 5" />
               </div>
               <div class="form-group">
                 <label>Техника *</label>
@@ -175,22 +211,23 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Марка/Модель</label>
+                <label>Марка / Модель</label>
                 <input type="text" name="brand_model" placeholder="Indesit IWSB 5105" />
               </div>
               <div class="form-group">
                 <label>Статус</label>
                 <select name="status">
-                  <option value="new">Новый</option>
-                  <option value="in_progress">В работе</option>
-                  <option value="completed">Выполнен</option>
-                  <option value="cancelled">Отменён</option>
+                  <option value="new">🆕 Новый</option>
+                  <option value="in_progress">🔧 В работе</option>
+                  <option value="waiting_parts">📦 Ждём запчасть</option>
+                  <option value="completed">✅ Выполнен</option>
+                  <option value="cancelled">❌ Отменён</option>
                 </select>
               </div>
             </div>
             <div class="form-group full">
               <label>Описание неисправности</label>
-              <textarea name="fault_description" rows="2" placeholder="Не крутит барабан, коды E01..."></textarea>
+              <textarea name="fault_description" rows="2" placeholder="Не крутит барабан, шумит при отжиме..."></textarea>
             </div>
             <div class="form-group full">
               <label>Выполненные работы</label>
@@ -198,13 +235,17 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
             </div>
             <div class="form-row">
               <div class="form-group">
-                <label>Стоимость запчастей (₽)</label>
+                <label>Запчасти (₽)</label>
                 <input type="number" name="parts_cost" placeholder="0" min="0" />
               </div>
               <div class="form-group">
-                <label>Стоимость работ (₽)</label>
+                <label>Работа (₽)</label>
                 <input type="number" name="labor_cost" placeholder="0" min="0" />
               </div>
+            </div>
+            <div class="form-total-row" id="form-total-preview">
+              <span class="form-total-label">Итого:</span>
+              <span class="form-total-value" id="form-total-val">0 ₽</span>
             </div>
             <div id="order-form-error" class="form-error hidden"></div>
             <button type="submit" class="btn-primary" id="add-order-submit">Сохранить заказ</button>
@@ -212,22 +253,24 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
         </div>
       </div>
 
-      <!-- Orders list -->
+      <!-- ── ORDERS LIST ── -->
       <div class="section-card">
         <div class="orders-filter-row">
-          <span class="filter-label">Фильтр:</span>
-          <div class="status-filters">
+          <div class="status-filters" id="status-filter-btns">
             <button class="filter-btn active" data-status="all">Все</button>
             <button class="filter-btn" data-status="new">Новые</button>
             <button class="filter-btn" data-status="in_progress">В работе</button>
-            <button class="filter-btn" data-status="completed">Выполнены</button>
+            <button class="filter-btn" data-status="waiting_parts">Ждём</button>
+            <button class="filter-btn" data-status="completed">Готово</button>
             <button class="filter-btn" data-status="cancelled">Отменены</button>
           </div>
+          <input type="text" id="order-search" class="order-search-input" placeholder="Поиск по клиенту или технике..." />
         </div>
         <div id="orders-list" class="orders-list">
           <div class="empty-state">Загрузка заказов...</div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -613,16 +656,92 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   .tab-content.active { display: block; }
   .tab-inner { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; }
 
-  /* ── STATS ── */
-  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
-  @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
-  .stat-card {
+  /* ── ANALYTICS PANEL ── */
+  .analytics-panel {
     background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
-    padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm);
+    overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow-sm);
   }
-  .stat-icon { font-size: 1.6rem; }
-  .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--gray-900); }
-  .stat-label { font-size: .72rem; color: var(--gray-500); margin-top: 2px; }
+  .analytics-header { padding: 16px 20px 0; }
+  .analytics-title-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  }
+  .analytics-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+  .month-nav { display: flex; align-items: center; gap: 8px; }
+  .month-btn {
+    width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--gray-200);
+    background: #fff; color: var(--gray-700); font-size: 1rem; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all .15s;
+    line-height: 1;
+  }
+  .month-btn:hover { background: var(--orange-light); border-color: var(--orange); color: var(--orange-dark); }
+  .month-label { font-size: .85rem; font-weight: 600; color: var(--gray-700); min-width: 110px; text-align: center; }
+
+  /* KPI row */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+    padding: 14px 16px 0;
+  }
+  @media (min-width: 600px) { .kpi-row { grid-template-columns: repeat(4, 1fr); } }
+  .kpi-card {
+    border-radius: 10px; padding: 12px 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .kpi-revenue { background: #fff7ed; }
+  .kpi-expense { background: #eff6ff; }
+  .kpi-profit  { background: #f0fdf4; }
+  .kpi-count   { background: var(--gray-50); border: 1px solid var(--gray-200); }
+  .kpi-icon { font-size: 1.4rem; line-height: 1; margin-top: 2px; }
+  .kpi-body { min-width: 0; }
+  .kpi-value { font-size: 1.1rem; font-weight: 800; color: var(--gray-900); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .kpi-label { font-size: .68rem; color: var(--gray-500); margin-top: 2px; }
+  .kpi-trend { font-size: .68rem; margin-top: 3px; }
+  .kpi-margin-label { color: var(--green); font-weight: 700; }
+
+  /* Bar chart */
+  .chart-section { padding: 16px 16px 4px; }
+  .chart-legend { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; font-size: .72rem; color: var(--gray-600); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block; margin-right: 4px; }
+  .legend-revenue { background: var(--orange); }
+  .legend-profit  { background: var(--green); }
+  .bar-chart {
+    display: flex; align-items: flex-end; gap: 6px; height: 80px;
+    border-bottom: 1px solid var(--gray-200); padding-bottom: 4px;
+  }
+  .bar-chart-empty { font-size: .78rem; color: var(--gray-400); align-self: center; padding: 8px 0; }
+  .bar-group { display: flex; gap: 2px; align-items: flex-end; flex: 1; }
+  .bar {
+    flex: 1; border-radius: 3px 3px 0 0; min-height: 2px;
+    transition: height .3s ease; position: relative;
+  }
+  .bar-rev { background: var(--orange); opacity: .85; }
+  .bar-pro { background: var(--green); opacity: .85; }
+  .bar:hover { opacity: 1; }
+  .bar-chart-labels {
+    display: flex; gap: 6px; padding-top: 4px; padding-bottom: 8px;
+  }
+  .bar-label { flex: 1; text-align: center; font-size: .62rem; color: var(--gray-400); white-space: nowrap; overflow: hidden; }
+
+  /* Status breakdown */
+  .status-breakdown {
+    padding: 12px 16px 14px;
+    display: flex; flex-wrap: wrap; gap: 8px;
+    border-top: 1px solid var(--gray-100);
+  }
+  .breakdown-item {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 10px; border-radius: 20px; font-size: .75rem; font-weight: 600;
+  }
+  .breakdown-item .bdot { width: 7px; height: 7px; border-radius: 50%; }
+  .bd-new       { background: var(--blue-light);   color: var(--blue); }
+  .bd-in_progress { background: var(--yellow-light); color: var(--yellow); }
+  .bd-waiting_parts { background: #fdf4ff; color: #7e22ce; }
+  .bd-completed { background: var(--green-light);  color: var(--green); }
+  .bd-cancelled { background: var(--gray-100);     color: var(--gray-500); }
+  .bdot-new       { background: var(--blue); }
+  .bdot-in_progress { background: var(--yellow); }
+  .bdot-waiting_parts { background: #7e22ce; }
+  .bdot-completed { background: var(--green); }
+  .bdot-cancelled { background: var(--gray-400); }
 
   /* ── SECTION CARD ── */
   .section-card {
@@ -649,19 +768,26 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   .form-group.full { grid-column: 1/-1; }
   .form-group label { font-size: .78rem; font-weight: 600; color: var(--gray-700); }
   .form-group input, .form-group textarea, .form-group select {
-    padding: 9px 12px; border: 1px solid var(--gray-200); border-radius: 8px;
+    padding: 10px 12px; border: 1.5px solid var(--gray-200); border-radius: 9px;
     font-size: .875rem; color: var(--gray-900); background: #fff;
-    transition: border-color .15s;
+    transition: border-color .15s; font-family: inherit;
   }
   .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
-    outline: none; border-color: var(--orange);
+    outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(234,88,12,.1);
   }
-  .form-group textarea { resize: vertical; font-family: inherit; }
+  .form-group textarea { resize: vertical; }
+  .form-total-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; background: var(--orange-light); border-radius: 9px;
+    border: 1px solid var(--orange-mid);
+  }
+  .form-total-label { font-size: .82rem; font-weight: 600; color: var(--orange-dark); }
+  .form-total-value { font-size: 1.05rem; font-weight: 800; color: var(--orange-dark); }
   .form-error { padding: 10px 14px; background: var(--red-light); color: var(--red); border-radius: 8px; font-size: .82rem; }
   .btn-primary {
-    padding: 11px 24px; background: linear-gradient(135deg, var(--orange), var(--orange-dark));
-    color: #fff; font-weight: 700; border: none; border-radius: 9px; cursor: pointer; font-size: .9rem;
-    transition: opacity .15s;
+    padding: 13px 24px; background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; font-size: .95rem;
+    transition: opacity .15s; box-shadow: 0 3px 10px rgba(234,88,12,.25);
   }
   .btn-primary:hover { opacity: .9; }
   .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
@@ -673,54 +799,69 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   .btn-outline:hover { background: var(--orange); color: #fff; }
 
   /* ── FILTER ROW ── */
-  .orders-filter-row { padding: 14px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--gray-100); }
-  .filter-label { font-size: .78rem; font-weight: 600; color: var(--gray-600); }
+  .orders-filter-row {
+    padding: 12px 16px; display: flex; flex-direction: column; gap: 10px;
+    border-bottom: 1px solid var(--gray-100);
+  }
   .status-filters { display: flex; gap: 6px; flex-wrap: wrap; }
   .filter-btn {
-    padding: 5px 12px; border-radius: 20px; border: 1px solid var(--gray-200);
-    background: #fff; color: var(--gray-600); font-size: .78rem; cursor: pointer; transition: all .15s;
+    padding: 6px 12px; border-radius: 20px; border: 1.5px solid var(--gray-200);
+    background: #fff; color: var(--gray-600); font-size: .78rem; font-weight: 500; cursor: pointer; transition: all .15s;
   }
-  .filter-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .filter-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); font-weight: 700; }
   .filter-btn:hover:not(.active) { border-color: var(--orange); color: var(--orange); }
+  .order-search-input {
+    width: 100%; padding: 9px 14px; border: 1.5px solid var(--gray-200); border-radius: 9px;
+    font-size: .85rem; color: var(--gray-900); background: #fff; font-family: inherit;
+  }
+  .order-search-input:focus { outline: none; border-color: var(--orange); }
 
   /* ── ORDERS LIST ── */
   .orders-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); font-size: .9rem; }
 
   .order-card {
-    border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 16px;
-    background: #fff; display: flex; flex-direction: column; gap: 8px;
+    border: 1px solid var(--gray-200); border-radius: 11px; overflow: hidden;
+    background: #fff; display: flex; flex-direction: column;
     transition: box-shadow .15s;
   }
   .order-card:hover { box-shadow: var(--shadow); }
+  .order-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 7px; }
   .order-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
   .order-client { font-weight: 700; font-size: .95rem; color: var(--gray-900); }
-  .order-phone { font-size: .8rem; color: var(--gray-500); }
-  .order-appliance { font-size: .82rem; color: var(--gray-700); }
-  .order-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .order-price { font-size: .85rem; font-weight: 600; color: var(--gray-800); }
-  .order-date { font-size: .75rem; color: var(--gray-400); }
-  .order-desc { font-size: .8rem; color: var(--gray-600); line-height: 1.4; }
-  .order-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .order-contact { font-size: .78rem; color: var(--gray-500); display: flex; gap: 10px; flex-wrap: wrap; }
+  .order-appliance { font-size: .82rem; font-weight: 600; color: var(--gray-700); }
+  .order-desc { font-size: .78rem; color: var(--gray-500); line-height: 1.4; }
+  .order-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 2px; }
+  .order-total { font-size: .85rem; font-weight: 700; color: var(--gray-900); }
+  .order-total-parts { font-size: .72rem; color: var(--gray-500); }
+  .order-date { font-size: .72rem; color: var(--gray-400); }
+  .order-card-footer {
+    padding: 8px 14px; background: var(--gray-50); border-top: 1px solid var(--gray-100);
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  }
   .status-select-inline {
-    padding: 4px 8px; border: 1px solid var(--gray-200); border-radius: 6px;
-    font-size: .75rem; color: var(--gray-700); background: #fff; cursor: pointer;
+    padding: 5px 8px; border: 1.5px solid var(--gray-200); border-radius: 7px;
+    font-size: .78rem; color: var(--gray-700); background: #fff; cursor: pointer; flex: 1; min-width: 120px;
+    font-family: inherit;
   }
+  .status-select-inline:focus { outline: none; border-color: var(--orange); }
   .delete-btn {
-    padding: 4px 10px; border-radius: 6px; border: 1px solid var(--red);
-    color: var(--red); background: none; font-size: .75rem; cursor: pointer;
-    transition: all .15s;
+    padding: 5px 12px; border-radius: 7px; border: 1px solid var(--gray-200);
+    color: var(--gray-500); background: none; font-size: .75rem; cursor: pointer;
+    transition: all .15s; white-space: nowrap;
   }
-  .delete-btn:hover { background: var(--red); color: #fff; }
+  .delete-btn:hover { border-color: var(--red); color: var(--red); }
 
   .status-badge {
     display: inline-flex; align-items: center; gap: 4px;
-    padding: 3px 9px; border-radius: 12px; font-size: .7rem; font-weight: 600;
+    padding: 3px 9px; border-radius: 12px; font-size: .7rem; font-weight: 700; white-space: nowrap;
   }
-  .status-new { background: var(--blue-light); color: var(--blue); }
-  .status-in_progress { background: var(--yellow-light); color: var(--yellow); }
-  .status-completed { background: var(--green-light); color: var(--green); }
-  .status-cancelled { background: var(--gray-100); color: var(--gray-500); }
+  .status-new            { background: var(--blue-light);   color: var(--blue); }
+  .status-in_progress    { background: var(--yellow-light); color: var(--yellow); }
+  .status-waiting_parts  { background: #fdf4ff; color: #7e22ce; }
+  .status-completed      { background: var(--green-light);  color: var(--green); }
+  .status-cancelled      { background: var(--gray-100);     color: var(--gray-500); }
 
   /* ── PARTS FILTERS ── */
   .parts-filters, .service-filters {
@@ -1071,9 +1212,9 @@ function showDashboard(profile) {
   const email = localStorage.getItem('sb_email') || '';
   $('user-email-display').textContent = email;
   $('perk-email-display').textContent = email;
-  // promo code based on uid fragment
   const uid = localStorage.getItem('sb_uid') || '';
   $('perk-promo-code').textContent = 'MASTER15-' + uid.slice(0, 6).toUpperCase();
+  updateMonthLabel();
   loadOrders();
   renderParts();
   renderServiceModes();
@@ -1149,56 +1290,184 @@ $('toggle-add-order').addEventListener('click', () => {
   header.classList.toggle('open');
 });
 
-// ── ORDERS ───────────────────────────────────────────────────────────────────
+// ── ORDERS / CRM ─────────────────────────────────────────────────────────────
 let allOrders = [];
 let currentFilter = 'all';
+let orderSearchQ = '';
+let viewMonth = new Date().getMonth();
+let viewYear  = new Date().getFullYear();
 
-const STATUS_LABELS = { new: 'Новый', in_progress: 'В работе', completed: 'Выполнен', cancelled: 'Отменён' };
-const STATUS_CLASSES = { new: 'status-new', in_progress: 'status-in_progress', completed: 'status-completed', cancelled: 'status-cancelled' };
+const STATUS_LABELS = {
+  new: '🆕 Новый',
+  in_progress: '🔧 В работе',
+  waiting_parts: '📦 Ждём запчасть',
+  completed: '✅ Выполнен',
+  cancelled: '❌ Отменён',
+};
+const STATUS_CLASSES = {
+  new: 'status-new',
+  in_progress: 'status-in_progress',
+  waiting_parts: 'status-waiting_parts',
+  completed: 'status-completed',
+  cancelled: 'status-cancelled',
+};
+const MONTH_NAMES = ['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
 
 function fmt(n) {
+  const v = Number(n || 0);
+  return v >= 1000
+    ? Math.round(v / 100) / 10 + ' тыс. ₽'
+    : v.toLocaleString('ru-RU') + ' ₽';
+}
+function fmtFull(n) {
   return Number(n || 0).toLocaleString('ru-RU') + ' ₽';
 }
 
-function renderStats(orders) {
-  const done = orders.filter(o => o.status === 'completed');
-  const revenue = done.reduce((s, o) => s + Number(o.parts_cost || 0) + Number(o.labor_cost || 0), 0);
-  const expenses = done.reduce((s, o) => s + Number(o.parts_cost || 0), 0);
-  const profit = done.reduce((s, o) => s + Number(o.labor_cost || 0), 0);
-  $('stat-revenue').textContent = fmt(revenue);
-  $('stat-expenses').textContent = fmt(expenses);
-  $('stat-profit').textContent = fmt(profit);
-  $('stat-count').textContent = orders.length;
+// ── ANALYTICS ──────────────────────────────────────────────────────────────
+function updateMonthLabel() {
+  $('month-label').textContent = MONTH_NAMES[viewMonth] + ' ' + viewYear;
 }
 
+function getMonthOrders(orders, month, year) {
+  return orders.filter(o => {
+    const d = new Date(o.created_at || 0);
+    return d.getMonth() === month && d.getFullYear() === year;
+  });
+}
+
+function renderAnalytics(orders) {
+  updateMonthLabel();
+
+  const mo = getMonthOrders(orders, viewMonth, viewYear);
+  const done = mo.filter(o => o.status === 'completed');
+  const revenue  = done.reduce((s, o) => s + Number(o.parts_cost || 0) + Number(o.labor_cost || 0), 0);
+  const expenses = done.reduce((s, o) => s + Number(o.parts_cost || 0), 0);
+  const profit   = done.reduce((s, o) => s + Number(o.labor_cost || 0), 0);
+  const margin   = revenue > 0 ? Math.round(profit / revenue * 100) : 0;
+
+  $('kpi-revenue').textContent  = fmtFull(revenue);
+  $('kpi-expenses').textContent = fmtFull(expenses);
+  $('kpi-profit').textContent   = fmtFull(profit);
+  $('kpi-count').textContent    = done.length;
+  $('kpi-margin').textContent   = revenue > 0 ? `Маржа ${margin}%` : '';
+  $('kpi-total-count').textContent = mo.length > done.length
+    ? `из ${mo.length} заказов` : '';
+
+  // 6-week bar chart (by week within month)
+  renderBarChart(mo);
+
+  // Status breakdown pill row
+  renderBreakdown(mo);
+}
+
+function renderBarChart(mo) {
+  const chart  = $('bar-chart');
+  const labels = $('bar-chart-labels');
+
+  // Group into weeks within the current month view — show last 6 completed weeks
+  // Build 4 week buckets for the month (W1-W4)
+  const weeks = [[], [], [], []];
+  mo.forEach(o => {
+    const d = new Date(o.created_at || 0);
+    const wk = Math.min(3, Math.floor((d.getDate() - 1) / 7));
+    weeks[wk].push(o);
+  });
+
+  const weekData = weeks.map((w, i) => {
+    const done = w.filter(o => o.status === 'completed');
+    const rev = done.reduce((s, o) => s + Number(o.parts_cost || 0) + Number(o.labor_cost || 0), 0);
+    const pro = done.reduce((s, o) => s + Number(o.labor_cost || 0), 0);
+    return { label: `Нед ${i+1}`, rev, pro };
+  });
+
+  const maxVal = Math.max(...weekData.map(w => w.rev), 1);
+  const hasData = weekData.some(w => w.rev > 0);
+
+  if (!hasData) {
+    chart.innerHTML = '<span class="bar-chart-empty">Добавьте выполненные заказы — здесь появится график</span>';
+    labels.innerHTML = '';
+    return;
+  }
+
+  chart.innerHTML = weekData.map(w => `
+    <div class="bar-group">
+      <div class="bar bar-rev" style="height:${Math.max(2, Math.round(w.rev / maxVal * 72))}px" title="Выручка: ${fmtFull(w.rev)}"></div>
+      <div class="bar bar-pro" style="height:${Math.max(w.pro > 0 ? 2 : 0, Math.round(w.pro / maxVal * 72))}px" title="Прибыль: ${fmtFull(w.pro)}"></div>
+    </div>
+  `).join('');
+  labels.innerHTML = weekData.map(w => `<span class="bar-label">${w.label}</span>`).join('');
+}
+
+function renderBreakdown(mo) {
+  const counts = {};
+  mo.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
+  const el = $('status-breakdown');
+  if (Object.keys(counts).length === 0) { el.innerHTML = '<span style="font-size:.78rem;color:var(--gray-400)">Нет заказов за этот период</span>'; return; }
+  el.innerHTML = Object.entries(counts).map(([st, n]) => `
+    <span class="breakdown-item bd-${st}">
+      <span class="bdot bdot-${st}"></span>
+      ${(STATUS_LABELS[st] || st).replace(/^\S+\s/, '')} — ${n}
+    </span>
+  `).join('');
+}
+
+// Month navigation
+$('month-prev').addEventListener('click', () => {
+  viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+  renderAnalytics(allOrders);
+});
+$('month-next').addEventListener('click', () => {
+  const now = new Date();
+  if (viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth())) {
+    viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderAnalytics(allOrders);
+  }
+});
+
+// ── RENDER ORDERS ──────────────────────────────────────────────────────────
 function renderOrders() {
   const list = $('orders-list');
-  const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+  const q = orderSearchQ.toLowerCase();
+  let filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+  if (q) filtered = filtered.filter(o =>
+    (o.client_name || '').toLowerCase().includes(q) ||
+    (o.appliance_type || '').toLowerCase().includes(q) ||
+    (o.brand_model || '').toLowerCase().includes(q) ||
+    (o.client_phone || '').includes(q)
+  );
 
   if (filtered.length === 0) {
-    list.innerHTML = `<div class="empty-state">${currentFilter === 'all' ? 'Заказов пока нет. Добавьте первый!' : 'Нет заказов с таким статусом.'}</div>`;
+    list.innerHTML = `<div class="empty-state">${currentFilter === 'all' && !q ? 'Заказов пока нет. Добавьте первый!' : 'Нет заказов по выбранному фильтру.'}</div>`;
     return;
   }
 
   list.innerHTML = filtered.map(o => {
-    const total = Number(o.parts_cost || 0) + Number(o.labor_cost || 0);
-    const date = o.created_at ? new Date(o.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '';
+    const total  = Number(o.parts_cost || 0) + Number(o.labor_cost || 0);
+    const parts  = Number(o.parts_cost || 0);
+    const date   = o.created_at ? new Date(o.created_at).toLocaleDateString('ru-RU', { day:'2-digit', month:'2-digit', year:'2-digit' }) : '';
+    const badge  = `<span class="status-badge ${STATUS_CLASSES[o.status] || ''}">${STATUS_LABELS[o.status] || o.status}</span>`;
     return `<div class="order-card">
-      <div class="order-card-top">
-        <div>
-          <div class="order-client">${o.client_name || '—'}</div>
-          ${o.client_phone ? `<div class="order-phone">${o.client_phone}</div>` : ''}
-          <div class="order-appliance">${o.appliance_type || ''}${o.brand_model ? ' · ' + o.brand_model : ''}</div>
+      <div class="order-card-body">
+        <div class="order-card-top">
+          <div>
+            <div class="order-client">${o.client_name || '—'}</div>
+            <div class="order-contact">
+              ${o.client_phone ? `<span>📞 ${o.client_phone}</span>` : ''}
+              ${o.client_city  ? `<span>📍 ${o.client_city}</span>`  : ''}
+            </div>
+          </div>
+          ${badge}
         </div>
-        <span class="status-badge ${STATUS_CLASSES[o.status] || ''}">${STATUS_LABELS[o.status] || o.status}</span>
+        <div class="order-appliance">🔧 ${o.appliance_type || ''}${o.brand_model ? ' · ' + o.brand_model : ''}</div>
+        ${o.fault_description ? `<div class="order-desc">${o.fault_description}</div>` : ''}
+        <div class="order-meta">
+          ${total > 0 ? `<span class="order-total">${fmtFull(total)}</span>` : ''}
+          ${parts > 0 && total > parts ? `<span class="order-total-parts">запчасти ${fmtFull(parts)}</span>` : ''}
+          <span class="order-date">${date}</span>
+        </div>
       </div>
-      ${o.fault_description ? `<div class="order-desc">${o.fault_description}</div>` : ''}
-      <div class="order-meta">
-        ${total > 0 ? `<span class="order-price">Итого: ${fmt(total)}</span>` : ''}
-        <span class="order-date">${date}</span>
-      </div>
-      <div class="order-actions">
-        <select class="status-select-inline" data-id="${o.id}" onchange="updateOrderStatus('${o.id}', this.value)">
+      <div class="order-card-footer">
+        <select class="status-select-inline" onchange="updateOrderStatus('${o.id}', this.value)">
           ${Object.entries(STATUS_LABELS).map(([v,l]) => `<option value="${v}"${o.status===v?' selected':''}>${l}</option>`).join('')}
         </select>
         <button class="delete-btn" onclick="deleteOrder('${o.id}')">Удалить</button>
@@ -1209,25 +1478,30 @@ function renderOrders() {
 
 async function loadOrders() {
   const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
+  const uid   = localStorage.getItem('sb_uid');
   const res = await fetch(
     `${SUPA_URL}/rest/v1/master_orders?user_id=eq.${uid}&order=created_at.desc`,
     { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` } }
   );
   if (res.ok) {
     allOrders = await res.json();
-    renderStats(allOrders);
+    renderAnalytics(allOrders);
     renderOrders();
   }
 }
 
-document.querySelectorAll('.filter-btn').forEach(btn => {
+document.querySelectorAll('#status-filter-btns .filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('#status-filter-btns .filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = btn.dataset.status;
     renderOrders();
   });
+});
+
+$('order-search').addEventListener('input', e => {
+  orderSearchQ = e.target.value;
+  renderOrders();
 });
 
 $('add-order-form').addEventListener('submit', async e => {
@@ -1240,49 +1514,57 @@ $('add-order-form').addEventListener('submit', async e => {
   submitBtn.textContent = 'Сохраняем...';
 
   const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
+  const uid   = localStorage.getItem('sb_uid');
   const data = {
     user_id: uid,
-    client_name: form.client_name.value.trim(),
-    client_phone: form.client_phone.value.trim(),
-    client_city: form.client_city.value.trim(),
-    appliance_type: form.appliance_type.value.trim(),
-    brand_model: form.brand_model.value.trim(),
+    client_name:       form.client_name.value.trim(),
+    client_phone:      form.client_phone.value.trim(),
+    client_city:       form.client_city.value.trim(),
+    appliance_type:    form.appliance_type.value.trim(),
+    brand_model:       form.brand_model.value.trim(),
     fault_description: form.fault_description.value.trim(),
-    work_done: form.work_done.value.trim(),
-    parts_cost: parseFloat(form.parts_cost.value) || 0,
-    labor_cost: parseFloat(form.labor_cost.value) || 0,
+    work_done:         form.work_done.value.trim(),
+    parts_cost:  parseFloat(form.parts_cost.value)  || 0,
+    labor_cost:  parseFloat(form.labor_cost.value)  || 0,
     status: form.status.value,
   };
 
   const res = await fetch(`${SUPA_URL}/rest/v1/master_orders`, {
     method: 'POST',
     headers: {
-      'apikey': SUPA_KEY,
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-      'Prefer': 'return=representation',
+      'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json', 'Prefer': 'return=representation',
     },
     body: JSON.stringify(data),
   });
 
   if (res.ok) {
     form.reset();
+    $('form-total-val').textContent = '0 ₽';
     $('add-order-form-wrap').classList.add('hidden');
     $('toggle-add-order').classList.remove('open');
     await loadOrders();
   } else {
     const err = await res.json().catch(() => ({}));
-    errEl.textContent = err.message || 'Ошибка при сохранении. Попробуйте ещё раз.';
+    errEl.textContent = err.message || 'Ошибка при сохранении.';
     errEl.classList.remove('hidden');
   }
   submitBtn.disabled = false;
   submitBtn.textContent = 'Сохранить заказ';
 });
 
+// Live total preview in form
+['parts_cost','labor_cost'].forEach(name => {
+  document.querySelector(`[name="${name}"]`)?.addEventListener('input', () => {
+    const p = parseFloat(document.querySelector('[name=parts_cost]')?.value) || 0;
+    const l = parseFloat(document.querySelector('[name=labor_cost]')?.value) || 0;
+    $('form-total-val').textContent = fmtFull(p + l);
+  });
+});
+
 window.updateOrderStatus = async (id, status) => {
   const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
+  const uid   = localStorage.getItem('sb_uid');
   await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
     method: 'PATCH',
     headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -1290,20 +1572,20 @@ window.updateOrderStatus = async (id, status) => {
   });
   const idx = allOrders.findIndex(o => o.id === id);
   if (idx !== -1) allOrders[idx].status = status;
-  renderStats(allOrders);
+  renderAnalytics(allOrders);
   renderOrders();
 };
 
 window.deleteOrder = async (id) => {
   if (!confirm('Удалить заказ?')) return;
   const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
+  const uid   = localStorage.getItem('sb_uid');
   await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
     method: 'DELETE',
     headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` },
   });
   allOrders = allOrders.filter(o => o.id !== id);
-  renderStats(allOrders);
+  renderAnalytics(allOrders);
   renderOrders();
 };
 
