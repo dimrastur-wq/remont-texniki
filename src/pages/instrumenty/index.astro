@@ -22,7 +22,16 @@ const applianceIcon: Record<string, string> = {
 >
   <SiteHeader />
 
-  <main class="tools-page">
+  <!-- Auth loading overlay -->
+  <div id="auth-loading" style="position:fixed;inset:0;background:#fff;z-index:9999;display:flex;align-items:center;justify-content:center;">
+    <div style="text-align:center;">
+      <div style="width:40px;height:40px;border:3px solid #e5e7eb;border-top-color:#f97316;border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;"></div>
+      <p style="color:#6b7280;font-size:14px;">Проверка доступа...</p>
+    </div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+  <main class="tools-page" id="tools-main" style="display:none;">
 
     <!-- Hero -->
     <section class="tools-hero">
@@ -574,6 +583,40 @@ const applianceIcon: Record<string, string> = {
 </style>
 
 <script>
+  import { createClient } from '@supabase/supabase-js';
+
+  (async () => {
+    const supabase = createClient(
+      import.meta.env.VITE_SUPABASE_URL,
+      import.meta.env.VITE_SUPABASE_ANON_KEY,
+    );
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      window.location.href = '/master/login/?next=/instrumenty/';
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from('master_profiles')
+      .select('subscription_status, subscription_expires_at')
+      .eq('user_id', session.user.id)
+      .maybeSingle();
+
+    const isActive =
+      profile?.subscription_status === 'active' &&
+      profile?.subscription_expires_at &&
+      new Date(profile.subscription_expires_at) > new Date();
+
+    if (!isActive) {
+      window.location.href = '/master/subscribe/';
+      return;
+    }
+
+    document.getElementById('auth-loading')!.remove();
+    document.getElementById('tools-main')!.style.display = '';
+  })();
+
   // ── Tab switching ──────────────────────────────────────────────
   const tabBtns = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
   const tabContents = document.querySelectorAll<HTMLElement>('.tab-content');
