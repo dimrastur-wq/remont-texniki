@@ -15,10 +15,11 @@ const phoneRaw = '79512577757';
     </a>
 
     <nav class="nav">
+      <a href="/">Главная</a>
       <a href="/#services">Услуги</a>
-      <a href="/#why-us">Почему мы</a>
-      <a href="/#map">Карта</a>
-      <a href="/#contact">Контакты</a>
+      <a href="/zapchasti/" class="nav-parts">Запчасти +30%</a>
+      <a href="/kalkulator/">Расчет ремонта</a>
+      <a href="/b2b/">Для бизнеса</a>
       <a href="/instrumenty/" class="nav-tools">Инструменты</a>
       <a href="/master/" class="nav-master">Кабинет</a>
     </nav>
@@ -38,10 +39,11 @@ const phoneRaw = '79512577757';
   </div>
 
   <nav class="mobile-nav" id="mobile-nav">
+    <a href="/">Главная</a>
     <a href="/#services">Услуги</a>
-    <a href="/#why-us">Почему мы</a>
-    <a href="/#map">Карта</a>
-    <a href="/#contact">Контакты</a>
+    <a href="/zapchasti/" class="mobile-parts">Запчасти +30%</a>
+    <a href="/kalkulator/">Расчет ремонта</a>
+    <a href="/b2b/">Для бизнеса</a>
     <a href={`tel:+${phoneRaw}`} class="mobile-phone">{phone}</a>
     <a href="/instrumenty/" class="mobile-tools">Инструменты мастера</a>
     <a href="/master/" class="mobile-master">Кабинет мастера</a>
@@ -113,6 +115,14 @@ const phoneRaw = '79512577757';
   }
   .nav .nav-tools:hover { background: #ea580c; color: #fff; border-color: #ea580c; }
 
+  .nav .nav-parts {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    font-weight: 600;
+  }
+  .nav .nav-parts:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+
   .nav .nav-master {
     background: #1d4ed8;
     color: #fff;
@@ -176,6 +186,8 @@ const phoneRaw = '79512577757';
   .mobile-nav a:last-child { border-bottom: none; }
   .mobile-nav a:hover { background: #f8fafc; color: #1d4ed8; }
   .mobile-phone { color: #1d4ed8 !important; font-weight: 600; }
+  .mobile-parts { color: #15803d !important; background: #f0fdf4; font-weight: 600; }
+  .mobile-parts:hover { background: #dcfce7 !important; }
   .mobile-tools { color: #c2410c !important; background: #fff7ed; font-weight: 600; }
   .mobile-tools:hover { background: #fed7aa !important; }
   .mobile-master { background: #eff6ff; color: #1d4ed8 !important; font-weight: 700; }

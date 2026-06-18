@@ -5,92 +5,263 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import FloatingButton from '../../components/FloatingButton.astro';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
 import TelegramButtons from '../../components/TelegramButtons.astro';
-import Reviews from '../../components/Reviews.astro';
-import { SITE, PARTS } from '../../data/services';
+import { SITE } from '../../data/services';
+import { SHOP_PARTS, SHOP_CATEGORIES, retailPrice, masterPrice, formatPrice } from '../../data/parts';
 
-const title = 'Запчасти для бытовой техники — купить в Миассе, Златоусте, Чебаркуле | Центр восстановления бытовой техники';
-const description = 'Запчасти для холодильников, стиральных машин, микроволновок, электроплит и пылесосов. Новые и Б/У. Наличие на складе в Миассе. Доставка по Южному Уралу.';
-const keywords = 'запчасти бытовая техника, купить запчасти Миасс, компрессор холодильника, ТЭН стиральной машины, магнетрон микроволновки, подшипник барабана';
+const title = 'Магазин запчастей для бытовой техники — Миасс, Златоуст, Чебаркуль | Центр восстановления';
+const description = 'Запчасти для стиральных машин, холодильников, микроволновок и водонагревателей. ТЭНы, помпы, подшипники, ремни. Цены с наценкой +30%. Скидка 15% для мастеров.';
+const keywords = 'запчасти бытовая техника, ТЭН стиральной машины, помпа слива, подшипник барабана, компрессор холодильника, магнетрон, запчасти Миасс';
 
-const schema = JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "ItemList",
-  "name": "Запчасти для бытовой техники",
-  "description": description,
-  "numberOfItems": PARTS.length,
-});
+const subcategoriesMap: Record<string, string[]> = {};
+for (const part of SHOP_PARTS) {
+  if (!subcategoriesMap[part.category]) subcategoriesMap[part.category] = [];
+  if (!subcategoriesMap[part.category].includes(part.subcategory)) {
+    subcategoriesMap[part.category].push(part.subcategory);
+  }
+}
 
-const categories = [...new Set(PARTS.map(p => p.category))];
+const popularParts = SHOP_PARTS.filter(p => p.popular);
+const totalInStock = SHOP_PARTS.filter(p => p.inStock).length;
+
+const categoryIcons: { [key: string]: string } = {
+  'Стиральные машины': '🫧',
+  'Холодильники': '❄️',
+  'Микроволновки': '📡',
+  'Водонагреватели': '🔥',
+};
 ---
 
-<Layout title={title} description={description} keywords={keywords} schema={schema}>
+<Layout title={title} description={description} keywords={keywords}>
   <SiteHeader />
   <FloatingButton />
 
   <main>
     <div class="container">
-      <Breadcrumbs items={[{ label: 'Запчасти' }]} />
+      <Breadcrumbs items={[{ label: 'Магазин запчастей' }]} />
     </div>
 
-    <section class="parts-hero">
+    <!-- Hero -->
+    <section class="shop-hero">
       <div class="container">
-        <span class="badge">Склад запчастей</span>
-        <h1>Запчасти для бытовой техники</h1>
-        <p class="hero-desc">
-          Оригинальные и совместимые запчасти для холодильников, стиральных машин, микроволновок, электроплит и пылесосов.
-          Новые и Б/У варианты. Наличие на складе в Миассе, доставка по Златоусту и Чебаркулю.
-        </p>
-        <TelegramButtons context="Здравствуйте! Ищу запчасти для бытовой техники." />
+        <div class="hero-content">
+          <div class="hero-text">
+            <div class="hero-badges">
+              <span class="badge badge-blue">Склад в Миассе</span>
+              <span class="badge badge-green">{totalInStock} позиций в наличии</span>
+            </div>
+            <h1>Магазин запчастей<br><span class="accent">для бытовой техники</span></h1>
+            <p class="hero-desc">
+              ТЭНы, помпы, подшипники, ремни, манжеты и компрессоры.
+              Оригинальные и совместимые детали для всех популярных брендов.
+              Розничная цена уже включает наценку +30%. Мастерам — скидка 15%.
+            </p>
+            <div class="hero-stats">
+              <div class="stat">
+                <strong>50+</strong>
+                <span>позиций в каталоге</span>
+              </div>
+              <div class="stat">
+                <strong>4</strong>
+                <span>категории техники</span>
+              </div>
+              <div class="stat">
+                <strong>−15%</strong>
+                <span>скидка мастерам</span>
+              </div>
+            </div>
+            <TelegramButtons context="Здравствуйте! Хочу заказать запчасть." />
+          </div>
+          <div class="hero-categories">
+            {SHOP_CATEGORIES.map(cat => {
+              const count = SHOP_PARTS.filter(p => p.category === cat).length;
+              return (
+                <button class="cat-pill" data-cat={cat}>
+                  <span class="cat-icon">{categoryIcons[cat]}</span>
+                  <span class="cat-name">{cat}</span>
+                  <span class="cat-count">{count}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
 
+    <!-- Master discount banner -->
+    <section class="master-banner">
+      <div class="container">
+        <div class="master-inner">
+          <div class="master-icon">🔧</div>
+          <div class="master-text">
+            <strong>Скидка 15% для профессиональных мастеров</strong>
+            <span>Зарегистрируйтесь в Кабинете мастера — и получайте запчасти по сниженным ценам при каждом заказе.</span>
+          </div>
+          <a href="/master/" class="master-cta">Кабинет мастера</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Catalog -->
     <section class="catalog-section">
       <div class="container">
-        <div class="catalog-header">
-          <h2>Каталог запчастей</h2>
-          <div class="filter-row">
-            {categories.map(cat => (
-              <button class="filter-btn" data-category={cat}>{cat}</button>
-            ))}
-            <button class="filter-btn active" data-category="all">Все</button>
+        <div class="catalog-layout">
+
+          <!-- Sidebar filters -->
+          <aside class="sidebar" id="sidebar">
+            <div class="sidebar-section">
+              <h3>Категория</h3>
+              <button class="side-btn active" data-cat="all" data-sub="all">Все запчасти</button>
+              {SHOP_CATEGORIES.map(cat => (
+                <button class="side-btn" data-cat={cat} data-sub="all">{cat}</button>
+              ))}
+            </div>
+
+            <div class="sidebar-section" id="subcats-panel" style="display:none">
+              <h3 id="subcats-title">Подкатегория</h3>
+              <div id="subcats-list"></div>
+            </div>
+
+            <div class="sidebar-section">
+              <h3>Состояние</h3>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-new" checked> Новый
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-used" checked> Б/У
+              </label>
+            </div>
+
+            <div class="sidebar-section">
+              <h3>Наличие</h3>
+              <label class="checkbox-label">
+                <input type="checkbox" id="filter-instock"> Только в наличии
+              </label>
+            </div>
+          </aside>
+
+          <!-- Main content -->
+          <div class="catalog-main">
+            <div class="catalog-toolbar">
+              <div class="toolbar-left">
+                <span class="results-count" id="results-count">{SHOP_PARTS.length} товаров</span>
+              </div>
+              <button class="mobile-filter-btn" id="mobile-filter-btn">Фильтры</button>
+            </div>
+
+            <!-- Popular strip -->
+            <div class="popular-strip" id="popular-strip">
+              <h2 class="section-title">Популярные запчасти</h2>
+              <div class="parts-grid" id="popular-grid">
+                {popularParts.map(part => (
+                  <div
+                    class="part-card"
+                    data-id={part.id}
+                    data-cat={part.category}
+                    data-sub={part.subcategory}
+                    data-condition={part.condition}
+                    data-instock={part.inStock ? '1' : '0'}
+                    data-popular="1"
+                  >
+                    {part.popular && <div class="card-badge">Топ продаж</div>}
+                    <div class="card-meta">
+                      <span class={`condition-tag ${part.condition === 'Новый' ? 'new' : 'used'}`}>{part.condition}</span>
+                      <span class={`stock-tag ${part.inStock ? 'instock' : 'order'}`}>
+                        {part.inStock ? 'В наличии' : 'Под заказ'}
+                      </span>
+                    </div>
+                    <h3 class="card-title">{part.name}</h3>
+                    <div class="card-brands">{part.brands.slice(0, 3).join(', ')}</div>
+                    <div class="card-prices">
+                      <div class="price-retail">
+                        <span class="price-label">Розничная</span>
+                        <span class="price-value">{formatPrice(retailPrice(part))}</span>
+                      </div>
+                      <div class="price-master">
+                        <span class="price-label">Мастерам −15%</span>
+                        <span class="price-value master">{formatPrice(masterPrice(part))}</span>
+                      </div>
+                    </div>
+                    <a
+                      href={`${SITE.telegram}?text=${encodeURIComponent(`Здравствуйте! Интересует: ${part.name}`)}`}
+                      target="_blank"
+                      class="card-order"
+                    >
+                      Заказать в Telegram
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <!-- All parts -->
+            <div id="all-parts-section">
+              <h2 class="section-title" id="all-parts-title">Все запчасти</h2>
+              <div class="parts-grid" id="all-grid">
+                {SHOP_PARTS.map(part => (
+                  <div
+                    class="part-card"
+                    data-id={part.id}
+                    data-cat={part.category}
+                    data-sub={part.subcategory}
+                    data-condition={part.condition}
+                    data-instock={part.inStock ? '1' : '0'}
+                    data-popular={part.popular ? '1' : '0'}
+                  >
+                    {part.popular && <div class="card-badge">Топ продаж</div>}
+                    <div class="card-meta">
+                      <span class={`condition-tag ${part.condition === 'Новый' ? 'new' : 'used'}`}>{part.condition}</span>
+                      <span class={`stock-tag ${part.inStock ? 'instock' : 'order'}`}>
+                        {part.inStock ? 'В наличии' : 'Под заказ'}
+                      </span>
+                    </div>
+                    <h3 class="card-title">{part.name}</h3>
+                    <div class="card-brands">{part.brands.slice(0, 3).join(', ')}</div>
+                    <div class="card-prices">
+                      <div class="price-retail">
+                        <span class="price-label">Розничная</span>
+                        <span class="price-value">{formatPrice(retailPrice(part))}</span>
+                      </div>
+                      <div class="price-master">
+                        <span class="price-label">Мастерам −15%</span>
+                        <span class="price-value master">{formatPrice(masterPrice(part))}</span>
+                      </div>
+                    </div>
+                    <a
+                      href={`${SITE.telegram}?text=${encodeURIComponent(`Здравствуйте! Интересует: ${part.name}`)}`}
+                      target="_blank"
+                      class="card-order"
+                    >
+                      Заказать в Telegram
+                    </a>
+                  </div>
+                ))}
+              </div>
+
+              <div class="no-results" id="no-results" style="display:none">
+                <p>По выбранным фильтрам ничего не найдено.</p>
+                <button id="reset-filters">Сбросить фильтры</button>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="parts-grid" id="parts-grid">
-          {PARTS.map((part, i) => (
-            <div class="part-card" data-category={part.category}>
-              <div class="part-condition" data-condition={part.condition}>
-                {part.condition}
-              </div>
-              <h3>{part.name}</h3>
-              <span class="part-category">{part.category}</span>
-              <div class="part-bottom">
-                <span class="part-price">{part.price}</span>
-                <span class={`part-stock ${part.inStock ? 'in-stock' : 'out-of-stock'}`}>
-                  {part.inStock ? 'В наличии' : 'Под заказ'}
-                </span>
-              </div>
-              <a href={SITE.telegram + `?text=${encodeURIComponent(`Здравствуйте! Интересует запчасть: ${part.name}`)}`} target="_blank" class="part-order">
-                Заказать
-              </a>
-            </div>
-          ))}
-        </div>
-
-        <div class="add-part-note">
-          <h3>Не нашли нужную запчасть?</h3>
-          <p>Напишите нам — подберём и доставим под заказ. Работаем с поставщиками по всей России.</p>
-          <a href={SITE.telegram} target="_blank" class="btn-ask">Спросить в Telegram</a>
+        <!-- Not found block -->
+        <div class="not-found-block">
+          <div class="not-found-inner">
+            <h3>Не нашли нужную запчасть?</h3>
+            <p>Подберём и доставим под заказ. Работаем с поставщиками по всей России.</p>
+            <a href={SITE.telegram} target="_blank" class="btn-tg">Написать в Telegram</a>
+          </div>
         </div>
       </div>
     </section>
 
-    <Reviews />
+    <!-- CTA -->
     <section class="cta-section">
       <div class="container">
         <div class="cta-block">
           <h2>Нужна консультация по запчастям?</h2>
-          <p>Мастер поможет подобрать нужную деталь для вашей модели</p>
+          <p>Мастер поможет подобрать нужную деталь под вашу модель</p>
           <TelegramButtons context="Здравствуйте! Нужна консультация по запчастям." />
           <div class="cta-phone">
             <span>Или позвоните:</span>
@@ -104,313 +275,560 @@ const categories = [...new Set(PARTS.map(p => p.category))];
   <SiteFooter />
 </Layout>
 
-<style>
-  .parts-hero {
-    padding: 24px 0 64px;
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%);
+<!-- Pass subcategory map to client -->
+<script define:vars={{ subcategoriesMap }}>
+  const allCards = Array.from(document.querySelectorAll('#all-grid .part-card'));
+  const popularCards = Array.from(document.querySelectorAll('#popular-grid .part-card'));
+  const countEl = document.getElementById('results-count');
+  const noResults = document.getElementById('no-results');
+  const popularStrip = document.getElementById('popular-strip');
+  const allTitle = document.getElementById('all-parts-title');
+  const subcatsPanel = document.getElementById('subcats-panel');
+  const subcatsList = document.getElementById('subcats-list');
+  const subcatsTitle = document.getElementById('subcats-title');
+
+  let activeCat = 'all';
+  let activeSub = 'all';
+  let showNew = true;
+  let showUsed = true;
+  let onlyInStock = false;
+
+  function buildSubcats(cat) {
+    subcatsList.innerHTML = '';
+    if (!subcategoriesMap[cat]) return;
+    const all = document.createElement('button');
+    all.className = 'sub-btn active';
+    all.dataset.sub = 'all';
+    all.textContent = 'Все';
+    all.addEventListener('click', () => selectSub('all'));
+    subcatsList.appendChild(all);
+
+    subcategoriesMap[cat].forEach(sub => {
+      const btn = document.createElement('button');
+      btn.className = 'sub-btn';
+      btn.dataset.sub = sub;
+      btn.textContent = sub;
+      btn.addEventListener('click', () => selectSub(sub));
+      subcatsList.appendChild(btn);
+    });
   }
 
+  function selectCat(cat) {
+    activeCat = cat;
+    activeSub = 'all';
+
+    document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll(`.side-btn[data-cat="${cat}"]`).forEach(b => {
+      if (b.dataset.sub === 'all') b.classList.add('active');
+    });
+
+    document.querySelectorAll('.cat-pill').forEach(b => {
+      b.classList.toggle('active', b.dataset.cat === cat);
+    });
+
+    if (cat !== 'all') {
+      buildSubcats(cat);
+      subcatsTitle.textContent = cat;
+      subcatsPanel.style.display = '';
+    } else {
+      subcatsPanel.style.display = 'none';
+    }
+
+    applyFilters();
+  }
+
+  function selectSub(sub) {
+    activeSub = sub;
+    document.querySelectorAll('.sub-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll(`.sub-btn[data-sub="${sub}"]`).forEach(b => b.classList.add('active'));
+    applyFilters();
+  }
+
+  function cardMatches(card) {
+    const cat = card.dataset.cat;
+    const sub = card.dataset.sub;
+    const condition = card.dataset.condition;
+    const instock = card.dataset.instock === '1';
+
+    if (activeCat !== 'all' && cat !== activeCat) return false;
+    if (activeSub !== 'all' && sub !== activeSub) return false;
+    if (!showNew && condition === 'Новый') return false;
+    if (!showUsed && condition === 'Б/У') return false;
+    if (onlyInStock && !instock) return false;
+    return true;
+  }
+
+  function applyFilters() {
+    let visible = 0;
+
+    allCards.forEach(card => {
+      const show = cardMatches(card);
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    // Popular strip: only when showing all
+    const showPopular = activeCat === 'all' && activeSub === 'all' && !onlyInStock && showNew && showUsed;
+    popularStrip.style.display = showPopular ? '' : 'none';
+    allTitle.textContent = showPopular ? 'Все запчасти' : (activeCat !== 'all' ? activeCat : 'Результаты');
+
+    countEl.textContent = `${visible} товаров`;
+    noResults.style.display = visible === 0 ? '' : 'none';
+  }
+
+  // Category pills in hero
+  document.querySelectorAll('.cat-pill').forEach(btn => {
+    btn.addEventListener('click', () => selectCat(btn.dataset.cat));
+  });
+
+  // Sidebar category buttons
+  document.querySelectorAll('.side-btn[data-cat]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.dataset.sub === 'all') selectCat(btn.dataset.cat);
+    });
+  });
+
+  // Checkboxes
+  document.getElementById('filter-new').addEventListener('change', e => {
+    showNew = e.target.checked; applyFilters();
+  });
+  document.getElementById('filter-used').addEventListener('change', e => {
+    showUsed = e.target.checked; applyFilters();
+  });
+  document.getElementById('filter-instock').addEventListener('change', e => {
+    onlyInStock = e.target.checked; applyFilters();
+  });
+
+  // Reset
+  document.getElementById('reset-filters').addEventListener('click', () => {
+    activeCat = 'all'; activeSub = 'all';
+    showNew = true; showUsed = true; onlyInStock = false;
+    document.getElementById('filter-new').checked = true;
+    document.getElementById('filter-used').checked = true;
+    document.getElementById('filter-instock').checked = false;
+    document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.side-btn[data-cat="all"]').classList.add('active');
+    document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+    subcatsPanel.style.display = 'none';
+    applyFilters();
+  });
+
+  // Mobile sidebar toggle
+  const mobileBtn = document.getElementById('mobile-filter-btn');
+  const sidebar = document.getElementById('sidebar');
+  mobileBtn.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    mobileBtn.textContent = sidebar.classList.contains('open') ? 'Закрыть' : 'Фильтры';
+  });
+</script>
+
+<style>
+  /* ── Base ── */
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── Hero ── */
+  .shop-hero {
+    padding: 24px 0 56px;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 60%, #bfdbfe 100%);
+  }
+
+  .hero-content {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 48px;
+    align-items: start;
+  }
+
+  .hero-badges { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
   .badge {
     display: inline-block;
-    padding: 6px 16px;
-    background: rgba(29, 78, 216, 0.1);
-    color: #1d4ed8;
+    padding: 5px 14px;
     border-radius: 100px;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     font-weight: 600;
-    margin-bottom: 20px;
   }
+  .badge-blue { background: rgba(29,78,216,0.12); color: #1d4ed8; }
+  .badge-green { background: rgba(22,163,74,0.12); color: #15803d; }
 
-  .parts-hero h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
+  .shop-hero h1 {
+    font-size: 2.6rem;
+    font-weight: 800;
     line-height: 1.15;
     color: #0f172a;
     margin-bottom: 20px;
   }
+  .accent { color: #1d4ed8; }
 
   .hero-desc {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #475569;
     line-height: 1.7;
-    margin-bottom: 32px;
-    max-width: 700px;
+    margin-bottom: 28px;
+    max-width: 600px;
   }
 
-  .catalog-section {
-    padding: 80px 0;
-  }
-
-  .catalog-header h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: 20px;
-  }
-
-  .filter-row {
+  .hero-stats {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    gap: 32px;
     margin-bottom: 32px;
   }
+  .stat { display: flex; flex-direction: column; }
+  .stat strong { font-size: 1.6rem; font-weight: 800; color: #1d4ed8; line-height: 1; }
+  .stat span { font-size: 0.8rem; color: #64748b; margin-top: 4px; }
 
-  .filter-btn {
-    padding: 8px 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+  .hero-categories {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cat-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
     background: #fff;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #475569;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s;
     font-family: inherit;
+    text-align: left;
   }
-
-  .filter-btn:hover,
-  .filter-btn.active {
-    background: #1d4ed8;
-    color: #fff;
+  .cat-pill:hover, .cat-pill.active {
     border-color: #1d4ed8;
+    background: #eff6ff;
+    box-shadow: 0 4px 16px rgba(29,78,216,0.1);
+  }
+  .cat-icon { font-size: 1.4rem; }
+  .cat-name { font-size: 0.9rem; font-weight: 600; color: #0f172a; flex: 1; }
+  .cat-count {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #e0e7ff;
+    color: #1d4ed8;
+    padding: 2px 8px;
+    border-radius: 20px;
   }
 
-  .parts-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+  /* ── Master banner ── */
+  .master-banner {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 20px 0;
+  }
+  .master-inner {
+    display: flex;
+    align-items: center;
     gap: 20px;
   }
-
-  .part-card {
-    padding: 24px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 16px;
-    transition: all 0.3s;
+  .master-icon { font-size: 2rem; }
+  .master-text {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    gap: 4px;
   }
-
-  .part-card:hover {
-    background: #fff;
-    border-color: #bfdbfe;
-    box-shadow: 0 8px 32px rgba(29, 78, 216, 0.08);
-    transform: translateY(-2px);
-  }
-
-  .part-condition {
-    display: inline-block;
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    margin-bottom: 12px;
-    width: fit-content;
-  }
-
-  .part-condition[data-condition="Новый"] {
-    background: #dcfce7;
-    color: #16a34a;
-  }
-
-  .part-condition[data-condition="Б/У"] {
-    background: #fef3c7;
-    color: #d97706;
-  }
-
-  .part-card h3 {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 6px;
-  }
-
-  .part-category {
-    font-size: 0.8rem;
-    color: #94a3b8;
-    margin-bottom: 16px;
-  }
-
-  .part-bottom {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    margin-top: auto;
-  }
-
-  .part-price {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #0f172a;
-  }
-
-  .part-stock {
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 6px;
-  }
-
-  .part-stock.in-stock {
-    background: #dcfce7;
-    color: #16a34a;
-  }
-
-  .part-stock.out-of-stock {
-    background: #fef3c7;
-    color: #d97706;
-  }
-
-  .part-order {
-    display: block;
-    text-align: center;
-    padding: 10px;
+  .master-text strong { color: #fff; font-size: 1rem; }
+  .master-text span { color: #94a3b8; font-size: 0.85rem; }
+  .master-cta {
+    padding: 10px 22px;
     background: #1d4ed8;
     color: #fff;
     border-radius: 10px;
     font-weight: 600;
     font-size: 0.9rem;
-    transition: all 0.25s;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .master-cta:hover { background: #1e40af; }
+
+  /* ── Catalog layout ── */
+  .catalog-section { padding: 56px 0 40px; }
+
+  .catalog-layout {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 32px;
+    align-items: start;
   }
 
-  .part-order:hover {
-    background: #1e40af;
-  }
-
-  .add-part-note {
-    margin-top: 48px;
-    padding: 32px;
+  /* ── Sidebar ── */
+  .sidebar {
     background: #f8fafc;
-    border: 2px dashed #bfdbfe;
+    border: 1px solid #e2e8f0;
     border-radius: 16px;
-    text-align: center;
+    padding: 20px;
+    position: sticky;
+    top: 80px;
   }
-
-  .add-part-note h3 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: #0f172a;
-    margin-bottom: 8px;
+  .sidebar-section { margin-bottom: 24px; }
+  .sidebar-section:last-child { margin-bottom: 0; }
+  .sidebar-section h3 {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #94a3b8;
+    margin-bottom: 10px;
   }
-
-  .add-part-note p {
-    font-size: 0.95rem;
+  .side-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    font-size: 0.875rem;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    margin-bottom: 2px;
+  }
+  .side-btn:hover { background: #e0e7ff; color: #1d4ed8; }
+  .side-btn.active { background: #1d4ed8; color: #fff; }
+  .sub-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 6px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    font-size: 0.82rem;
     color: #64748b;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+    margin-bottom: 2px;
+  }
+  .sub-btn:hover { background: #e0e7ff; color: #1d4ed8; }
+  .sub-btn.active { background: #dbeafe; color: #1d4ed8; font-weight: 600; }
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: #475569;
+    cursor: pointer;
+    padding: 4px 0;
+  }
+  .checkbox-label input { accent-color: #1d4ed8; width: 15px; height: 15px; cursor: pointer; }
+
+  /* ── Toolbar ── */
+  .catalog-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+  .results-count { font-size: 0.9rem; color: #64748b; }
+  .mobile-filter-btn { display: none; }
+
+  /* ── Section title ── */
+  .section-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #0f172a;
     margin-bottom: 20px;
   }
 
-  .btn-ask {
+  /* ── Parts grid ── */
+  .parts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .part-card {
+    position: relative;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.25s;
+  }
+  .part-card:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 8px 28px rgba(29,78,216,0.09);
+    transform: translateY(-2px);
+  }
+
+  .card-badge {
+    position: absolute;
+    top: -1px;
+    right: 14px;
+    background: #f59e0b;
+    color: #fff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 0 0 8px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; }
+  .condition-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .condition-tag.new { background: #dcfce7; color: #15803d; }
+  .condition-tag.used { background: #fef3c7; color: #d97706; }
+  .stock-tag {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+  }
+  .stock-tag.instock { background: #dcfce7; color: #15803d; }
+  .stock-tag.order { background: #f1f5f9; color: #64748b; }
+
+  .card-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #0f172a;
+    line-height: 1.4;
+    flex: 1;
+  }
+
+  .card-brands { font-size: 0.78rem; color: #94a3b8; }
+
+  .card-prices {
+    display: flex;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .price-retail, .price-master {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .price-label { font-size: 0.7rem; color: #94a3b8; }
+  .price-value { font-size: 1rem; font-weight: 700; color: #0f172a; }
+  .price-value.master { color: #15803d; }
+
+  .card-order {
+    display: block;
+    text-align: center;
+    padding: 9px;
+    background: #1d4ed8;
+    color: #fff !important;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.82rem;
+    transition: background 0.2s;
+    margin-top: 6px;
+  }
+  .card-order:hover { background: #1e40af; }
+
+  /* ── No results ── */
+  .no-results {
+    text-align: center;
+    padding: 48px;
+    color: #64748b;
+  }
+  .no-results button {
+    margin-top: 16px;
+    padding: 10px 24px;
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+
+  /* ── Not found block ── */
+  .not-found-block {
+    margin-top: 8px;
+    margin-bottom: 8px;
+  }
+  .not-found-inner {
+    padding: 36px 40px;
+    background: #f8fafc;
+    border: 2px dashed #bfdbfe;
+    border-radius: 20px;
+    text-align: center;
+  }
+  .not-found-inner h3 { font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .not-found-inner p { font-size: 0.95rem; color: #64748b; margin-bottom: 20px; }
+  .btn-tg {
     display: inline-flex;
     align-items: center;
-    padding: 12px 24px;
+    gap: 8px;
+    padding: 12px 26px;
     background: #0088cc;
     color: #fff;
     border-radius: 10px;
     font-weight: 600;
     font-size: 0.95rem;
-    transition: all 0.25s;
-    box-shadow: 0 4px 14px rgba(0, 136, 204, 0.3);
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px rgba(0,136,204,0.3);
   }
+  .btn-tg:hover { background: #006daa; transform: translateY(-1px); }
 
-  .btn-ask:hover {
-    background: #006daa;
-    transform: translateY(-1px);
-  }
-
-  .cta-section {
-    padding: 80px 0;
-  }
-
+  /* ── CTA ── */
+  .cta-section { padding: 60px 0; }
   .cta-block {
     text-align: center;
-    padding: 48px;
+    padding: 52px 40px;
     background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
     border-radius: 24px;
     color: #fff;
   }
+  .cta-block h2 { font-size: 2rem; font-weight: 800; margin-bottom: 12px; }
+  .cta-block p { font-size: 1.05rem; opacity: 0.9; margin-bottom: 32px; }
+  .cta-phone { margin-top: 20px; font-size: 0.9rem; opacity: 0.8; }
+  .cta-phone a { color: #93c5fd; font-weight: 600; font-size: 1.1rem; margin-left: 8px; }
 
-  .cta-block h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    margin-bottom: 12px;
-  }
-
-  .cta-block p {
-    font-size: 1.05rem;
-    opacity: 0.9;
-    margin-bottom: 32px;
-  }
-
-  .cta-phone {
-    margin-top: 20px;
-    font-size: 0.9rem;
-    opacity: 0.8;
-  }
-
-  .cta-phone a {
-    color: #93c5fd;
-    font-weight: 600;
-    font-size: 1.1rem;
-    margin-left: 8px;
+  /* ── Responsive ── */
+  @media (max-width: 1024px) {
+    .parts-grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (max-width: 768px) {
-    .parts-hero {
-      padding: 16px 0 40px;
+    .hero-content { grid-template-columns: 1fr; gap: 28px; }
+    .hero-categories { flex-direction: row; flex-wrap: wrap; }
+    .cat-pill { flex: 1 1 calc(50% - 5px); min-width: 140px; }
+    .shop-hero h1 { font-size: 1.8rem; }
+    .hero-stats { gap: 20px; }
+
+    .master-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+
+    .catalog-layout { grid-template-columns: 1fr; }
+
+    .sidebar {
+      position: static;
+      display: none;
+    }
+    .sidebar.open { display: block; margin-bottom: 20px; }
+
+    .mobile-filter-btn {
+      display: block;
+      padding: 8px 18px;
+      background: #1d4ed8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
     }
 
-    .parts-hero h1 {
-      font-size: 1.75rem;
-    }
-
-    .catalog-section,
-    .cta-section {
-      padding: 48px 0;
-    }
-
-    .catalog-header h2 {
-      font-size: 1.5rem;
-    }
-
-    .parts-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .cta-block {
-      padding: 32px 20px;
-    }
-
-    .cta-block h2 {
-      font-size: 1.5rem;
-    }
-  }
-
-  @media (min-width: 769px) and (max-width: 1024px) {
-    .parts-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+    .parts-grid { grid-template-columns: 1fr; gap: 12px; }
+    .cta-block { padding: 36px 20px; }
+    .cta-block h2 { font-size: 1.5rem; }
+    .not-found-inner { padding: 28px 20px; }
   }
 </style>
-
-<script>
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const cards = document.querySelectorAll('.part-card');
-
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const category = btn.getAttribute('data-category');
-
-      cards.forEach(card => {
-        if (category === 'all' || card.getAttribute('data-category') === category) {
-          (card as HTMLElement).style.display = '';
-        } else {
-          (card as HTMLElement).style.display = 'none';
-        }
-      });
-    });
-  });
-</script>

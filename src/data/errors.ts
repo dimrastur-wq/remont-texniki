@@ -1,5 +1,6 @@
 export interface ErrorCode {
   id: string;
+  slug: string;
   brand: string;
   appliance: string;
   code: string;
@@ -8,7 +9,7 @@ export interface ErrorCode {
   urgency: 'high' | 'medium' | 'low';
 }
 
-export const ERROR_CODES: ErrorCode[] = [
+export const ERROR_CODES: ErrorCode[] = ([
   { id: 'bosch-e01', brand: 'Bosch', appliance: 'Стиральная машина', code: 'E01 / F01', description: 'Нет нагрева воды', cause: 'Неисправен ТЭН или термостат', urgency: 'high' },
   { id: 'bosch-e03', brand: 'Bosch', appliance: 'Стиральная машина', code: 'E03 / F03', description: 'Ошибка слива', cause: 'Засор помпы или патрубка слива', urgency: 'medium' },
   { id: 'bosch-e04', brand: 'Bosch', appliance: 'Стиральная машина', code: 'E04 / F04', description: 'Переполнение водой', cause: 'Неисправен прессостат или клапан заливной', urgency: 'high' },
@@ -43,7 +44,7 @@ export const ERROR_CODES: ErrorCode[] = [
   { id: 'lg-fr-erff', brand: 'LG', appliance: 'Холодильник', code: 'Er FF', description: 'Вентилятор морозилки', cause: 'Мотор вентилятора заморозился или вышел из строя', urgency: 'high' },
   { id: 'lg-fr-erdh', brand: 'LG', appliance: 'Холодильник', code: 'Er dH', description: 'Ошибка размораживания', cause: 'Неисправен нагреватель разморозки или датчик', urgency: 'high' },
   { id: 'lg-fr-erco', brand: 'LG', appliance: 'Холодильник', code: 'Er CO', description: 'Нет связи между платами', cause: 'Повреждён шлейф или неисправна плата', urgency: 'high' },
-];
+] as Omit<ErrorCode, 'slug'>[]).map(e => ({ ...e, slug: e.id }));
 
 export const ERROR_BRANDS = [...new Set(ERROR_CODES.map(e => e.brand))];
 export const ERROR_APPLIANCES = [...new Set(ERROR_CODES.map(e => e.appliance))];
