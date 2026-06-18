@@ -1,0 +1,903 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { ERROR_CODES, ERROR_BRANDS, ERROR_APPLIANCES } from '../../data/errors';
+import { SITE } from '../../data/services';
+
+const urgencyLabel: Record<string, string> = { high: 'Срочно', medium: 'Умеренно', low: 'Несрочно' };
+const applianceIcon: Record<string, string> = {
+  'стиральная машина': '🫧',
+  'холодильник': '🧊',
+  'микроволновка': '📡',
+  'посудомоечная машина': '🍽️',
+  'кофемашина': '☕',
+};
+---
+
+<Layout
+  title="Инструменты мастера — коды ошибок, шаблоны, генератор актов"
+  description="База кодов ошибок бытовой техники Bosch, LG, Samsung, Indesit, Whirlpool. Шаблоны актов приёма, гарантийных талонов. Генератор документов для мастеров по ремонту."
+  keywords="коды ошибок стиральных машин, ошибки холодильников, шаблон акта приёма техники, гарантийный талон шаблон, генератор акта ремонта"
+>
+  <SiteHeader />
+
+  <main class="tools-page">
+
+    <!-- Hero -->
+    <section class="tools-hero">
+      <div class="container">
+        <div class="hero-badge">Профессиональный инструментарий</div>
+        <h1>Инструменты мастера</h1>
+        <p class="hero-sub">База кодов ошибок, шаблоны документов и генератор актов выполненных работ — всё необходимое для профессионального сервиса в одном месте</p>
+        <div class="hero-features">
+          <div class="hf">
+            <div class="hf-icon">🔍</div>
+            <div>
+              <div class="hf-title">{ERROR_CODES.length}+ кодов ошибок</div>
+              <div class="hf-sub">Bosch, LG, Samsung, Indesit и другие</div>
+            </div>
+          </div>
+          <div class="hf">
+            <div class="hf-icon">📄</div>
+            <div>
+              <div class="hf-title">3 шаблона документов</div>
+              <div class="hf-sub">Акт, договор, гарантийный талон</div>
+            </div>
+          </div>
+          <div class="hf">
+            <div class="hf-icon">🖨️</div>
+            <div>
+              <div class="hf-title">Генератор акта</div>
+              <div class="hf-sub">Заполни форму — получи PDF</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sticky tabs -->
+    <div class="tabs-bar" id="tabs-bar">
+      <div class="container">
+        <div class="tabs-nav">
+          <button class="tab-btn active" data-tab="errors">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            Коды ошибок
+          </button>
+          <button class="tab-btn" data-tab="templates">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Шаблоны документов
+          </button>
+          <button class="tab-btn" data-tab="generator">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/></svg>
+            Генератор акта
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB 1: Error Codes ─── -->
+    <div class="tab-content active" id="tab-errors">
+      <div class="container">
+        <div class="filter-bar">
+          <div class="filter-search-wrap">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="error-search" placeholder="Поиск по коду, бренду или описанию..." class="filter-search" />
+          </div>
+          <div class="filter-row">
+            <div class="filter-group">
+              <span class="filter-label">Бренд:</span>
+              <div class="filter-chips" id="brand-chips">
+                <button class="chip active" data-brand="all">Все</button>
+                {ERROR_BRANDS.map(b => (
+                  <button class="chip" data-brand={b}>{b}</button>
+                ))}
+              </div>
+            </div>
+            <div class="filter-group">
+              <span class="filter-label">Техника:</span>
+              <div class="filter-chips" id="appliance-chips">
+                <button class="chip active" data-appliance="all">Все</button>
+                {ERROR_APPLIANCES.map(a => (
+                  <button class="chip" data-appliance={a}>{a}</button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="errors-count" id="errors-count">Показано: {ERROR_CODES.length} кодов</div>
+
+        <div class="errors-grid" id="errors-grid">
+          {ERROR_CODES.map(err => (
+            <div
+              class="error-card"
+              data-brand={err.brand}
+              data-appliance={err.appliance}
+              data-text={`${err.code} ${err.brand} ${err.appliance} ${err.meaning} ${err.causes.join(' ')}`}
+            >
+              <div class="ec-header">
+                <div class="ec-code">{err.code}</div>
+                <div class="ec-badges">
+                  <span class={`urgency-badge urgency-${err.urgency}`}>{urgencyLabel[err.urgency]}</span>
+                  <span class="appliance-badge">{applianceIcon[err.appliance] || '🔧'} {err.appliance}</span>
+                </div>
+              </div>
+              <div class="ec-brand">{err.brand}</div>
+              <p class="ec-meaning">{err.meaning}</p>
+              <button class="ec-expand" aria-expanded="false">
+                Подробнее
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div class="ec-details" hidden>
+                {err.causes.length > 0 && (
+                  <div class="ec-section">
+                    <div class="ec-section-title">Причины</div>
+                    <ul class="ec-list">
+                      {err.causes.map(c => <li>{c}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {err.diySteps.length > 0 && (
+                  <div class="ec-section">
+                    <div class="ec-section-title">Что проверить самостоятельно</div>
+                    <ol class="ec-list">
+                      {err.diySteps.map(s => <li>{s}</li>)}
+                    </ol>
+                  </div>
+                )}
+                <div class="ec-section">
+                  <div class="ec-section-title">Когда вызвать мастера</div>
+                  <p class="ec-when">{err.whenCallMaster}</p>
+                </div>
+                <div class="ec-footer">
+                  <span class="ec-price">{err.repairPrice}</span>
+                  <a href={`tel:+${SITE.phoneRaw}`} class="ec-call">Вызвать мастера</a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div class="no-results" id="no-results" hidden>
+          <div class="no-results-icon">🔍</div>
+          <p>Ничего не найдено. Попробуйте другой запрос или бренд.</p>
+          <button class="reset-btn" id="reset-filters">Сбросить фильтры</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB 2: Templates ─── -->
+    <div class="tab-content" id="tab-templates" hidden>
+      <div class="container">
+        <div class="templates-header">
+          <h2>Шаблоны документов для мастера</h2>
+          <p>Готовые формы для профессионального оформления ремонта. Нажмите «Печать» — откроется готовый документ для распечатки или сохранения в PDF.</p>
+        </div>
+
+        <div class="templates-grid">
+
+          <!-- Template 1: Приёмный акт -->
+          <div class="template-card">
+            <div class="tmpl-icon">📋</div>
+            <h3>Акт приёма-передачи техники</h3>
+            <p class="tmpl-desc">Оформляется при приёме устройства от клиента. Фиксирует состояние техники, видимые повреждения и перечень принятых комплектующих.</p>
+            <ul class="tmpl-includes">
+              <li>Данные клиента и мастера</li>
+              <li>Описание техники и её состояния</li>
+              <li>Видимые дефекты при приёме</li>
+              <li>Подписи обеих сторон</li>
+            </ul>
+            <button class="tmpl-print-btn" data-template="priom">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Открыть и распечатать
+            </button>
+          </div>
+
+          <!-- Template 2: Гарантийный талон -->
+          <div class="template-card">
+            <div class="tmpl-icon">🛡️</div>
+            <h3>Гарантийный талон</h3>
+            <p class="tmpl-desc">Выдаётся клиенту после завершения ремонта. Подтверждает гарантийные обязательства сервисного центра на выполненные работы и установленные запчасти.</p>
+            <ul class="tmpl-includes">
+              <li>Перечень выполненных работ</li>
+              <li>Заменённые запчасти</li>
+              <li>Срок гарантии (до 12 месяцев)</li>
+              <li>Печать и подпись мастера</li>
+            </ul>
+            <button class="tmpl-print-btn" data-template="garantiya">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Открыть и распечатать
+            </button>
+          </div>
+
+          <!-- Template 3: Договор на ремонт -->
+          <div class="template-card">
+            <div class="tmpl-icon">📝</div>
+            <h3>Договор на ремонт</h3>
+            <p class="tmpl-desc">Полноценный договор бытового подряда. Устанавливает права и обязанности сторон, стоимость работ, сроки и условия гарантии.</p>
+            <ul class="tmpl-includes">
+              <li>Предмет договора и стороны</li>
+              <li>Стоимость и порядок оплаты</li>
+              <li>Права и обязанности сторон</li>
+              <li>Гарантийные обязательства</li>
+            </ul>
+            <button class="tmpl-print-btn" data-template="dogovor">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              Открыть и распечатать
+            </button>
+          </div>
+
+        </div>
+
+        <div class="templates-tip">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          В браузере нажмите Ctrl+P (или Cmd+P на Mac) и выберите «Сохранить как PDF», чтобы получить файл.
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── TAB 3: Generator ─── -->
+    <div class="tab-content" id="tab-generator" hidden>
+      <div class="container">
+        <div class="gen-layout">
+          <div class="gen-form-wrap">
+            <div class="gen-header">
+              <h2>Генератор акта выполненных работ</h2>
+              <p>Заполните форму — получите готовый документ, который можно сохранить в PDF или распечатать.</p>
+            </div>
+
+            <form id="act-form" class="act-form">
+
+              <div class="form-section">
+                <div class="form-section-title">Реквизиты документа</div>
+                <div class="form-row-2">
+                  <div class="fg">
+                    <label for="act-num">Номер акта</label>
+                    <input type="text" id="act-num" placeholder="№ 001" value="001" />
+                  </div>
+                  <div class="fg">
+                    <label for="act-date">Дата</label>
+                    <input type="date" id="act-date" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Данные клиента</div>
+                <div class="fg">
+                  <label for="client-name">ФИО клиента *</label>
+                  <input type="text" id="client-name" placeholder="Иванов Иван Иванович" required />
+                </div>
+                <div class="form-row-2">
+                  <div class="fg">
+                    <label for="client-phone">Телефон *</label>
+                    <input type="tel" id="client-phone" placeholder="+7 (___) ___-__-__" required />
+                  </div>
+                  <div class="fg">
+                    <label for="client-city">Город *</label>
+                    <select id="client-city" required>
+                      <option value="">Выберите город</option>
+                      <option value="г. Миасс">г. Миасс</option>
+                      <option value="г. Златоуст">г. Златоуст</option>
+                      <option value="г. Чебаркуль">г. Чебаркуль</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="client-addr">Адрес (необязательно)</label>
+                  <input type="text" id="client-addr" placeholder="ул. Ленина, д. 1, кв. 5" />
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Техника</div>
+                <div class="form-row-2">
+                  <div class="fg">
+                    <label for="app-type">Тип техники *</label>
+                    <select id="app-type" required>
+                      <option value="">Выберите тип</option>
+                      <option>Холодильник</option>
+                      <option>Стиральная машина</option>
+                      <option>Микроволновая печь</option>
+                      <option>Посудомоечная машина</option>
+                      <option>Электрическая плита</option>
+                      <option>Духовой шкаф</option>
+                      <option>Пылесос</option>
+                      <option>Кофемашина</option>
+                      <option>Другое</option>
+                    </select>
+                  </div>
+                  <div class="fg">
+                    <label for="app-brand">Марка и модель *</label>
+                    <input type="text" id="app-brand" placeholder="Bosch WAN28163OE" required />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="app-serial">Серийный номер (необязательно)</label>
+                  <input type="text" id="app-serial" placeholder="SN: XXXXXXXXXX" />
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Ремонт</div>
+                <div class="fg">
+                  <label for="fault-desc">Описание неисправности *</label>
+                  <textarea id="fault-desc" rows="2" placeholder="Например: не сливает воду, ошибка E18" required></textarea>
+                </div>
+                <div class="fg">
+                  <label for="work-done">Выполненные работы *</label>
+                  <textarea id="work-done" rows="2" placeholder="Например: замена насоса сливного, чистка фильтра" required></textarea>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Запчасти</div>
+                <div id="parts-list">
+                  <div class="parts-row">
+                    <input type="text" placeholder="Название запчасти" class="part-name" />
+                    <input type="number" placeholder="Кол-во" class="part-qty" value="1" min="1" />
+                    <input type="number" placeholder="Цена ₽" class="part-price" min="0" />
+                    <button type="button" class="part-remove" title="Удалить">✕</button>
+                  </div>
+                </div>
+                <button type="button" id="add-part" class="add-part-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Добавить запчасть
+                </button>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Стоимость</div>
+                <div class="form-row-2">
+                  <div class="fg">
+                    <label for="labor-cost">Стоимость работ (₽) *</label>
+                    <input type="number" id="labor-cost" placeholder="0" min="0" required />
+                  </div>
+                  <div class="fg">
+                    <label>Итого (авто)</label>
+                    <input type="text" id="total-display" readonly class="total-field" placeholder="0 ₽" />
+                  </div>
+                </div>
+                <div class="fg">
+                  <label for="warranty-period">Гарантия</label>
+                  <select id="warranty-period">
+                    <option value="без гарантии">Без гарантии</option>
+                    <option value="1 месяц">1 месяц</option>
+                    <option value="3 месяца">3 месяца</option>
+                    <option value="6 месяцев">6 месяцев</option>
+                    <option value="12 месяцев" selected>12 месяцев</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-section">
+                <div class="form-section-title">Мастер</div>
+                <div class="fg">
+                  <label for="master-name">ФИО мастера</label>
+                  <input type="text" id="master-name" placeholder="Иванов Дмитрий" value="Дмитрий" />
+                </div>
+              </div>
+
+              <button type="submit" class="gen-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+                Сформировать акт и открыть для печати
+              </button>
+            </form>
+          </div>
+
+          <div class="gen-sidebar">
+            <div class="gen-tip-card">
+              <div class="gen-tip-title">Как использовать</div>
+              <ol class="gen-tips">
+                <li>Заполните все обязательные поля (*)</li>
+                <li>Нажмите «Сформировать акт»</li>
+                <li>Откроется новое окно с документом</li>
+                <li>В браузере нажмите <strong>Ctrl+P</strong></li>
+                <li>Выберите принтер или «Сохранить как PDF»</li>
+              </ol>
+            </div>
+            <div class="gen-tip-card">
+              <div class="gen-tip-title">Компания-исполнитель</div>
+              <p class="gen-company-info">
+                Центр восстановления бытовой техники<br>
+                г. Миасс, ул. Победы, д. 18<br>
+                Тел: {SITE.phone}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .tools-page { background: #f8fafc; min-height: 100vh; }
+
+  /* Hero */
+  .tools-hero { padding: 100px 0 56px; background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%); }
+  .hero-badge { display: inline-block; padding: 4px 14px; background: rgba(255,255,255,0.15); color: #93c5fd; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
+  .tools-hero h1 { font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 16px; }
+  .tools-hero .hero-sub { font-size: 1.05rem; color: #94a3b8; line-height: 1.7; max-width: 600px; margin-bottom: 40px; }
+  .hero-features { display: flex; gap: 32px; flex-wrap: wrap; }
+  .hf { display: flex; align-items: center; gap: 16px; }
+  .hf-icon { font-size: 2rem; flex-shrink: 0; }
+  .hf-title { font-size: 0.95rem; font-weight: 700; color: #fff; }
+  .hf-sub { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+
+  /* Tabs */
+  .tabs-bar { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 72px; z-index: 100; }
+  .tabs-nav { display: flex; gap: 4px; padding: 10px 0; overflow-x: auto; }
+  .tabs-nav::-webkit-scrollbar { display: none; }
+  .tab-btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 18px; border: none; background: none; cursor: pointer; font-size: 0.9rem; font-weight: 500; color: #64748b; border-radius: 10px; transition: all 0.2s; white-space: nowrap; font-family: inherit; }
+  .tab-btn:hover { color: #1d4ed8; background: #f1f5f9; }
+  .tab-btn.active { color: #1d4ed8; background: #eff6ff; font-weight: 600; }
+
+  /* Tab content */
+  .tab-content { padding: 40px 0 80px; }
+
+  /* ─ Error codes ─ */
+  .filter-bar { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; }
+  .filter-search-wrap { position: relative; margin-bottom: 16px; }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+  .filter-search { width: 100%; padding: 11px 14px 11px 40px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; color: #0f172a; font-family: inherit; background: #f8fafc; transition: all 0.2s; }
+  .filter-search:focus { outline: none; border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.1); background: #fff; }
+  .filter-row { display: flex; gap: 20px; flex-wrap: wrap; }
+  .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .filter-label { font-size: 0.8rem; font-weight: 600; color: #64748b; white-space: nowrap; }
+  .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { padding: 5px 12px; border: 1px solid #e2e8f0; border-radius: 20px; background: #fff; font-size: 0.8rem; font-weight: 500; color: #475569; cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .chip:hover { border-color: #1d4ed8; color: #1d4ed8; }
+  .chip.active { background: #1d4ed8; border-color: #1d4ed8; color: #fff; }
+
+  .errors-count { font-size: 0.85rem; color: #64748b; margin-bottom: 16px; }
+
+  .errors-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+  .error-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 14px; padding: 20px; transition: all 0.2s; display: flex; flex-direction: column; gap: 8px; }
+  .error-card:hover { border-color: #bfdbfe; box-shadow: 0 4px 16px rgba(29,78,216,0.06); }
+  .error-card.hidden { display: none; }
+
+  .ec-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+  .ec-code { font-size: 1.4rem; font-weight: 800; color: #0f172a; font-family: 'Courier New', monospace; }
+  .ec-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .urgency-badge { padding: 3px 9px; border-radius: 6px; font-size: 0.72rem; font-weight: 700; }
+  .urgency-high { background: #fef2f2; color: #dc2626; }
+  .urgency-medium { background: #fffbeb; color: #d97706; }
+  .urgency-low { background: #f0fdf4; color: #16a34a; }
+  .appliance-badge { padding: 3px 8px; background: #f1f5f9; color: #475569; border-radius: 6px; font-size: 0.72rem; font-weight: 500; }
+  .ec-brand { font-size: 0.78rem; font-weight: 700; color: #1d4ed8; text-transform: uppercase; letter-spacing: 0.04em; }
+  .ec-meaning { font-size: 0.88rem; color: #475569; line-height: 1.55; }
+  .ec-expand { display: inline-flex; align-items: center; gap: 4px; font-size: 0.82rem; font-weight: 600; color: #1d4ed8; background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; margin-top: 4px; }
+  .ec-expand svg { transition: transform 0.2s; }
+  .ec-expand[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+  .ec-details { border-top: 1px solid #f1f5f9; padding-top: 12px; margin-top: 4px; display: flex; flex-direction: column; gap: 12px; }
+  .ec-section-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 6px; }
+  .ec-list { padding-left: 16px; display: flex; flex-direction: column; gap: 4px; }
+  .ec-list li { font-size: 0.85rem; color: #475569; line-height: 1.5; }
+  .ec-when { font-size: 0.85rem; color: #475569; line-height: 1.55; }
+  .ec-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 1px solid #f1f5f9; padding-top: 10px; }
+  .ec-price { font-size: 0.88rem; font-weight: 700; color: #1d4ed8; }
+  .ec-call { padding: 7px 14px; background: #1d4ed8; color: #fff; border-radius: 8px; font-size: 0.8rem; font-weight: 600; transition: background 0.2s; }
+  .ec-call:hover { background: #1e40af; }
+
+  .no-results { text-align: center; padding: 60px 20px; }
+  .no-results-icon { font-size: 3rem; margin-bottom: 16px; }
+  .no-results p { color: #64748b; margin-bottom: 16px; }
+  .reset-btn { padding: 10px 20px; background: #1d4ed8; color: #fff; border: none; border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; font-family: inherit; }
+
+  /* ─ Templates ─ */
+  .templates-header { text-align: center; max-width: 620px; margin: 0 auto 40px; }
+  .templates-header h2 { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+  .templates-header p { color: #64748b; line-height: 1.65; }
+
+  .templates-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+
+  .template-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 18px; padding: 32px 28px; display: flex; flex-direction: column; gap: 16px; transition: all 0.2s; }
+  .template-card:hover { border-color: #bfdbfe; box-shadow: 0 8px 32px rgba(29,78,216,0.07); transform: translateY(-2px); }
+  .tmpl-icon { font-size: 2.5rem; }
+  .template-card h3 { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+  .tmpl-desc { font-size: 0.875rem; color: #64748b; line-height: 1.6; }
+  .tmpl-includes { padding-left: 18px; flex: 1; }
+  .tmpl-includes li { font-size: 0.82rem; color: #475569; margin-bottom: 5px; }
+  .tmpl-print-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 20px; background: #0f172a; color: #fff; border: none; border-radius: 12px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; margin-top: auto; }
+  .tmpl-print-btn:hover { background: #1d4ed8; }
+
+  .templates-tip { display: flex; align-items: center; gap: 10px; padding: 14px 20px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; font-size: 0.85rem; color: #1d4ed8; }
+
+  /* ─ Generator ─ */
+  .gen-layout { display: grid; grid-template-columns: 1fr 300px; gap: 32px; align-items: start; }
+  .gen-form-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 36px; }
+  .gen-header { margin-bottom: 28px; }
+  .gen-header h2 { font-size: 1.5rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; }
+  .gen-header p { font-size: 0.9rem; color: #64748b; }
+
+  .form-section { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #f1f5f9; }
+  .form-section:last-of-type { border-bottom: none; }
+  .form-section-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; margin-bottom: 14px; }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .fg { margin-bottom: 12px; }
+  .fg label { display: block; font-size: 0.82rem; font-weight: 500; color: #475569; margin-bottom: 5px; }
+  .fg input, .fg select, .fg textarea { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 9px; font-size: 0.9rem; color: #0f172a; background: #f8fafc; font-family: inherit; transition: all 0.2s; }
+  .fg input:focus, .fg select:focus, .fg textarea:focus { outline: none; border-color: #1d4ed8; box-shadow: 0 0 0 3px rgba(29,78,216,0.1); background: #fff; }
+  .fg textarea { resize: vertical; min-height: 72px; }
+  .fg select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+  .total-field { background: #f0fdf4 !important; color: #16a34a !important; font-weight: 700 !important; }
+
+  .parts-row { display: grid; grid-template-columns: 1fr 80px 100px 36px; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .parts-row input { padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 9px; font-size: 0.88rem; font-family: inherit; background: #f8fafc; }
+  .parts-row input:focus { outline: none; border-color: #1d4ed8; background: #fff; }
+  .part-remove { width: 36px; height: 36px; border: 1px solid #fecaca; background: #fef2f2; color: #dc2626; border-radius: 8px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .part-remove:hover { background: #fee2e2; }
+  .add-part-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px dashed #bfdbfe; background: #eff6ff; color: #1d4ed8; border-radius: 8px; font-size: 0.82rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: all 0.15s; margin-top: 4px; }
+  .add-part-btn:hover { background: #dbeafe; }
+
+  .gen-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px; background: #1d4ed8; color: #fff; border: none; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: all 0.25s; font-family: inherit; margin-top: 8px; box-shadow: 0 4px 16px rgba(29,78,216,0.3); }
+  .gen-btn:hover { background: #1e40af; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(29,78,216,0.4); }
+
+  .gen-sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .gen-tip-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; }
+  .gen-tip-title { font-size: 0.85rem; font-weight: 700; color: #0f172a; margin-bottom: 12px; }
+  .gen-tips { padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+  .gen-tips li { font-size: 0.83rem; color: #475569; line-height: 1.5; }
+  .gen-company-info { font-size: 0.85rem; color: #475569; line-height: 1.7; }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .errors-grid { grid-template-columns: repeat(2, 1fr); }
+    .templates-grid { grid-template-columns: repeat(2, 1fr); }
+    .gen-layout { grid-template-columns: 1fr; }
+    .gen-sidebar { display: grid; grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .tools-hero { padding: 80px 0 40px; }
+    .tools-hero h1 { font-size: 1.8rem; }
+    .hero-features { gap: 20px; flex-direction: column; }
+    .errors-grid { grid-template-columns: 1fr; }
+    .templates-grid { grid-template-columns: 1fr; }
+    .gen-form-wrap { padding: 20px 16px; }
+    .form-row-2 { grid-template-columns: 1fr; }
+    .gen-sidebar { grid-template-columns: 1fr; }
+    .parts-row { grid-template-columns: 1fr 60px 80px 36px; }
+  }
+
+  @media (max-width: 480px) {
+    .filter-row { flex-direction: column; }
+    .ec-badges { flex-direction: column; }
+  }
+</style>
+
+<script>
+  // ── Tab switching ──────────────────────────────────────────────
+  const tabBtns = document.querySelectorAll<HTMLButtonElement>('.tab-btn');
+  const tabContents = document.querySelectorAll<HTMLElement>('.tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.dataset.tab!;
+      tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === target));
+      tabContents.forEach(tc => {
+        const isTarget = tc.id === `tab-${target}`;
+        tc.classList.toggle('active', isTarget);
+        tc.hidden = !isTarget;
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // ── Error code filtering ──────────────────────────────────────
+  const cards = document.querySelectorAll<HTMLElement>('.error-card');
+  const countEl = document.getElementById('errors-count');
+  const noResults = document.getElementById('no-results') as HTMLElement;
+  const searchInput = document.getElementById('error-search') as HTMLInputElement;
+  let activeBrand = 'all';
+  let activeAppliance = 'all';
+  let searchQuery = '';
+
+  function filterCards() {
+    let visible = 0;
+    cards.forEach(card => {
+      const brandMatch = activeBrand === 'all' || card.dataset.brand === activeBrand;
+      const appMatch = activeAppliance === 'all' || card.dataset.appliance === activeAppliance;
+      const text = (card.dataset.text || '').toLowerCase();
+      const searchMatch = !searchQuery || text.includes(searchQuery.toLowerCase());
+      const show = brandMatch && appMatch && searchMatch;
+      card.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    if (countEl) countEl.textContent = `Показано: ${visible} кодов`;
+    noResults.hidden = visible > 0;
+  }
+
+  document.getElementById('brand-chips')?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLElement>('.chip');
+    if (!chip || !chip.dataset.brand) return;
+    activeBrand = chip.dataset.brand;
+    document.querySelectorAll('#brand-chips .chip').forEach(c => c.classList.toggle('active', c === chip));
+    filterCards();
+  });
+
+  document.getElementById('appliance-chips')?.addEventListener('click', (e) => {
+    const chip = (e.target as HTMLElement).closest<HTMLElement>('.chip');
+    if (!chip || !chip.dataset.appliance) return;
+    activeAppliance = chip.dataset.appliance;
+    document.querySelectorAll('#appliance-chips .chip').forEach(c => c.classList.toggle('active', c === chip));
+    filterCards();
+  });
+
+  searchInput?.addEventListener('input', () => {
+    searchQuery = searchInput.value.trim();
+    filterCards();
+  });
+
+  document.getElementById('reset-filters')?.addEventListener('click', () => {
+    activeBrand = 'all';
+    activeAppliance = 'all';
+    searchQuery = '';
+    searchInput.value = '';
+    document.querySelectorAll('#brand-chips .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+    document.querySelectorAll('#appliance-chips .chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+    filterCards();
+  });
+
+  // ── Error card expand/collapse ────────────────────────────────
+  document.querySelectorAll<HTMLButtonElement>('.ec-expand').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const details = btn.nextElementSibling as HTMLElement;
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!expanded));
+      details.hidden = expanded;
+      btn.querySelector('span')?.remove();
+      btn.childNodes[0].textContent = expanded ? 'Подробнее' : 'Свернуть';
+    });
+  });
+
+  // ── Print templates ───────────────────────────────────────────
+  const today = new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+  const company = 'Центр восстановления бытовой техники';
+  const companyAddr = 'г. Миасс, ул. Победы, д. 18';
+  const companyPhone = '8 (951) 257-77-57';
+
+  const printBase = (content: string, title: string) => {
+    const win = window.open('', '_blank', 'width=900,height=700');
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html><html lang="ru"><head>
+      <meta charset="UTF-8"><title>${title}</title>
+      <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: Arial, sans-serif; font-size: 13px; color: #000; padding: 24mm 20mm; }
+        h1 { font-size: 17px; text-align: center; margin-bottom: 6px; }
+        h2 { font-size: 14px; margin: 16px 0 8px; }
+        .sub { text-align: center; color: #555; font-size: 12px; margin-bottom: 20px; }
+        .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
+        .party-block { border: 1px solid #ccc; border-radius: 6px; padding: 12px 14px; }
+        .party-label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #777; margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        td, th { border: 1px solid #ccc; padding: 7px 10px; font-size: 12px; vertical-align: top; }
+        th { background: #f5f5f5; font-weight: 600; text-align: left; }
+        .sigs { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 40px; }
+        .sig-line { border-top: 1px solid #000; padding-top: 6px; font-size: 11px; color: #555; }
+        .stamp { border: 2px dashed #ccc; border-radius: 50%; width: 90px; height: 90px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #aaa; text-align: center; margin: 12px 0; }
+        .footer-note { font-size: 11px; color: #777; border-top: 1px solid #eee; padding-top: 12px; margin-top: 20px; }
+        @media print { body { padding: 15mm 12mm; } @page { margin: 0; } }
+      </style></head><body>${content}<script>window.print();<\/script></body></html>`);
+    win.document.close();
+  };
+
+  const templates: Record<string, () => void> = {
+    priom: () => printBase(`
+      <h1>АКТ ПРИЁМА-ПЕРЕДАЧИ ТЕХНИКИ</h1>
+      <p class="sub">${company} · ${companyAddr} · ${companyPhone}</p>
+      <div class="parties">
+        <div class="party-block"><div class="party-label">Исполнитель</div>${company}<br>${companyAddr}<br>Тел: ${companyPhone}</div>
+        <div class="party-block"><div class="party-label">Заказчик</div>ФИО: ___________________<br>Тел: ___________________<br>Адрес: _________________</div>
+      </div>
+      <p>Дата приёма: ________________________</p>
+      <h2>Сведения о технике</h2>
+      <table>
+        <tr><th style="width:200px">Параметр</th><th>Значение</th></tr>
+        <tr><td>Тип техники</td><td>&nbsp;</td></tr>
+        <tr><td>Марка / Модель</td><td>&nbsp;</td></tr>
+        <tr><td>Серийный номер</td><td>&nbsp;</td></tr>
+        <tr><td>Цвет / внешний вид</td><td>&nbsp;</td></tr>
+        <tr><td>Видимые дефекты</td><td>&nbsp;</td></tr>
+        <tr><td>Комплектность</td><td>&nbsp;</td></tr>
+      </table>
+      <h2>Заявленная неисправность</h2>
+      <table><tr><td style="height:60px">&nbsp;</td></tr></table>
+      <h2>Предварительная стоимость</h2>
+      <table><tr><th>Диагностика</th><th>Ориентировочный ремонт</th><th>Срок исполнения</th></tr>
+        <tr><td>Бесплатно</td><td>&nbsp;</td><td>&nbsp;</td></tr></table>
+      <p style="font-size:12px;color:#555;margin:12px 0">Стороны подтверждают, что техника передана в указанном состоянии, претензий к внешнему виду при приёме не имеется.</p>
+      <div class="sigs">
+        <div><div class="stamp">М.П.</div><div class="sig-line">Исполнитель: ______________________</div></div>
+        <div><div style="height:90px"></div><div class="sig-line">Заказчик: _________________________</div></div>
+      </div>
+      <p class="footer-note">Срок хранения невостребованной техники — 3 месяца с даты приёма. ${company} не несёт ответственности за данные, хранящиеся на устройстве.</p>
+    `, 'Акт приёма-передачи техники'),
+
+    garantiya: () => printBase(`
+      <h1>ГАРАНТИЙНЫЙ ТАЛОН</h1>
+      <p class="sub">${company} · ${companyPhone}</p>
+      <table style="margin-bottom:20px">
+        <tr><th style="width:220px">Исполнитель</th><td>${company}, ${companyAddr}</td></tr>
+        <tr><th>Заказчик (ФИО)</th><td>&nbsp;</td></tr>
+        <tr><th>Телефон</th><td>&nbsp;</td></tr>
+        <tr><th>Дата ремонта</th><td>&nbsp;</td></tr>
+        <tr><th>Техника (марка/модель)</th><td>&nbsp;</td></tr>
+        <tr><th>Серийный номер</th><td>&nbsp;</td></tr>
+      </table>
+      <h2>Выполненные работы</h2>
+      <table><tr><td style="height:80px">&nbsp;</td></tr></table>
+      <h2>Заменённые запчасти</h2>
+      <table>
+        <tr><th>Наименование</th><th>Кол-во</th><th>Стоимость</th></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+        <tr><th colspan="2">Итого</th><th>&nbsp;</th></tr>
+      </table>
+      <h2>Условия гарантии</h2>
+      <p style="font-size:12px;margin-bottom:12px">Срок гарантии: <strong>________ месяцев</strong> с даты ремонта на выполненные работы и установленные запчасти.</p>
+      <p style="font-size:11px;color:#555;margin-bottom:20px">Гарантия не распространяется на повреждения, возникшие в результате механического воздействия, попадания влаги, нарушения правил эксплуатации, а также на расходные материалы.</p>
+      <div class="sigs">
+        <div><div class="stamp">М.П.</div><div class="sig-line">Мастер: __________________________</div></div>
+        <div><div style="height:90px"></div><div class="sig-line">Заказчик: _________________________</div></div>
+      </div>
+    `, 'Гарантийный талон'),
+
+    dogovor: () => printBase(`
+      <h1>ДОГОВОР НА РЕМОНТ БЫТОВОЙ ТЕХНИКИ</h1>
+      <p class="sub">г. Миасс &nbsp;&nbsp;•&nbsp;&nbsp; «___» ____________ 20___ г.</p>
+      <div class="parties">
+        <div class="party-block"><div class="party-label">Исполнитель</div>${company}, г. Миасс, ул. Победы, д. 18, именуемый далее «Исполнитель».</div>
+        <div class="party-block"><div class="party-label">Заказчик</div>Гр. ___________________________, тел. ___________________________, именуемый далее «Заказчик».</div>
+      </div>
+      <p>Стороны заключили настоящий договор о нижеследующем:</p>
+      <h2>1. Предмет договора</h2>
+      <p style="font-size:12px;margin-bottom:10px">1.1. Исполнитель принимает на себя обязательство выполнить ремонт бытовой техники: <u>________________________________________________</u>, а Заказчик обязуется принять и оплатить работу.</p>
+      <p style="font-size:12px;margin-bottom:6px">1.2. Неисправность: _____________________________________________________</p>
+      <h2>2. Стоимость и порядок оплаты</h2>
+      <p style="font-size:12px;margin-bottom:6px">2.1. Стоимость работ: _______________________ руб. Стоимость запчастей: _______________________ руб. <strong>Итого: _______________________ руб.</strong></p>
+      <p style="font-size:12px;margin-bottom:10px">2.2. Оплата производится наличными или переводом после выполнения ремонта.</p>
+      <h2>3. Сроки выполнения</h2>
+      <p style="font-size:12px;margin-bottom:10px">3.1. Срок выполнения ремонта: с «___» _______ по «___» _______ 20___ г.</p>
+      <h2>4. Гарантийные обязательства</h2>
+      <p style="font-size:12px;margin-bottom:10px">4.1. Исполнитель предоставляет гарантию на выполненные работы и установленные запчасти сроком <strong>___________ месяцев</strong> со дня сдачи техники Заказчику.</p>
+      <p style="font-size:12px;margin-bottom:10px">4.2. Гарантия не распространяется на механические повреждения и дефекты, возникшие по вине Заказчика.</p>
+      <h2>5. Права и обязанности сторон</h2>
+      <p style="font-size:12px;margin-bottom:6px">5.1. Исполнитель вправе использовать запчасти, аналогичные по качеству оригинальным, если иное не согласовано сторонами.</p>
+      <p style="font-size:12px;margin-bottom:10px">5.2. Заказчик обязан сообщать достоверные сведения о технике и характере неисправности.</p>
+      <div class="sigs">
+        <div><div class="party-label" style="margin-bottom:8px">Исполнитель</div><div class="stamp">М.П.</div><div class="sig-line">_________________ / ${company}</div></div>
+        <div><div class="party-label" style="margin-bottom:8px">Заказчик</div><div style="height:90px"></div><div class="sig-line">___________________ / _______________</div></div>
+      </div>
+    `, 'Договор на ремонт'),
+  };
+
+  document.querySelectorAll<HTMLButtonElement>('.tmpl-print-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tmpl = btn.dataset.template!;
+      if (templates[tmpl]) templates[tmpl]();
+    });
+  });
+
+  // ── Generator ────────────────────────────────────────────────
+  // Set default date
+  const dateInput = document.getElementById('act-date') as HTMLInputElement;
+  if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+
+  // Auto-calculate total
+  function recalcTotal() {
+    const labor = parseFloat((document.getElementById('labor-cost') as HTMLInputElement).value) || 0;
+    let partsTotal = 0;
+    document.querySelectorAll<HTMLElement>('.parts-row').forEach(row => {
+      const qty = parseFloat((row.querySelector('.part-qty') as HTMLInputElement)?.value) || 0;
+      const price = parseFloat((row.querySelector('.part-price') as HTMLInputElement)?.value) || 0;
+      partsTotal += qty * price;
+    });
+    const total = labor + partsTotal;
+    const display = document.getElementById('total-display') as HTMLInputElement;
+    if (display) display.value = total > 0 ? total.toLocaleString('ru-RU') + ' ₽' : '';
+  }
+
+  document.getElementById('labor-cost')?.addEventListener('input', recalcTotal);
+
+  // Add part row
+  document.getElementById('add-part')?.addEventListener('click', () => {
+    const list = document.getElementById('parts-list')!;
+    const row = document.createElement('div');
+    row.className = 'parts-row';
+    row.innerHTML = `<input type="text" placeholder="Название запчасти" class="part-name" /><input type="number" placeholder="Кол-во" class="part-qty" value="1" min="1" /><input type="number" placeholder="Цена ₽" class="part-price" min="0" /><button type="button" class="part-remove" title="Удалить">✕</button>`;
+    row.querySelector('.part-remove')?.addEventListener('click', () => { row.remove(); recalcTotal(); });
+    row.querySelectorAll('input').forEach(i => i.addEventListener('input', recalcTotal));
+    list.appendChild(row);
+  });
+
+  // Wire remove on first row
+  document.querySelector('.part-remove')?.addEventListener('click', function(this: HTMLElement) {
+    this.closest('.parts-row')?.remove();
+    recalcTotal();
+  });
+  document.querySelectorAll('.parts-row input').forEach(i => i.addEventListener('input', recalcTotal));
+
+  // Generate act
+  document.getElementById('act-form')?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const g = (id: string) => (document.getElementById(id) as HTMLInputElement)?.value || '';
+
+    const actNum = g('act-num');
+    const actDate = new Date(g('act-date')).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    const clientName = g('client-name');
+    const clientPhone = g('client-phone');
+    const clientCity = g('client-city');
+    const clientAddr = g('client-addr');
+    const appType = g('app-type');
+    const appBrand = g('app-brand');
+    const appSerial = g('app-serial');
+    const faultDesc = g('fault-desc');
+    const workDone = g('work-done');
+    const laborCost = parseFloat(g('labor-cost')) || 0;
+    const warranty = g('warranty-period');
+    const masterName = g('master-name');
+
+    // Collect parts
+    const partsRows: { name: string; qty: number; price: number }[] = [];
+    let partsTotalCost = 0;
+    document.querySelectorAll<HTMLElement>('.parts-row').forEach(row => {
+      const name = (row.querySelector('.part-name') as HTMLInputElement)?.value?.trim();
+      const qty = parseFloat((row.querySelector('.part-qty') as HTMLInputElement)?.value) || 0;
+      const price = parseFloat((row.querySelector('.part-price') as HTMLInputElement)?.value) || 0;
+      if (name) {
+        partsRows.push({ name, qty, price });
+        partsTotalCost += qty * price;
+      }
+    });
+    const totalCost = laborCost + partsTotalCost;
+
+    const partsHtml = partsRows.length > 0
+      ? partsRows.map(p => `<tr><td>${p.name}</td><td style="text-align:center">${p.qty}</td><td style="text-align:right">${(p.qty * p.price).toLocaleString('ru-RU')} ₽</td></tr>`).join('')
+      : '<tr><td colspan="3" style="color:#999;text-align:center">—</td></tr>';
+
+    printBase(`
+      <h1>АКТ ВЫПОЛНЕННЫХ РАБОТ № ${actNum}</h1>
+      <p class="sub">${company} · ${companyAddr} · ${companyPhone}</p>
+      <div class="parties">
+        <div class="party-block"><div class="party-label">Исполнитель</div>${company}<br>${companyAddr}<br>Тел: ${companyPhone}</div>
+        <div class="party-block"><div class="party-label">Заказчик</div>${clientName}<br>Тел: ${clientPhone}<br>${clientCity}${clientAddr ? ', ' + clientAddr : ''}</div>
+      </div>
+      <table style="margin-bottom:20px">
+        <tr><th colspan="2" style="background:#f5f5f5;text-align:center">Дата: ${actDate}</th></tr>
+        <tr><th style="width:200px">Тип техники</th><td>${appType}</td></tr>
+        <tr><th>Марка / Модель</th><td>${appBrand}</td></tr>
+        ${appSerial ? `<tr><th>Серийный номер</th><td>${appSerial}</td></tr>` : ''}
+        <tr><th>Неисправность</th><td>${faultDesc}</td></tr>
+        <tr><th>Выполненные работы</th><td>${workDone}</td></tr>
+      </table>
+      <h2>Запчасти и материалы</h2>
+      <table>
+        <tr><th>Наименование</th><th style="width:70px;text-align:center">Кол-во</th><th style="width:100px;text-align:right">Стоимость</th></tr>
+        ${partsHtml}
+      </table>
+      <h2>Расчёт стоимости</h2>
+      <table>
+        <tr><th style="width:200px">Стоимость работ</th><td style="text-align:right">${laborCost.toLocaleString('ru-RU')} ₽</td></tr>
+        <tr><th>Стоимость запчастей</th><td style="text-align:right">${partsTotalCost.toLocaleString('ru-RU')} ₽</td></tr>
+        <tr><th><strong>ИТОГО к оплате</strong></th><td style="text-align:right"><strong>${totalCost.toLocaleString('ru-RU')} ₽</strong></td></tr>
+      </table>
+      ${warranty !== 'без гарантии' ? `<p style="margin:14px 0 4px;font-size:12px"><strong>Гарантия:</strong> ${warranty} на выполненные работы и установленные запчасти.</p>` : ''}
+      <p style="font-size:11px;color:#555;margin-bottom:4px">Мастер: ${masterName || '—'}</p>
+      <p style="font-size:11px;color:#555">Работа выполнена в полном объёме. Заказчик претензий не имеет.</p>
+      <div class="sigs">
+        <div><div class="stamp">М.П.</div><div class="sig-line">Исполнитель: ___________________</div></div>
+        <div><div style="height:90px"></div><div class="sig-line">Заказчик: ______________________</div></div>
+      </div>
+    `, `Акт выполненных работ № ${actNum}`);
+  });
+</script>

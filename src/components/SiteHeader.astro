@@ -50,6 +50,10 @@ const isActive = (href: string) =>
       <a href="/blog/" class={`nav-link${isActive('/blog/') ? ' active' : ''}`}>Блог</a>
       <a href="/skupka/" class={`nav-link${isActive('/skupka/') ? ' active' : ''}`}>Скупка</a>
       <a href="/baza-znanii/" class={`nav-link${isActive('/baza-znanii/') ? ' active' : ''}`}>База знаний</a>
+      <a href="/instrumenty/" class={`nav-tools${isActive('/instrumenty/') ? ' active' : ''}`}>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Инструменты
+      </a>
       <a href="/diagnostika/" class={`nav-diag${isActive('/diagnostika/') ? ' active' : ''}`}>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         Диагностика
@@ -127,6 +131,10 @@ const isActive = (href: string) =>
       <a href="/baza-znanii/" class={`mobile-link${isActive('/baza-znanii/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
         База знаний
+      </a>
+      <a href="/instrumenty/" class={`mobile-link mobile-tools${isActive('/instrumenty/') ? ' active' : ''}`}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        Инструменты мастера
       </a>
       <a href="/diagnostika/" class={`mobile-link mobile-diag${isActive('/diagnostika/') ? ' active' : ''}`}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -249,6 +257,29 @@ const isActive = (href: string) =>
     background: #0369a1;
     color: #fff;
     border-color: #0369a1;
+  }
+
+  /* Tools pill */
+  .nav-tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #c2410c;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    padding: 6px 12px;
+    border-radius: 20px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .nav-tools:hover,
+  .nav-tools.active {
+    background: #ea580c;
+    color: #fff;
+    border-color: #ea580c;
   }
 
   /* Calc pill */
@@ -599,6 +630,11 @@ const isActive = (href: string) =>
 
   .mobile-b2b {
     color: #1d4ed8;
+    font-weight: 600;
+  }
+
+  .mobile-tools {
+    color: #c2410c;
     font-weight: 600;
   }
 
