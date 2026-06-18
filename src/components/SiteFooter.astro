@@ -1,30 +1,175 @@
 ---
+const phone = '8 (951) 257-77-57';
+const phoneRaw = '79512577757';
+const year = new Date().getFullYear();
 ---
-<footer class="site-footer">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <strong>Мастер Техники 74</strong>
-      <span>Ремонт бытовой техники в Челябинске</span>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="/" class="footer-logo">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="8" fill="#1d4ed8" />
+            <path d="M8 10h16v2H8zM8 15h12v2H8zM8 20h14v2H8z" fill="#fff" />
+            <circle cx="24" cy="21" r="3" fill="#60a5fa" />
+          </svg>
+          <span>Центр восстановления</span>
+        </a>
+        <p class="footer-about">Профессиональный ремонт бытовой техники в Миассе, Златоусте и Чебаркуле. Работаем с 2015 года.</p>
+      </div>
+
+      <div class="footer-links">
+        <h4>Навигация</h4>
+        <a href="/#services">Услуги</a>
+        <a href="/#why-us">Почему мы</a>
+        <a href="/#map">Карта</a>
+        <a href="/#contact">Контакты</a>
+      </div>
+
+      <div class="footer-links">
+        <h4>Услуги</h4>
+        <a href="/#services">Ремонт холодильников</a>
+        <a href="/#services">Ремонт стиральных машин</a>
+        <a href="/#services">Ремонт микроволновок</a>
+        <a href="/diagnostika/">Диагностика</a>
+        <a href="/zapchasti/">Запчасти</a>
+      </div>
+
+      <div class="footer-links">
+        <h4>Мастерам</h4>
+        <a href="/instrumenty/">Инструменты мастера</a>
+        <a href="/instrumenty/">База ошибок</a>
+        <a href="/instrumenty/">Акты выполненных работ</a>
+        <a href="/master/">Кабинет мастера</a>
+      </div>
+
+      <div class="footer-contacts">
+        <h4>Контакты</h4>
+        <a href={`tel:+${phoneRaw}`} class="footer-phone">{phone}</a>
+        <p>г. Миасс, ул. Победы, д. 18, цоколь</p>
+        <p>Ежедневно 9:00 — 20:00</p>
+        <p class="footer-districts">Также обслуживаем: Златоуст, Чебаркуль</p>
+      </div>
     </div>
-    <div class="footer-links">
-      <a href="/instrumenty/">Инструменты мастера</a>
-      <a href="/master/">Кабинет мастера</a>
+
+    <div class="footer-bottom">
+      <p>&copy; {year} Центр восстановления бытовой техники. Все права защищены.</p>
+      <p>Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле</p>
     </div>
-    <div class="footer-copy">© 2024 Мастер Техники 74</div>
   </div>
 </footer>
 
 <style>
-  .site-footer { background: #111827; color: #9ca3af; margin-top: 60px; }
-  .footer-inner {
-    max-width: 1100px; margin: 0 auto; padding: 32px 16px;
-    display: flex; flex-direction: column; gap: 12px; align-items: center; text-align: center;
+  .footer {
+    background: #0f172a;
+    color: #94a3b8;
+    padding: 64px 0 0;
+    margin-top: 60px;
   }
-  .footer-brand { display: flex; flex-direction: column; gap: 4px; }
-  .footer-brand strong { color: #fff; font-size: 1rem; }
-  .footer-brand span { font-size: .82rem; }
-  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
-  .footer-links a { color: #6b7280; text-decoration: none; font-size: .82rem; }
-  .footer-links a:hover { color: #ea580c; }
-  .footer-copy { font-size: .75rem; color: #4b5563; }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1fr 1.2fr 1.2fr 1.3fr;
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid #1e293b;
+  }
+
+  .footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #fff;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+  .footer-logo:hover { color: #60a5fa; }
+
+  .footer-about {
+    font-size: 0.875rem;
+    line-height: 1.7;
+    color: #94a3b8;
+  }
+
+  .footer-links h4,
+  .footer-contacts h4 {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 14px;
+  }
+
+  .footer-links a {
+    display: block;
+    font-size: 0.875rem;
+    color: #94a3b8;
+    text-decoration: none;
+    margin-bottom: 9px;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: #60a5fa; }
+
+  .footer-phone {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #60a5fa;
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: color 0.2s;
+  }
+  .footer-phone:hover { color: #93c5fd; }
+
+  .footer-contacts p {
+    font-size: 0.875rem;
+    margin-bottom: 6px;
+    color: #94a3b8;
+  }
+  .footer-districts {
+    margin-top: 10px;
+    color: #64748b !important;
+    font-size: 0.8rem !important;
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 22px 0;
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+
+  @media (max-width: 1024px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 32px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .footer {
+      padding: 48px 0 0;
+    }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 28px;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      gap: 6px;
+      text-align: center;
+    }
+  }
 </style>
