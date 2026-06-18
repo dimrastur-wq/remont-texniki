@@ -1,716 +1,291 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
 ---
 
 <Layout
-  title="Вход для мастеров — Центр восстановления бытовой техники"
-  description="Войдите в профессиональный кабинет мастера. База кодов ошибок, генератор документов, CRM-система."
+  title="Вход для мастеров — Кабинет мастера"
+  description="Войдите или зарегистрируйтесь в профессиональном кабинете мастера по ремонту бытовой техники"
 >
-  <div class="auth-page" id="auth-page">
+  <SiteHeader />
 
-    <!-- Left panel -->
-    <aside class="auth-aside">
-      <div class="aside-inner">
-        <a href="/" class="aside-logo">
-          <svg width="40" height="40" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#fff" fill-opacity=".15"/><path d="M8 10h16v2H8zM8 15h12v2H8zM8 20h14v2H8z" fill="#fff"/><circle cx="24" cy="21" r="3" fill="#60a5fa"/></svg>
-          <span>Центр восстановления</span>
-        </a>
+  <main class="auth-page">
+    <div class="auth-wrap">
 
-        <div class="aside-hero">
-          <h1>Профессиональный кабинет мастера</h1>
-          <p>Всё необходимое для эффективной работы в одном месте</p>
-        </div>
-
-        <ul class="aside-benefits">
-          <li>
-            <div class="benefit-icon">🔍</div>
-            <div>
-              <strong>База кодов ошибок</strong>
-              <span>60+ кодов Bosch, LG, Samsung, Indesit, Whirlpool</span>
-            </div>
-          </li>
-          <li>
-            <div class="benefit-icon">🖨️</div>
-            <div>
-              <strong>Генератор документов</strong>
-              <span>Акты, гарантийные талоны, договоры одним кликом</span>
-            </div>
-          </li>
-          <li>
-            <div class="benefit-icon">📋</div>
-            <div>
-              <strong>Мини-CRM</strong>
-              <span>Учёт заявок, клиентская база, история ремонтов</span>
-            </div>
-          </li>
-          <li>
-            <div class="benefit-icon">📄</div>
-            <div>
-              <strong>Шаблоны документов</strong>
-              <span>Готовые акты приёма, договоры, гарантийные талоны</span>
-            </div>
-          </li>
-        </ul>
-
-        <div class="aside-price">
-          <span class="price-num">390 ₽</span>
-          <span class="price-per">в месяц</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- Right panel -->
-    <main class="auth-main">
       <div class="auth-card">
-
-        <!-- Tab switcher -->
-        <div class="auth-tabs">
-          <button class="auth-tab active" id="tab-login">Войти</button>
-          <button class="auth-tab" id="tab-register">Регистрация</button>
+        <div class="auth-logo">
+          <div class="auth-logo-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <div>
+            <div class="auth-logo-title">Кабинет мастера</div>
+            <div class="auth-logo-sub">Профессиональные инструменты</div>
+          </div>
         </div>
 
-        <!-- Login form -->
-        <form class="auth-form active" id="form-login">
-          <div class="auth-form-header">
-            <h2>Добро пожаловать</h2>
-            <p>Войдите, чтобы получить доступ к инструментам</p>
-          </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-tab="login">Войти</button>
+          <button class="auth-tab" data-tab="register">Зарегистрироваться</button>
+        </div>
 
-          <div class="field-group">
-            <label for="login-email">Email</label>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="login-email" placeholder="ваш@email.ru" autocomplete="email" required />
-            </div>
-          </div>
+        <div id="msg" class="auth-msg" hidden></div>
 
-          <div class="field-group">
-            <div class="field-label-row">
-              <label for="login-password">Пароль</label>
-              <button type="button" class="forgot-link" id="forgot-btn">Забыли пароль?</button>
-            </div>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required />
-              <button type="button" class="toggle-password" data-target="login-password" aria-label="Показать пароль">
+        <!-- Login -->
+        <form id="login-form" class="auth-form">
+          <div class="fg">
+            <label for="l-email">Email</label>
+            <input type="email" id="l-email" placeholder="master@example.com" required autocomplete="email" />
+          </div>
+          <div class="fg">
+            <label for="l-pass">Пароль</label>
+            <div class="pass-wrap">
+              <input type="password" id="l-pass" placeholder="Ваш пароль" required autocomplete="current-password" />
+              <button type="button" class="pass-toggle" data-target="l-pass" tabindex="-1">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
           </div>
-
-          <div class="auth-error" id="login-error" hidden></div>
-
-          <button type="submit" class="auth-submit" id="login-submit">
-            <span class="btn-text">Войти</span>
-            <span class="btn-loader" hidden>
-              <svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="1"/></svg>
-            </span>
+          <button type="submit" class="auth-btn" id="login-btn">
+            <span>Войти в кабинет</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
-
-          <p class="auth-switch">Нет аккаунта? <button type="button" class="switch-link" id="to-register">Зарегистрироваться</button></p>
         </form>
 
-        <!-- Register form -->
-        <form class="auth-form" id="form-register" hidden>
-          <div class="auth-form-header">
-            <h2>Создать аккаунт</h2>
-            <p>Начните пользоваться профессиональными инструментами</p>
+        <!-- Register -->
+        <form id="register-form" class="auth-form" hidden>
+          <div class="fg">
+            <label for="r-name">Ваше имя</label>
+            <input type="text" id="r-name" placeholder="Дмитрий" required />
           </div>
-
-          <div class="field-group">
-            <label for="reg-name">Ваше имя</label>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <input type="text" id="reg-name" placeholder="Иван Иванов" autocomplete="name" />
-            </div>
+          <div class="fg">
+            <label for="r-email">Email</label>
+            <input type="email" id="r-email" placeholder="master@example.com" required autocomplete="email" />
           </div>
-
-          <div class="field-group">
-            <label for="reg-email">Email *</label>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="reg-email" placeholder="ваш@email.ru" autocomplete="email" required />
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label for="reg-city">Город</label>
-            <div class="field-wrap field-wrap-select">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <select id="reg-city">
-                <option value="Миасс">Миасс</option>
-                <option value="Златоуст">Златоуст</option>
-                <option value="Чебаркуль">Чебаркуль</option>
-                <option value="Другой">Другой город</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label for="reg-password">Пароль *</label>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <input type="password" id="reg-password" placeholder="Минимум 6 символов" autocomplete="new-password" required minlength="6" />
-              <button type="button" class="toggle-password" data-target="reg-password" aria-label="Показать пароль">
+          <div class="fg">
+            <label for="r-pass">Пароль <span class="hint">(не менее 6 символов)</span></label>
+            <div class="pass-wrap">
+              <input type="password" id="r-pass" placeholder="Придумайте пароль" required minlength="6" autocomplete="new-password" />
+              <button type="button" class="pass-toggle" data-target="r-pass" tabindex="-1">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
-            <div class="password-strength" id="pwd-strength" hidden>
-              <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
-              <span id="strength-label"></span>
-            </div>
           </div>
-
-          <div class="auth-error" id="register-error" hidden></div>
-          <div class="auth-success" id="register-success" hidden></div>
-
-          <button type="submit" class="auth-submit" id="register-submit">
-            <span class="btn-text">Создать аккаунт</span>
-            <span class="btn-loader" hidden>
-              <svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10" stroke-opacity="1"/></svg>
-            </span>
+          <button type="submit" class="auth-btn" id="register-btn">
+            <span>Создать аккаунт</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
-
-          <p class="auth-terms">Регистрируясь, вы принимаете условия использования сервиса</p>
-          <p class="auth-switch">Уже есть аккаунт? <button type="button" class="switch-link" id="to-login">Войти</button></p>
+          <p class="auth-legal">Регистрируясь, вы принимаете условия пользования сервисом</p>
         </form>
-
-        <!-- Forgot password form -->
-        <form class="auth-form" id="form-forgot" hidden>
-          <div class="auth-form-header">
-            <h2>Сброс пароля</h2>
-            <p>Введите email — пришлём ссылку для сброса</p>
-          </div>
-          <div class="field-group">
-            <label for="forgot-email">Email</label>
-            <div class="field-wrap">
-              <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              <input type="email" id="forgot-email" placeholder="ваш@email.ru" required />
-            </div>
-          </div>
-          <div class="auth-error" id="forgot-error" hidden></div>
-          <div class="auth-success" id="forgot-success" hidden></div>
-          <button type="submit" class="auth-submit">
-            <span class="btn-text">Отправить ссылку</span>
-            <span class="btn-loader" hidden><svg class="spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10" stroke-opacity=".25"/><path d="M12 2a10 10 0 0 1 10 10"/></svg></span>
-          </button>
-          <p class="auth-switch"><button type="button" class="switch-link" id="back-to-login">← Назад к входу</button></p>
-        </form>
-
       </div>
-    </main>
-  </div>
+
+      <div class="auth-perks">
+        <h2>Что входит в Премиум</h2>
+        <div class="perk-list">
+          <div class="perk">
+            <div class="perk-icon">📦</div>
+            <div>
+              <div class="perk-title">Мини-CRM для заказов</div>
+              <div class="perk-desc">Ведите все заказы, статусы и финансы в одном месте</div>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">🔩</div>
+            <div>
+              <div class="perk-title">Подбор запчастей</div>
+              <div class="perk-desc">Кросс-референс OEM и универсальных деталей по параметрам</div>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">📘</div>
+            <div>
+              <div class="perk-title">Сервисные режимы</div>
+              <div class="perk-desc">Инструкции по входу в тест-режим для Bosch, LG, Samsung, Indesit</div>
+            </div>
+          </div>
+          <div class="perk">
+            <div class="perk-icon">🏷️</div>
+            <div>
+              <div class="perk-title">Скидка 15% на запчасти</div>
+              <div class="perk-desc">Эксклюзивная скидка в нашем каталоге запчастей</div>
+            </div>
+          </div>
+        </div>
+        <div class="perk-price">
+          <span class="price-amount">390 ₽</span>
+          <span class="price-period">/месяц</span>
+        </div>
+        <p class="perk-cancel">Отмена в любой момент</p>
+      </div>
+
+    </div>
+  </main>
+
+  <SiteFooter />
 </Layout>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  .auth-page { padding: 100px 0 80px; background: #f8fafc; min-height: 100vh; }
 
-  .auth-page {
-    display: grid;
-    grid-template-columns: 480px 1fr;
-    min-height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  }
+  .auth-wrap { max-width: 960px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: 480px 1fr; gap: 40px; align-items: start; }
 
-  /* Left panel */
-  .auth-aside {
-    background: linear-gradient(160deg, #0f172a 0%, #1e3a5f 60%, #1d4ed8 100%);
-    padding: 48px 40px;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-  }
+  .auth-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 20px; padding: 40px; box-shadow: 0 8px 32px rgba(0,0,0,0.06); }
 
-  .aside-inner {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 40px;
-  }
+  .auth-logo { display: flex; align-items: center; gap: 14px; margin-bottom: 28px; }
+  .auth-logo-icon { width: 48px; height: 48px; background: #ea580c; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
+  .auth-logo-title { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+  .auth-logo-sub { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
 
-  .aside-logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-    text-decoration: none;
-  }
+  .auth-tabs { display: flex; background: #f1f5f9; border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 24px; }
+  .auth-tab { flex: 1; padding: 9px 16px; border: none; background: none; border-radius: 9px; font-size: 0.9rem; font-weight: 500; color: #64748b; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+  .auth-tab.active { background: #fff; color: #0f172a; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 
-  .aside-hero h1 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.25;
-    margin-bottom: 12px;
-  }
+  .auth-msg { padding: 12px 16px; border-radius: 10px; font-size: 0.88rem; margin-bottom: 16px; }
+  .auth-msg.error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+  .auth-msg.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  .auth-msg.info { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
 
-  .aside-hero p {
-    font-size: 1rem;
-    color: #94a3b8;
-    line-height: 1.6;
-  }
+  .auth-form { display: flex; flex-direction: column; gap: 16px; }
+  .fg label { display: block; font-size: 0.82rem; font-weight: 500; color: #475569; margin-bottom: 5px; }
+  .hint { font-weight: 400; color: #94a3b8; }
+  .fg input { width: 100%; padding: 11px 14px; border: 1px solid #e2e8f0; border-radius: 10px; font-size: 0.95rem; font-family: inherit; background: #f8fafc; color: #0f172a; transition: all 0.2s; }
+  .fg input:focus { outline: none; border-color: #ea580c; box-shadow: 0 0 0 3px rgba(234,88,12,0.1); background: #fff; }
+  .pass-wrap { position: relative; }
+  .pass-wrap input { padding-right: 44px; }
+  .pass-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #94a3b8; padding: 4px; transition: color 0.15s; }
+  .pass-toggle:hover { color: #475569; }
 
-  .aside-benefits {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    flex: 1;
-  }
+  .auth-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px 20px; background: #ea580c; color: #fff; border: none; border-radius: 12px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: inherit; box-shadow: 0 4px 14px rgba(234,88,12,0.3); margin-top: 4px; }
+  .auth-btn:hover { background: #c2410c; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(234,88,12,0.4); }
+  .auth-btn:disabled { opacity: 0.6; transform: none; cursor: not-allowed; }
+  .auth-legal { font-size: 0.75rem; color: #94a3b8; text-align: center; }
 
-  .aside-benefits li {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-  }
+  /* Perks panel */
+  .auth-perks { padding: 32px; }
+  .auth-perks h2 { font-size: 1.3rem; font-weight: 700; color: #0f172a; margin-bottom: 24px; }
+  .perk-list { display: flex; flex-direction: column; gap: 18px; margin-bottom: 28px; }
+  .perk { display: flex; align-items: flex-start; gap: 14px; }
+  .perk-icon { font-size: 1.5rem; flex-shrink: 0; width: 40px; text-align: center; }
+  .perk-title { font-size: 0.92rem; font-weight: 600; color: #0f172a; margin-bottom: 3px; }
+  .perk-desc { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
+  .perk-price { display: flex; align-items: baseline; gap: 4px; }
+  .price-amount { font-size: 2.2rem; font-weight: 800; color: #0f172a; }
+  .price-period { font-size: 1rem; color: #64748b; }
+  .perk-cancel { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
 
-  .benefit-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .aside-benefits strong {
-    display: block;
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #f1f5f9;
-    margin-bottom: 3px;
-  }
-
-  .aside-benefits span {
-    font-size: 0.82rem;
-    color: #64748b;
-    line-height: 1.5;
-  }
-
-  .aside-price {
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 14px;
-    padding: 20px 24px;
-  }
-
-  .price-num {
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: #fff;
-  }
-
-  .price-per {
-    font-size: 1rem;
-    color: #94a3b8;
-  }
-
-  /* Right panel */
-  .auth-main {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    background: #f8fafc;
-    min-height: 100vh;
-  }
-
-  .auth-card {
-    background: #fff;
-    border-radius: 24px;
-    box-shadow: 0 8px 48px rgba(0,0,0,0.08);
-    padding: 40px;
-    width: 100%;
-    max-width: 420px;
-  }
-
-  /* Tabs */
-  .auth-tabs {
-    display: flex;
-    gap: 4px;
-    background: #f1f5f9;
-    border-radius: 12px;
-    padding: 4px;
-    margin-bottom: 32px;
-  }
-
-  .auth-tab {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background: transparent;
-    border-radius: 9px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: inherit;
-  }
-
-  .auth-tab.active {
-    background: #fff;
-    color: #1d4ed8;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-
-  /* Forms */
-  .auth-form { display: none; flex-direction: column; gap: 0; }
-  .auth-form.active { display: flex; }
-
-  .auth-form-header { margin-bottom: 28px; }
-  .auth-form-header h2 { font-size: 1.4rem; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
-  .auth-form-header p { font-size: 0.88rem; color: #64748b; }
-
-  .field-group { margin-bottom: 18px; }
-  .field-label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .field-group > label, .field-label-row > label { font-size: 0.83rem; font-weight: 500; color: #475569; }
-  .forgot-link { background: none; border: none; font-size: 0.8rem; color: #1d4ed8; cursor: pointer; font-family: inherit; padding: 0; }
-  .forgot-link:hover { text-decoration: underline; }
-
-  .field-wrap {
-    position: relative;
-    display: flex;
-    align-items: center;
-  }
-
-  .field-icon {
-    position: absolute;
-    left: 14px;
-    color: #94a3b8;
-    pointer-events: none;
-    flex-shrink: 0;
-  }
-
-  .field-wrap input, .field-wrap select {
-    width: 100%;
-    padding: 12px 14px 12px 42px;
-    border: 1.5px solid #e2e8f0;
-    border-radius: 11px;
-    font-size: 0.93rem;
-    color: #0f172a;
-    background: #f8fafc;
-    font-family: inherit;
-    transition: all 0.2s;
-  }
-
-  .field-wrap input:focus, .field-wrap select:focus {
-    outline: none;
-    border-color: #1d4ed8;
-    box-shadow: 0 0 0 3px rgba(29,78,216,0.1);
-    background: #fff;
-  }
-
-  .field-wrap input::placeholder { color: #94a3b8; }
-
-  .field-wrap-select select {
-    appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    background-color: #f8fafc;
-    padding-right: 36px;
-    cursor: pointer;
-  }
-
-  .toggle-password {
-    position: absolute;
-    right: 12px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #94a3b8;
-    display: flex;
-    align-items: center;
-    padding: 4px;
-    border-radius: 4px;
-    transition: color 0.15s;
-  }
-
-  .toggle-password:hover { color: #475569; }
-
-  /* Password strength */
-  .password-strength { margin-top: 8px; display: flex; align-items: center; gap: 8px; }
-  .strength-bar { flex: 1; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden; }
-  .strength-fill { height: 100%; border-radius: 2px; transition: width 0.3s, background 0.3s; width: 0; }
-  #strength-label { font-size: 0.75rem; color: #64748b; white-space: nowrap; }
-
-  /* Error/success */
-  .auth-error {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 0.85rem;
-    color: #dc2626;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .auth-success {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    font-size: 0.85rem;
-    color: #16a34a;
-    margin-bottom: 16px;
-  }
-
-  /* Submit button */
-  .auth-submit {
-    width: 100%;
-    padding: 14px;
-    background: #1d4ed8;
-    color: #fff;
-    border: none;
-    border-radius: 12px;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.25s;
-    font-family: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 16px rgba(29,78,216,0.3);
-    margin-bottom: 20px;
-  }
-
-  .auth-submit:hover:not(:disabled) { background: #1e40af; transform: translateY(-1px); box-shadow: 0 6px 24px rgba(29,78,216,0.4); }
-  .auth-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spin { animation: spin 0.8s linear infinite; }
-
-  /* Bottom links */
-  .auth-switch { text-align: center; font-size: 0.85rem; color: #64748b; }
-  .auth-terms { text-align: center; font-size: 0.78rem; color: #94a3b8; margin-bottom: 12px; }
-  .switch-link { background: none; border: none; color: #1d4ed8; font-weight: 600; cursor: pointer; font-family: inherit; font-size: inherit; padding: 0; }
-  .switch-link:hover { text-decoration: underline; }
-
-  /* Mobile */
-  @media (max-width: 900px) {
-    .auth-page { grid-template-columns: 1fr; }
-    .auth-aside { display: none; }
-    .auth-main { min-height: 100vh; align-items: flex-start; padding-top: 60px; }
-    .auth-card { max-width: 100%; box-shadow: none; background: transparent; padding: 0; }
-  }
-
-  @media (max-width: 480px) {
-    .auth-main { padding: 20px 16px; }
-    .auth-card { padding: 0; }
+  @media (max-width: 768px) {
+    .auth-page { padding: 80px 0 60px; }
+    .auth-wrap { grid-template-columns: 1fr; max-width: 480px; }
+    .auth-perks { padding: 0 0 24px; }
+    .auth-card { padding: 24px 20px; }
   }
 </style>
 
 <script>
-  import { createClient } from '@supabase/supabase-js';
+  const SB_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co';
+  const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
 
-  const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  );
-
-  // ── Redirect if already logged in ─────────────────────────────
-  (async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) {
-      const params = new URLSearchParams(window.location.search);
-      const next = params.get('next') || '/instrumenty/';
-      window.location.href = next;
-    }
-  })();
-
-  // ── Tab switching ─────────────────────────────────────────────
-  const tabLogin = document.getElementById('tab-login')!;
-  const tabRegister = document.getElementById('tab-register')!;
-  const formLogin = document.getElementById('form-login')!;
-  const formRegister = document.getElementById('form-register')!;
-  const formForgot = document.getElementById('form-forgot')!;
-
-  function showForm(which: 'login' | 'register' | 'forgot') {
-    formLogin.hidden = which !== 'login';
-    formRegister.hidden = which !== 'register';
-    formForgot.hidden = which !== 'forgot';
-    formLogin.classList.toggle('active', which === 'login');
-    formRegister.classList.toggle('active', which === 'register');
-    formForgot.classList.toggle('active', which === 'forgot');
-    tabLogin.classList.toggle('active', which === 'login');
-    tabRegister.classList.toggle('active', which === 'register');
+  // Redirect if already logged in
+  if (localStorage.getItem('sb_token')) {
+    window.location.href = '/master/';
   }
 
-  tabLogin.addEventListener('click', () => showForm('login'));
-  tabRegister.addEventListener('click', () => showForm('register'));
-  document.getElementById('to-register')?.addEventListener('click', () => showForm('register'));
-  document.getElementById('to-login')?.addEventListener('click', () => showForm('login'));
-  document.getElementById('forgot-btn')?.addEventListener('click', () => showForm('forgot'));
-  document.getElementById('back-to-login')?.addEventListener('click', () => showForm('login'));
+  async function sbAuth(path: string, body: object) {
+    const res = await fetch(`${SB_URL}${path}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON },
+      body: JSON.stringify(body),
+    });
+    return { ok: res.ok, data: await res.json() };
+  }
 
-  // ── Toggle password visibility ────────────────────────────────
-  document.querySelectorAll<HTMLButtonElement>('.toggle-password').forEach(btn => {
+  function saveSession(data: { access_token: string; refresh_token: string; user: { id: string; email: string } }) {
+    localStorage.setItem('sb_token', data.access_token);
+    localStorage.setItem('sb_refresh', data.refresh_token || '');
+    localStorage.setItem('sb_uid', data.user.id);
+    localStorage.setItem('sb_email', data.user.email);
+  }
+
+  function showMsg(text: string, type: 'error' | 'success' | 'info') {
+    const el = document.getElementById('msg') as HTMLElement;
+    el.textContent = text;
+    el.className = `auth-msg ${type}`;
+    el.hidden = false;
+  }
+
+  // Tab switching
+  document.querySelectorAll<HTMLButtonElement>('.auth-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tab = btn.dataset.tab!;
+      document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t === btn));
+      (document.getElementById('login-form') as HTMLElement).hidden = tab !== 'login';
+      (document.getElementById('register-form') as HTMLElement).hidden = tab !== 'register';
+      (document.getElementById('msg') as HTMLElement).hidden = true;
+    });
+  });
+
+  // Password toggle
+  document.querySelectorAll<HTMLButtonElement>('.pass-toggle').forEach(btn => {
     btn.addEventListener('click', () => {
       const input = document.getElementById(btn.dataset.target!) as HTMLInputElement;
-      if (!input) return;
       input.type = input.type === 'password' ? 'text' : 'password';
     });
   });
 
-  // ── Password strength ─────────────────────────────────────────
-  const regPwd = document.getElementById('reg-password') as HTMLInputElement;
-  const strengthWrap = document.getElementById('pwd-strength') as HTMLElement;
-  const strengthFill = document.getElementById('strength-fill') as HTMLElement;
-  const strengthLabel = document.getElementById('strength-label') as HTMLElement;
-
-  regPwd?.addEventListener('input', () => {
-    const v = regPwd.value;
-    strengthWrap.hidden = v.length === 0;
-    let score = 0;
-    if (v.length >= 6) score++;
-    if (v.length >= 10) score++;
-    if (/[0-9]/.test(v)) score++;
-    if (/[^a-zA-Z0-9]/.test(v)) score++;
-    if (/[A-Z]/.test(v)) score++;
-    const pct = (score / 5) * 100;
-    strengthFill.style.width = pct + '%';
-    if (score <= 1) { strengthFill.style.background = '#dc2626'; strengthLabel.textContent = 'Слабый'; }
-    else if (score <= 3) { strengthFill.style.background = '#d97706'; strengthLabel.textContent = 'Средний'; }
-    else { strengthFill.style.background = '#16a34a'; strengthLabel.textContent = 'Надёжный'; }
-  });
-
-  // ── Helper: set loading state ─────────────────────────────────
-  function setLoading(form: string, loading: boolean) {
-    const btn = document.getElementById(`${form}-submit`) as HTMLButtonElement;
-    if (!btn) return;
-    const text = btn.querySelector('.btn-text') as HTMLElement;
-    const loader = btn.querySelector('.btn-loader') as HTMLElement;
-    btn.disabled = loading;
-    text.hidden = loading;
-    loader.hidden = !loading;
-  }
-
-  function showError(formId: string, msg: string) {
-    const el = document.getElementById(`${formId}-error`) as HTMLElement;
-    el.textContent = msg;
-    el.hidden = false;
-  }
-
-  function hideError(formId: string) {
-    const el = document.getElementById(`${formId}-error`) as HTMLElement;
-    if (el) el.hidden = true;
-  }
-
-  function showSuccess(formId: string, msg: string) {
-    const el = document.getElementById(`${formId}-success`) as HTMLElement;
-    if (el) { el.textContent = msg; el.hidden = false; }
-  }
-
-  // Error message translation
-  function translateError(msg: string): string {
-    if (msg.includes('Invalid login credentials')) return 'Неверный email или пароль';
-    if (msg.includes('Email not confirmed')) return 'Подтвердите email перед входом';
-    if (msg.includes('User already registered')) return 'Пользователь с таким email уже существует';
-    if (msg.includes('Password should be at least')) return 'Пароль должен содержать минимум 6 символов';
-    if (msg.includes('Unable to validate email')) return 'Некорректный email адрес';
-    if (msg.includes('rate limit')) return 'Слишком много попыток. Подождите немного.';
-    return 'Произошла ошибка. Попробуйте снова.';
-  }
-
-  // ── Login ─────────────────────────────────────────────────────
-  document.getElementById('form-login')?.addEventListener('submit', async (e) => {
+  // Login
+  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
-    hideError('login');
-    setLoading('login', true);
+    const btn = document.getElementById('login-btn') as HTMLButtonElement;
+    const email = (document.getElementById('l-email') as HTMLInputElement).value;
+    const password = (document.getElementById('l-pass') as HTMLInputElement).value;
 
-    const email = (document.getElementById('login-email') as HTMLInputElement).value.trim();
-    const password = (document.getElementById('login-password') as HTMLInputElement).value;
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-    if (error) {
-      setLoading('login', false);
-      showError('login', translateError(error.message));
-      return;
-    }
-
-    // Check subscription + redirect
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get('next') || '/instrumenty/';
-    window.location.href = next;
-  });
-
-  // ── Register ──────────────────────────────────────────────────
-  document.getElementById('form-register')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideError('register');
-    setLoading('register', true);
-
-    const name = (document.getElementById('reg-name') as HTMLInputElement).value.trim();
-    const email = (document.getElementById('reg-email') as HTMLInputElement).value.trim();
-    const password = (document.getElementById('reg-password') as HTMLInputElement).value;
-    const city = (document.getElementById('reg-city') as HTMLSelectElement).value;
-
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { name, city } },
-    });
-
-    if (error) {
-      setLoading('register', false);
-      showError('register', translateError(error.message));
-      return;
-    }
-
-    // Create profile
-    if (data.user) {
-      await supabase.from('master_profiles').insert({
-        user_id: data.user.id,
-        name: name || null,
-        city,
-        subscription_status: 'free',
-      });
-    }
-
-    setLoading('register', false);
-
-    if (data.session) {
-      // Email confirmation not required — redirect directly
-      window.location.href = '/master/subscribe/';
-    } else {
-      // Email confirmation required
-      showSuccess('register', '✓ Письмо отправлено на ' + email + '. Перейдите по ссылке для подтверждения.');
-      (document.getElementById('register-submit') as HTMLButtonElement).disabled = true;
-    }
-  });
-
-  // ── Forgot password ───────────────────────────────────────────
-  document.getElementById('form-forgot')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    hideError('forgot');
-
-    const email = (document.getElementById('forgot-email') as HTMLInputElement).value.trim();
-    const btn = document.querySelector('#form-forgot .auth-submit') as HTMLButtonElement;
     btn.disabled = true;
-    (btn.querySelector('.btn-text') as HTMLElement).hidden = true;
-    (btn.querySelector('.btn-loader') as HTMLElement).hidden = false;
+    btn.querySelector('span')!.textContent = 'Входим...';
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/master/login/',
+    const { ok, data } = await sbAuth('/auth/v1/token?grant_type=password', { email, password });
+
+    if (ok && data.access_token) {
+      saveSession(data);
+      showMsg('Вход выполнен! Перенаправляем...', 'success');
+      setTimeout(() => { window.location.href = '/master/'; }, 800);
+    } else {
+      showMsg(data.error_description || data.message || 'Неверный email или пароль', 'error');
+      btn.disabled = false;
+      btn.querySelector('span')!.textContent = 'Войти в кабинет';
+    }
+  });
+
+  // Register
+  document.getElementById('register-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('register-btn') as HTMLButtonElement;
+    const name = (document.getElementById('r-name') as HTMLInputElement).value;
+    const email = (document.getElementById('r-email') as HTMLInputElement).value;
+    const password = (document.getElementById('r-pass') as HTMLInputElement).value;
+
+    btn.disabled = true;
+    btn.querySelector('span')!.textContent = 'Создаём аккаунт...';
+
+    const { ok, data } = await sbAuth('/auth/v1/signup', {
+      email, password, data: { full_name: name },
     });
 
-    btn.disabled = false;
-    (btn.querySelector('.btn-text') as HTMLElement).hidden = false;
-    (btn.querySelector('.btn-loader') as HTMLElement).hidden = true;
-
-    if (error) { showError('forgot', translateError(error.message)); return; }
-    showSuccess('forgot', `✓ Письмо для сброса пароля отправлено на ${email}`);
+    if (ok) {
+      if (data.access_token) {
+        saveSession(data);
+        showMsg('Аккаунт создан! Перенаправляем...', 'success');
+        setTimeout(() => { window.location.href = '/master/'; }, 800);
+      } else {
+        showMsg('Аккаунт создан! Проверьте почту для подтверждения, затем войдите.', 'info');
+        btn.disabled = false;
+        btn.querySelector('span')!.textContent = 'Создать аккаунт';
+      }
+    } else {
+      const msg = data.msg || data.message || data.error_description || 'Ошибка регистрации';
+      const ruMsg = msg.includes('already registered') ? 'Этот email уже зарегистрирован' : msg;
+      showMsg(ruMsg, 'error');
+      btn.disabled = false;
+      btn.querySelector('span')!.textContent = 'Создать аккаунт';
+    }
   });
 </script>

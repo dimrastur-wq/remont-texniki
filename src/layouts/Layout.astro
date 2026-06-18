@@ -1,138 +1,34 @@
 ---
 interface Props {
-  title?: string;
+  title: string;
   description?: string;
-  keywords?: string;
-  canonical?: string;
-  schema?: string;
-  ogImage?: string;
-  geoRegion?: string;
-  geoPlace?: string;
 }
-
-const {
-  title = 'Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле | Центр восстановления бытовой техники',
-  description = 'Профессиональный ремонт холодильников, стиральных машин и микроволновок в Миассе, Златоусте и Чебаркуле. Выезд мастера, доступные цены, гарантия. Звоните: 8 (951) 257-77-57',
-  keywords = 'ремонт техники Миасс, вызвать мастера Златоуст, ремонт холодильников Чебаркуль, ремонт стиральных машин Миасс, ремонт микроволновок Златоуст, мастер по ремонту бытовой техники, ремонт бытовой техники Миасс',
-  canonical,
-  schema,
-  ogImage = '/og-image.jpg',
-  geoRegion = 'RU-CHE',
-  geoPlace = 'Миасс',
-} = Astro.props;
-
-const siteUrl = 'https://master-tehniki74.store';
-
-// Always build canonical from the production domain + current pathname.
-// This prevents wrong-host duplicates (http, www, staging, localhost).
-// Normalize: ensure exactly one trailing slash.
-const rawPath = canonical
-  ? (canonical.startsWith('http') ? new URL(canonical).pathname : canonical)
-  : Astro.url.pathname;
-
-// Normalize trailing slash: always add it unless this is a file URL (has extension)
-const hasExtension = /\.[a-z]{2,4}$/i.test(rawPath);
-const normalizedPath = hasExtension
-  ? rawPath
-  : rawPath.endsWith('/')
-    ? rawPath
-    : `${rawPath}/`;
-
-const canonicalUrl = `${siteUrl}${normalizedPath}`;
-const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`;
+const { title, description = 'Мастер Техники 74 — ремонт бытовой техники в Челябинске' } = Astro.props;
 ---
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="generator" content={Astro.generator} />
-
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta name="keywords" content={keywords} />
-    <meta name="robots" content="index, follow" />
-    <meta name="geo.region" content={geoRegion} />
-    <meta name="geo.placename" content={geoPlace} />
-    <link rel="canonical" href={canonicalUrl} />
-
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="ru_RU" />
-    <meta property="og:url" content={canonicalUrl} />
-    <meta property="og:site_name" content="Центр восстановления бытовой техники" />
-    <meta property="og:image" content={ogImageUrl} />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
-    <meta name="twitter:image" content={ogImageUrl} />
-
-    <meta name="theme-color" content="#1d4ed8" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-
-    {schema && <script type="application/ld+json" set:html={schema} />}
-
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for (var j = 0; j < document.scripts.length; j++){if (document.scripts[j].src === r){ return; }}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, "script", "https://mc.yandex.ru/metrika/tag.js?id=109025369", "ym");ym(109025369, "init", {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/109025369" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-  </head>
-  <body>
-    <slot />
-  </body>
-</html>
-
-<style is:global>
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    color: #1e293b;
-    background: #ffffff;
-    line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  img {
-    max-width: 100%;
-    display: block;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 24px;
-  }
-
-  @media (max-width: 768px) {
-    .container {
-      padding: 0 16px;
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content={description} />
+  <title>{title}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; padding: 0; min-height: 100vh;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #111827; background: #f9fafb;
+      -webkit-font-smoothing: antialiased;
     }
-  }
-</style>
+    a { color: inherit; }
+    img { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+  <slot />
+</body>
+</html>

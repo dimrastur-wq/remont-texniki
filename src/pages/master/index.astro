@@ -1,0 +1,1525 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import { PARTS_CROSSREF } from '../../data/parts-crossref';
+import { SERVICE_MODES, SERVICE_BRANDS, SERVICE_APPLIANCES } from '../../data/service-manuals';
+
+const partsJSON = JSON.stringify(PARTS_CROSSREF);
+const servicemodesJSON = JSON.stringify(SERVICE_MODES);
+const serviceBrandsJSON = JSON.stringify(SERVICE_BRANDS);
+const serviceAppsJSON = JSON.stringify(SERVICE_APPLIANCES);
+
+const SUPA_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
+---
+
+<Layout title="Кабинет мастера — Мастер Техники 74" description="Личный кабинет профессионального мастера по ремонту бытовой техники">
+  <SiteHeader />
+  <main>
+
+<div id="loading-overlay" class="overlay">
+  <div class="spinner-wrap">
+    <div class="spinner"></div>
+    <p>Загрузка кабинета...</p>
+  </div>
+</div>
+
+<!-- PAYWALL -->
+<div id="paywall-screen" class="hidden">
+  <div class="paywall-container">
+    <div class="paywall-header">
+      <a href="/instrumenty/" class="back-link">← Инструменты</a>
+      <div class="paywall-logo">
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#ea580c"/><path d="M20 8l10 6v12l-10 6-10-6V14l10-6z" fill="white" opacity=".9"/><circle cx="20" cy="20" r="4" fill="#ea580c"/></svg>
+        <span>Кабинет мастера</span>
+      </div>
+    </div>
+
+    <div class="paywall-content">
+      <div class="paywall-badge">ПРЕМИУМ</div>
+      <h1 class="paywall-title">Профессиональный кабинет мастера</h1>
+      <p class="paywall-sub">Всё необходимое для эффективной работы и учёта в одном месте</p>
+
+      <div class="perks-grid">
+        <div class="perk-card">
+          <div class="perk-icon">📦</div>
+          <div class="perk-text">
+            <strong>Менеджер заказов</strong>
+            <span>Ведите CRM, считайте прибыль, отслеживайте статусы</span>
+          </div>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon">🔧</div>
+          <div class="perk-text">
+            <strong>Подбор запчастей</strong>
+            <span>База совместимых универсальных деталей с ценами</span>
+          </div>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon">📋</div>
+          <div class="perk-text">
+            <strong>Сервисные режимы</strong>
+            <span>Инструкции по входу в тест-режимы Indesit, Bosch, LG, Samsung</span>
+          </div>
+        </div>
+        <div class="perk-card">
+          <div class="perk-icon">🏷️</div>
+          <div class="perk-text">
+            <strong>Скидка 15%</strong>
+            <span>На запчасти в каталоге для премиум-мастеров</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="price-block">
+        <div class="price-main">390 ₽<span class="price-period">/месяц</span></div>
+        <div class="price-sub">Отмена в любой момент</div>
+      </div>
+
+      <button id="pay-btn" class="pay-button">
+        <span id="pay-btn-text">Подключить премиум</span>
+        <span id="pay-btn-spinner" class="hidden btn-spin">⟳</span>
+      </button>
+      <p class="pay-note">Демо-режим: оплата симулируется мгновенно</p>
+
+      <button id="logout-paywall-btn" class="logout-btn-small">Выйти из аккаунта</button>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard-screen" class="hidden">
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-logo">
+        <svg width="32" height="32" viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="10" fill="#ea580c"/><path d="M20 8l10 6v12l-10 6-10-6V14l10-6z" fill="white" opacity=".9"/><circle cx="20" cy="20" r="4" fill="#ea580c"/></svg>
+        <span>Кабинет мастера</span>
+      </div>
+      <div class="dash-header-right">
+        <span class="premium-badge">ПРЕМИУМ</span>
+        <span id="user-email-display" class="user-email"></span>
+        <button id="logout-btn" class="logout-btn">Выйти</button>
+      </div>
+    </div>
+    <nav class="dash-tabs">
+      <button class="dash-tab active" data-tab="orders">📦 Заказы</button>
+      <button class="dash-tab" data-tab="parts">🔧 Запчасти</button>
+      <button class="dash-tab" data-tab="service">📋 Сервис</button>
+      <button class="dash-tab" data-tab="perks">🏷️ Привилегии</button>
+    </nav>
+  </div>
+
+  <!-- ORDERS TAB -->
+  <div id="tab-orders" class="tab-content active">
+    <div class="tab-inner">
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon stat-revenue">💰</div>
+          <div class="stat-data">
+            <div id="stat-revenue" class="stat-value">0 ₽</div>
+            <div class="stat-label">Выручка (выполнено)</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-expense">🛒</div>
+          <div class="stat-data">
+            <div id="stat-expenses" class="stat-value">0 ₽</div>
+            <div class="stat-label">Расходы на запчасти</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-profit">📈</div>
+          <div class="stat-data">
+            <div id="stat-profit" class="stat-value">0 ₽</div>
+            <div class="stat-label">Чистая прибыль</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon stat-count">📋</div>
+          <div class="stat-data">
+            <div id="stat-count" class="stat-value">0</div>
+            <div class="stat-label">Всего заказов</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add order -->
+      <div class="section-card">
+        <div class="section-header" id="toggle-add-order">
+          <h2 class="section-title">+ Добавить заказ</h2>
+          <span class="toggle-arrow">▼</span>
+        </div>
+        <div id="add-order-form-wrap" class="collapsible hidden">
+          <form id="add-order-form" class="order-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Клиент *</label>
+                <input type="text" name="client_name" placeholder="Иванов Иван" required />
+              </div>
+              <div class="form-group">
+                <label>Телефон</label>
+                <input type="tel" name="client_phone" placeholder="+7 (900) 000-00-00" />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Город</label>
+                <input type="text" name="client_city" placeholder="Челябинск" />
+              </div>
+              <div class="form-group">
+                <label>Техника *</label>
+                <input type="text" name="appliance_type" placeholder="Стиральная машина" required />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Марка/Модель</label>
+                <input type="text" name="brand_model" placeholder="Indesit IWSB 5105" />
+              </div>
+              <div class="form-group">
+                <label>Статус</label>
+                <select name="status">
+                  <option value="new">Новый</option>
+                  <option value="in_progress">В работе</option>
+                  <option value="completed">Выполнен</option>
+                  <option value="cancelled">Отменён</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group full">
+              <label>Описание неисправности</label>
+              <textarea name="fault_description" rows="2" placeholder="Не крутит барабан, коды E01..."></textarea>
+            </div>
+            <div class="form-group full">
+              <label>Выполненные работы</label>
+              <textarea name="work_done" rows="2" placeholder="Заменён подшипник барабана 6205ZZ..."></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Стоимость запчастей (₽)</label>
+                <input type="number" name="parts_cost" placeholder="0" min="0" />
+              </div>
+              <div class="form-group">
+                <label>Стоимость работ (₽)</label>
+                <input type="number" name="labor_cost" placeholder="0" min="0" />
+              </div>
+            </div>
+            <div id="order-form-error" class="form-error hidden"></div>
+            <button type="submit" class="btn-primary" id="add-order-submit">Сохранить заказ</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Orders list -->
+      <div class="section-card">
+        <div class="orders-filter-row">
+          <span class="filter-label">Фильтр:</span>
+          <div class="status-filters">
+            <button class="filter-btn active" data-status="all">Все</button>
+            <button class="filter-btn" data-status="new">Новые</button>
+            <button class="filter-btn" data-status="in_progress">В работе</button>
+            <button class="filter-btn" data-status="completed">Выполнены</button>
+            <button class="filter-btn" data-status="cancelled">Отменены</button>
+          </div>
+        </div>
+        <div id="orders-list" class="orders-list">
+          <div class="empty-state">Загрузка заказов...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PARTS TAB -->
+  <div id="tab-parts" class="tab-content hidden">
+    <div class="tab-inner">
+
+      <!-- Calculator header -->
+      <div class="calc-hero">
+        <div class="calc-hero-left">
+          <div class="calc-hero-title">Калькулятор запчастей</div>
+          <div class="calc-hero-sub">Выберите марку и категорию — покажем совместимые универсальные аналоги с OEM-кодами</div>
+        </div>
+        <a href="/zapchasti/" class="calc-catalog-link" target="_blank">
+          <span class="calc-discount-badge">−15%</span>
+          Каталог запчастей →
+        </a>
+      </div>
+
+      <!-- Step 1: Brand selector -->
+      <div class="calc-step">
+        <div class="calc-step-label"><span class="step-pill">1</span> Марка техники</div>
+        <div class="brand-selector" id="brand-selector">
+          <button class="brand-btn active" data-brand="">
+            <span class="brand-icon">🔍</span>
+            <span>Все марки</span>
+          </button>
+          <button class="brand-btn" data-brand="Indesit">
+            <span class="brand-icon">🔵</span>
+            <span>Indesit</span>
+          </button>
+          <button class="brand-btn" data-brand="Hotpoint-Ariston">
+            <span class="brand-icon">🟠</span>
+            <span>Ariston</span>
+          </button>
+          <button class="brand-btn" data-brand="Bosch">
+            <span class="brand-icon">🔴</span>
+            <span>Bosch</span>
+          </button>
+          <button class="brand-btn" data-brand="Siemens">
+            <span class="brand-icon">⚫</span>
+            <span>Siemens</span>
+          </button>
+          <button class="brand-btn" data-brand="LG">
+            <span class="brand-icon">🟣</span>
+            <span>LG</span>
+          </button>
+          <button class="brand-btn" data-brand="Samsung">
+            <span class="brand-icon">🔷</span>
+            <span>Samsung</span>
+          </button>
+          <button class="brand-btn" data-brand="Beko">
+            <span class="brand-icon">🟢</span>
+            <span>Beko</span>
+          </button>
+          <button class="brand-btn" data-brand="Electrolux">
+            <span class="brand-icon">🟡</span>
+            <span>Electrolux</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Category quick-pick -->
+      <div class="calc-step">
+        <div class="calc-step-label"><span class="step-pill">2</span> Тип запчасти</div>
+        <div class="category-selector" id="category-selector">
+          <button class="cat-btn active" data-cat="">
+            <span class="cat-icon">⚙️</span>
+            <span>Все</span>
+          </button>
+          <button class="cat-btn" data-cat="bearing">
+            <span class="cat-icon">⭕</span>
+            <span>Подшипники</span>
+          </button>
+          <button class="cat-btn" data-cat="heater">
+            <span class="cat-icon">🔥</span>
+            <span>ТЭНы</span>
+          </button>
+          <button class="cat-btn" data-cat="pump">
+            <span class="cat-icon">💧</span>
+            <span>Помпы</span>
+          </button>
+          <button class="cat-btn" data-cat="seal">
+            <span class="cat-icon">🔵</span>
+            <span>Манжеты</span>
+          </button>
+          <button class="cat-btn" data-cat="pressure">
+            <span class="cat-icon">📊</span>
+            <span>Прессостаты</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Spec search -->
+      <div class="calc-step">
+        <div class="calc-step-label"><span class="step-pill">3</span> Поиск по характеристикам</div>
+        <div class="spec-search-row">
+          <input
+            type="text"
+            id="parts-spec-search"
+            class="spec-search-input"
+            placeholder="Размер (6205ZZ, 20×47мм), мощность (1950W), артикул (C00289285)..."
+          />
+          <button class="spec-clear-btn" id="spec-clear-btn" title="Очистить">✕</button>
+        </div>
+        <div class="spec-hints">
+          <span class="spec-hint" data-q="6204">6204ZZ</span>
+          <span class="spec-hint" data-q="6205">6205ZZ</span>
+          <span class="spec-hint" data-q="1950W">1950W</span>
+          <span class="spec-hint" data-q="2000W">2000W</span>
+          <span class="spec-hint" data-q="Askoll">Askoll</span>
+          <span class="spec-hint" data-q="Direct Drive">Direct Drive</span>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="calc-results-header">
+        <span id="parts-result-count" class="result-count">Все запчасти</span>
+        <label class="sort-label">
+          Сортировка:
+          <select id="parts-sort" class="sort-select">
+            <option value="default">По умолчанию</option>
+            <option value="price-asc">Цена ↑</option>
+            <option value="cat">По категории</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="parts-results" class="parts-results"></div>
+
+      <!-- Catalog CTA -->
+      <div class="catalog-cta-banner">
+        <div class="catalog-cta-left">
+          <div class="catalog-cta-badge">ПРЕМИУМ −15%</div>
+          <div class="catalog-cta-text">
+            <strong>Заказывайте запчасти со скидкой 15%</strong>
+            <span>Покажите промокод поставщику — цены как у оптовика</span>
+          </div>
+        </div>
+        <a href="/zapchasti/" target="_blank" class="catalog-cta-btn">Открыть каталог</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SERVICE MANUALS TAB -->
+  <div id="tab-service" class="tab-content hidden">
+    <div class="tab-inner">
+      <div class="section-card">
+        <h2 class="section-title">Сервисные режимы и диагностика</h2>
+        <p class="section-desc">Пошаговые инструкции по входу в тест-режимы для основных марок</p>
+        <div class="service-filters">
+          <div class="filter-group">
+            <label>Марка</label>
+            <select id="service-brand-filter">
+              <option value="">Все марки</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Тип техники</label>
+            <select id="service-appliance-filter">
+              <option value="">Все типы</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Поиск</label>
+            <input type="text" id="service-search" placeholder="Марка, режим..." />
+          </div>
+        </div>
+        <div id="service-results" class="service-results"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERKS TAB -->
+  <div id="tab-perks" class="tab-content hidden">
+    <div class="tab-inner">
+      <div class="perks-hero">
+        <div class="perks-hero-badge">ПРЕМИУМ МАСТЕР</div>
+        <h2 class="perks-hero-title">Ваши привилегии</h2>
+        <p class="perks-hero-sub">Как подписчик премиум-тарифа, вы получаете эксклюзивные возможности</p>
+      </div>
+
+      <div class="perks-list">
+        <div class="perk-big-card">
+          <div class="perk-big-icon">🏷️</div>
+          <div class="perk-big-body">
+            <h3>Скидка 15% на запчасти</h3>
+            <p>Ваш персональный промокод на скидку в каталоге запчастей. Показывайте поставщикам для получения партнёрской цены.</p>
+            <div class="discount-badge-wrap">
+              <div class="discount-badge-card">
+                <div class="discount-badge-label">Промокод мастера</div>
+                <div class="discount-badge-code" id="perk-promo-code">MASTER15-——</div>
+                <div class="discount-badge-desc">Скидка 15% · Действителен весь срок подписки</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="perk-big-card">
+          <div class="perk-big-icon">📦</div>
+          <div class="perk-big-body">
+            <h3>Менеджер заказов (CRM)</h3>
+            <p>Ведите все заказы в одном месте. Статистика выручки, расходов и прибыли обновляется автоматически. Работает на телефоне.</p>
+            <button class="btn-outline" onclick="document.querySelector('[data-tab=orders]').click()">Открыть заказы →</button>
+          </div>
+        </div>
+
+        <div class="perk-big-card">
+          <div class="perk-big-icon">🔧</div>
+          <div class="perk-big-body">
+            <h3>Подбор запчастей</h3>
+            <p>База из 20+ категорий совместимых деталей: подшипники, ТЭНы, помпы, манжеты, прессостаты с OEM-номерами и ценами.</p>
+            <button class="btn-outline" onclick="document.querySelector('[data-tab=parts]').click()">Открыть подбор →</button>
+          </div>
+        </div>
+
+        <div class="perk-big-card">
+          <div class="perk-big-icon">📋</div>
+          <div class="perk-big-body">
+            <h3>Сервисные режимы</h3>
+            <p>Подробные инструкции по входу в диагностические тест-режимы Indesit, Bosch, LG, Samsung — стиральные машины и холодильники.</p>
+            <button class="btn-outline" onclick="document.querySelector('[data-tab=service]').click()">Открыть режимы →</button>
+          </div>
+        </div>
+
+        <div class="perk-big-card">
+          <div class="perk-big-icon">📄</div>
+          <div class="perk-big-body">
+            <h3>Генератор документов</h3>
+            <p>Бесплатное создание актов, договоров и гарантийных талонов для клиентов. Печатайте прямо с телефона.</p>
+            <a href="/instrumenty/" class="btn-outline">Открыть инструменты →</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="subscription-info">
+        <h3>Управление подпиской</h3>
+        <div class="sub-info-card">
+          <div class="sub-status">
+            <span class="sub-status-dot"></span>
+            <strong>Активна</strong>
+          </div>
+          <div class="sub-detail">Тариф: Премиум — 390 ₽/месяц</div>
+          <div class="sub-detail" id="perk-email-display"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  :root {
+    --orange: #ea580c;
+    --orange-dark: #c2410c;
+    --orange-light: #fff7ed;
+    --orange-mid: #fed7aa;
+    --gray-50: #f9fafb;
+    --gray-100: #f3f4f6;
+    --gray-200: #e5e7eb;
+    --gray-400: #9ca3af;
+    --gray-600: #4b5563;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+    --gray-900: #111827;
+    --green: #16a34a;
+    --green-light: #dcfce7;
+    --blue: #2563eb;
+    --blue-light: #dbeafe;
+    --yellow: #ca8a04;
+    --yellow-light: #fef9c3;
+    --red: #dc2626;
+    --red-light: #fee2e2;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,.08);
+    --shadow: 0 4px 12px rgba(0,0,0,.1);
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── OVERLAY ── */
+  .overlay {
+    position: fixed; inset: 0; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+  }
+  .spinner-wrap { text-align: center; }
+  .spinner-wrap p { color: var(--gray-600); margin-top: 12px; font-size: .9rem; }
+  .spinner {
+    width: 40px; height: 40px; border: 3px solid var(--orange-mid);
+    border-top-color: var(--orange); border-radius: 50%;
+    animation: spin .7s linear infinite; margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── PAYWALL ── */
+  .paywall-container {
+    max-width: 520px; margin: 0 auto; padding: 24px 16px 40px;
+    min-height: 100vh; display: flex; flex-direction: column;
+  }
+  .paywall-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+  .back-link { color: var(--gray-600); text-decoration: none; font-size: .875rem; }
+  .back-link:hover { color: var(--orange); }
+  .paywall-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1.05rem; color: var(--gray-900); }
+  .paywall-content { flex: 1; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .paywall-badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .08em; margin-bottom: 20px;
+  }
+  .paywall-title { font-size: 1.7rem; font-weight: 800; color: var(--gray-900); margin-bottom: 10px; line-height: 1.25; }
+  .paywall-sub { color: var(--gray-600); font-size: .95rem; margin-bottom: 28px; max-width: 380px; }
+  .perks-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; margin-bottom: 28px; text-align: left; }
+  .perk-card {
+    background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: 14px; display: flex; align-items: flex-start; gap: 10px;
+  }
+  .perk-icon { font-size: 1.4rem; line-height: 1; }
+  .perk-text { display: flex; flex-direction: column; gap: 3px; }
+  .perk-text strong { font-size: .82rem; color: var(--gray-900); }
+  .perk-text span { font-size: .75rem; color: var(--gray-600); line-height: 1.4; }
+  .price-block { margin-bottom: 20px; }
+  .price-main { font-size: 2.4rem; font-weight: 800; color: var(--gray-900); }
+  .price-period { font-size: 1rem; font-weight: 400; color: var(--gray-600); }
+  .price-sub { font-size: .8rem; color: var(--gray-400); margin-top: 4px; }
+  .pay-button {
+    width: 100%; max-width: 320px; padding: 16px 24px; border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-size: 1rem; font-weight: 700; border: none; cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+    box-shadow: 0 4px 14px rgba(234,88,12,.35);
+  }
+  .pay-button:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(234,88,12,.45); }
+  .pay-button:active { transform: translateY(0); }
+  .pay-button:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+  .pay-note { font-size: .75rem; color: var(--gray-400); margin-top: 10px; }
+  .btn-spin { display: inline-block; animation: spin .7s linear infinite; margin-left: 8px; }
+  .logout-btn-small {
+    margin-top: 24px; background: none; border: 1px solid var(--gray-200);
+    color: var(--gray-500); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: .8rem;
+  }
+  .logout-btn-small:hover { color: var(--red); border-color: var(--red); }
+
+  /* ── DASHBOARD HEADER ── */
+  .dash-header {
+    background: var(--gray-900); color: #fff; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .dash-header-inner {
+    max-width: 1100px; margin: 0 auto; padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .dash-logo { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 1rem; }
+  .dash-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .premium-badge {
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-size: .65rem; font-weight: 700; padding: 3px 8px; border-radius: 10px;
+    letter-spacing: .06em;
+  }
+  .user-email { font-size: .78rem; color: #9ca3af; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .logout-btn {
+    background: none; border: 1px solid #374151; color: #9ca3af;
+    padding: 5px 12px; border-radius: 7px; cursor: pointer; font-size: .8rem;
+    transition: all .15s;
+  }
+  .logout-btn:hover { color: #fff; border-color: #6b7280; }
+
+  .dash-tabs {
+    max-width: 1100px; margin: 0 auto; padding: 0 16px;
+    display: flex; gap: 0; overflow-x: auto; scrollbar-width: none;
+  }
+  .dash-tabs::-webkit-scrollbar { display: none; }
+  .dash-tab {
+    padding: 12px 18px; background: none; border: none; color: #9ca3af;
+    font-size: .875rem; font-weight: 500; cursor: pointer; border-bottom: 2px solid transparent;
+    white-space: nowrap; transition: all .15s;
+  }
+  .dash-tab:hover { color: #fff; }
+  .dash-tab.active { color: #fff; border-bottom-color: var(--orange); }
+
+  /* ── TAB CONTENT ── */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .tab-inner { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; }
+
+  /* ── STATS ── */
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (min-width: 640px) { .stats-grid { grid-template-columns: repeat(4, 1fr); } }
+  .stat-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm);
+  }
+  .stat-icon { font-size: 1.6rem; }
+  .stat-value { font-size: 1.25rem; font-weight: 800; color: var(--gray-900); }
+  .stat-label { font-size: .72rem; color: var(--gray-500); margin-top: 2px; }
+
+  /* ── SECTION CARD ── */
+  .section-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    overflow: hidden; margin-bottom: 16px; box-shadow: var(--shadow-sm);
+  }
+  .section-header {
+    padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none; border-bottom: 1px solid var(--gray-100);
+  }
+  .section-header:hover { background: var(--gray-50); }
+  .section-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); }
+  .section-desc { padding: 0 20px 4px; font-size: .82rem; color: var(--gray-500); }
+  .toggle-arrow { color: var(--gray-400); transition: transform .2s; }
+  .section-header.open .toggle-arrow { transform: rotate(180deg); }
+
+  .collapsible { padding: 20px; border-top: 1px solid var(--gray-100); }
+
+  /* ── FORM ── */
+  .order-form { display: flex; flex-direction: column; gap: 14px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 520px) { .form-row { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1/-1; }
+  .form-group label { font-size: .78rem; font-weight: 600; color: var(--gray-700); }
+  .form-group input, .form-group textarea, .form-group select {
+    padding: 9px 12px; border: 1px solid var(--gray-200); border-radius: 8px;
+    font-size: .875rem; color: var(--gray-900); background: #fff;
+    transition: border-color .15s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    outline: none; border-color: var(--orange);
+  }
+  .form-group textarea { resize: vertical; font-family: inherit; }
+  .form-error { padding: 10px 14px; background: var(--red-light); color: var(--red); border-radius: 8px; font-size: .82rem; }
+  .btn-primary {
+    padding: 11px 24px; background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-weight: 700; border: none; border-radius: 9px; cursor: pointer; font-size: .9rem;
+    transition: opacity .15s;
+  }
+  .btn-primary:hover { opacity: .9; }
+  .btn-primary:disabled { opacity: .6; cursor: not-allowed; }
+  .btn-outline {
+    display: inline-block; padding: 9px 18px; border: 1px solid var(--orange); color: var(--orange);
+    background: none; border-radius: 9px; cursor: pointer; font-size: .875rem; font-weight: 600;
+    text-decoration: none; transition: all .15s;
+  }
+  .btn-outline:hover { background: var(--orange); color: #fff; }
+
+  /* ── FILTER ROW ── */
+  .orders-filter-row { padding: 14px 20px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border-bottom: 1px solid var(--gray-100); }
+  .filter-label { font-size: .78rem; font-weight: 600; color: var(--gray-600); }
+  .status-filters { display: flex; gap: 6px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 5px 12px; border-radius: 20px; border: 1px solid var(--gray-200);
+    background: #fff; color: var(--gray-600); font-size: .78rem; cursor: pointer; transition: all .15s;
+  }
+  .filter-btn.active { background: var(--orange); color: #fff; border-color: var(--orange); }
+  .filter-btn:hover:not(.active) { border-color: var(--orange); color: var(--orange); }
+
+  /* ── ORDERS LIST ── */
+  .orders-list { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-400); font-size: .9rem; }
+
+  .order-card {
+    border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 16px;
+    background: #fff; display: flex; flex-direction: column; gap: 8px;
+    transition: box-shadow .15s;
+  }
+  .order-card:hover { box-shadow: var(--shadow); }
+  .order-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+  .order-client { font-weight: 700; font-size: .95rem; color: var(--gray-900); }
+  .order-phone { font-size: .8rem; color: var(--gray-500); }
+  .order-appliance { font-size: .82rem; color: var(--gray-700); }
+  .order-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .order-price { font-size: .85rem; font-weight: 600; color: var(--gray-800); }
+  .order-date { font-size: .75rem; color: var(--gray-400); }
+  .order-desc { font-size: .8rem; color: var(--gray-600); line-height: 1.4; }
+  .order-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .status-select-inline {
+    padding: 4px 8px; border: 1px solid var(--gray-200); border-radius: 6px;
+    font-size: .75rem; color: var(--gray-700); background: #fff; cursor: pointer;
+  }
+  .delete-btn {
+    padding: 4px 10px; border-radius: 6px; border: 1px solid var(--red);
+    color: var(--red); background: none; font-size: .75rem; cursor: pointer;
+    transition: all .15s;
+  }
+  .delete-btn:hover { background: var(--red); color: #fff; }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: 12px; font-size: .7rem; font-weight: 600;
+  }
+  .status-new { background: var(--blue-light); color: var(--blue); }
+  .status-in_progress { background: var(--yellow-light); color: var(--yellow); }
+  .status-completed { background: var(--green-light); color: var(--green); }
+  .status-cancelled { background: var(--gray-100); color: var(--gray-500); }
+
+  /* ── PARTS FILTERS ── */
+  .parts-filters, .service-filters {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
+    padding: 16px 20px; border-bottom: 1px solid var(--gray-100);
+  }
+  @media (min-width: 640px) {
+    .parts-filters { grid-template-columns: repeat(4, 1fr); }
+    .service-filters { grid-template-columns: repeat(3, 1fr); }
+  }
+  .filter-group { display: flex; flex-direction: column; gap: 5px; }
+  .filter-group label { font-size: .75rem; font-weight: 600; color: var(--gray-600); }
+  .filter-group select, .filter-group input {
+    padding: 8px 10px; border: 1px solid var(--gray-200); border-radius: 8px;
+    font-size: .82rem; color: var(--gray-900); background: #fff;
+  }
+  .filter-group select:focus, .filter-group input:focus { outline: none; border-color: var(--orange); }
+
+  /* ── PARTS RESULTS ── */
+  .parts-results { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .part-card {
+    border: 1px solid var(--gray-200); border-radius: 10px; padding: 14px 16px;
+    background: #fff; transition: box-shadow .15s;
+  }
+  .part-card:hover { box-shadow: var(--shadow); }
+  .part-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+  .part-name { font-weight: 700; font-size: .95rem; color: var(--gray-900); }
+  .part-specs { font-size: .8rem; color: var(--gray-600); margin-top: 2px; }
+  .part-price {
+    background: var(--orange-light); color: var(--orange-dark); padding: 4px 10px;
+    border-radius: 8px; font-size: .82rem; font-weight: 700; white-space: nowrap;
+  }
+  .part-cat-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    background: var(--gray-100); color: var(--gray-600); font-size: .7rem; margin-bottom: 8px;
+  }
+  .part-section { margin-top: 8px; }
+  .part-section-label { font-size: .72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag {
+    padding: 2px 8px; border-radius: 5px; font-size: .72rem;
+    background: var(--gray-100); color: var(--gray-700);
+  }
+  .tag-oem { background: var(--blue-light); color: var(--blue); }
+  .tag-universal { background: var(--green-light); color: var(--green); }
+  .tag-brand { background: var(--orange-light); color: var(--orange-dark); }
+  .part-note { font-size: .78rem; color: var(--gray-500); margin-top: 8px; font-style: italic; }
+  .part-models { font-size: .78rem; color: var(--gray-600); margin-top: 6px; }
+
+  /* ── SERVICE RESULTS ── */
+  .service-results { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+  .service-card {
+    border: 1px solid var(--gray-200); border-radius: 10px; overflow: hidden;
+    background: #fff; transition: box-shadow .15s;
+  }
+  .service-card:hover { box-shadow: var(--shadow); }
+  .service-card-header {
+    padding: 14px 16px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+    cursor: pointer; user-select: none;
+  }
+  .service-card-header:hover { background: var(--gray-50); }
+  .service-brand-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    background: var(--orange-light); color: var(--orange-dark); font-size: .7rem; font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .service-mode-name { font-weight: 700; font-size: .92rem; color: var(--gray-900); }
+  .service-appliance-tag { font-size: .78rem; color: var(--gray-500); margin-top: 3px; }
+  .service-expand-btn { color: var(--gray-400); font-size: .85rem; white-space: nowrap; transition: transform .2s; }
+  .service-card-header.open .service-expand-btn { transform: rotate(180deg); }
+  .service-card-body { display: none; padding: 0 16px 16px; border-top: 1px solid var(--gray-100); }
+  .service-card-body.open { display: block; }
+  .service-steps { margin: 12px 0 0; display: flex; flex-direction: column; gap: 6px; }
+  .service-step {
+    display: flex; gap: 10px; align-items: flex-start;
+    padding: 8px 10px; background: var(--gray-50); border-radius: 7px;
+    font-size: .83rem; line-height: 1.45; color: var(--gray-800);
+  }
+  .step-num {
+    min-width: 22px; height: 22px; border-radius: 50%;
+    background: var(--orange); color: #fff; font-size: .7rem; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .service-note, .service-exit, .service-diagram {
+    margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: .8rem; line-height: 1.4;
+  }
+  .service-note { background: var(--yellow-light); color: #713f12; border-left: 3px solid #eab308; }
+  .service-exit { background: var(--green-light); color: #166534; border-left: 3px solid #22c55e; }
+  .service-diagram { background: var(--blue-light); color: #1e40af; border-left: 3px solid #3b82f6; }
+  .service-note-label, .service-exit-label, .service-diagram-label { font-weight: 700; display: block; margin-bottom: 3px; }
+
+  /* ── PERKS ── */
+  .perks-hero { text-align: center; padding: 28px 20px 20px; }
+  .perks-hero-badge {
+    display: inline-block; padding: 4px 14px; border-radius: 20px;
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-size: .7rem; font-weight: 700; letter-spacing: .08em; margin-bottom: 12px;
+  }
+  .perks-hero-title { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); margin-bottom: 8px; }
+  .perks-hero-sub { font-size: .9rem; color: var(--gray-600); }
+  .perks-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+  .perk-big-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    padding: 20px; display: flex; gap: 16px; align-items: flex-start; box-shadow: var(--shadow-sm);
+  }
+  .perk-big-icon { font-size: 1.8rem; line-height: 1; }
+  .perk-big-body h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+  .perk-big-body p { font-size: .85rem; color: var(--gray-600); line-height: 1.5; margin-bottom: 12px; }
+  .discount-badge-wrap { margin-top: 12px; }
+  .discount-badge-card {
+    background: linear-gradient(135deg, #1f2937, #374151); color: #fff;
+    border-radius: 12px; padding: 16px 20px; text-align: center; max-width: 280px;
+  }
+  .discount-badge-label { font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: #9ca3af; margin-bottom: 6px; }
+  .discount-badge-code { font-size: 1.4rem; font-weight: 800; letter-spacing: .15em; color: #fb923c; margin-bottom: 6px; }
+  .discount-badge-desc { font-size: .72rem; color: #9ca3af; }
+  .subscription-info { background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow-sm); }
+  .subscription-info h3 { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin-bottom: 14px; }
+  .sub-info-card { display: flex; flex-direction: column; gap: 8px; }
+  .sub-status { display: flex; align-items: center; gap: 8px; font-size: .9rem; }
+  .sub-status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+  .sub-detail { font-size: .82rem; color: var(--gray-600); }
+
+  /* ── PARTS CALCULATOR ── */
+  .calc-hero {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+    background: linear-gradient(135deg, #1f2937, #111827); border-radius: var(--radius);
+    padding: 20px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .calc-hero-title { font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px; }
+  .calc-hero-sub { font-size: .8rem; color: #9ca3af; line-height: 1.4; max-width: 400px; }
+  .calc-catalog-link {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--orange); color: #fff; padding: 10px 16px; border-radius: 9px;
+    font-size: .82rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+    transition: background .15s; flex-shrink: 0;
+  }
+  .calc-catalog-link:hover { background: var(--orange-dark); }
+  .calc-discount-badge {
+    background: #fff; color: var(--orange-dark); font-size: .7rem; font-weight: 800;
+    padding: 2px 6px; border-radius: 5px;
+  }
+
+  .calc-step { margin-bottom: 16px; }
+  .calc-step-label {
+    display: flex; align-items: center; gap: 8px;
+    font-size: .78rem; font-weight: 700; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px;
+  }
+  .step-pill {
+    width: 20px; height: 20px; border-radius: 50%; background: var(--orange);
+    color: #fff; font-size: .7rem; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+
+  .brand-selector {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .brand-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    padding: 10px 14px; min-width: 72px; border-radius: 10px;
+    border: 1.5px solid var(--gray-200); background: #fff;
+    cursor: pointer; transition: all .15s; font-size: .78rem; font-weight: 600; color: var(--gray-700);
+  }
+  .brand-btn .brand-icon { font-size: 1.2rem; line-height: 1; }
+  .brand-btn:hover { border-color: var(--orange); color: var(--orange); transform: translateY(-1px); }
+  .brand-btn.active { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); }
+  @media (max-width: 480px) {
+    .brand-btn { min-width: 60px; padding: 8px 10px; font-size: .72rem; }
+    .brand-btn .brand-icon { font-size: 1rem; }
+  }
+
+  .category-selector {
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .cat-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 9px 14px; border-radius: 9px;
+    border: 1.5px solid var(--gray-200); background: #fff;
+    cursor: pointer; transition: all .15s; font-size: .82rem; font-weight: 600; color: var(--gray-700);
+  }
+  .cat-btn .cat-icon { font-size: 1rem; }
+  .cat-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .cat-btn.active { border-color: var(--orange); background: var(--orange-light); color: var(--orange-dark); }
+
+  .spec-search-row {
+    position: relative; display: flex; align-items: center;
+  }
+  .spec-search-input {
+    width: 100%; padding: 12px 44px 12px 16px;
+    border: 1.5px solid var(--gray-200); border-radius: 10px;
+    font-size: .9rem; color: var(--gray-900); background: #fff;
+    transition: border-color .15s; box-shadow: var(--shadow-sm);
+  }
+  .spec-search-input:focus { outline: none; border-color: var(--orange); box-shadow: 0 0 0 3px rgba(234,88,12,.12); }
+  .spec-clear-btn {
+    position: absolute; right: 12px; background: none; border: none;
+    color: var(--gray-400); cursor: pointer; font-size: .85rem; padding: 4px;
+    transition: color .15s;
+  }
+  .spec-clear-btn:hover { color: var(--gray-700); }
+  .spec-hints { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .spec-hint {
+    padding: 4px 10px; border-radius: 6px; background: var(--gray-100); color: var(--gray-600);
+    font-size: .75rem; cursor: pointer; transition: all .15s;
+  }
+  .spec-hint:hover { background: var(--orange-mid); color: var(--orange-dark); }
+
+  .calc-results-header {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin-bottom: 12px; flex-wrap: wrap;
+  }
+  .result-count { font-size: .82rem; font-weight: 600; color: var(--gray-600); }
+  .sort-label { font-size: .78rem; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+  .sort-select {
+    padding: 5px 8px; border: 1px solid var(--gray-200); border-radius: 7px;
+    font-size: .78rem; color: var(--gray-700); background: #fff;
+  }
+
+  /* ── PARTS RESULTS ── */
+  .parts-results { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+  .part-card {
+    background: #fff; border: 1px solid var(--gray-200); border-radius: var(--radius);
+    overflow: hidden; transition: box-shadow .15s;
+  }
+  .part-card:hover { box-shadow: var(--shadow); }
+  .part-card-top {
+    padding: 14px 16px 10px; display: flex; align-items: flex-start;
+    justify-content: space-between; gap: 12px;
+  }
+  .part-card-meta { flex: 1; min-width: 0; }
+  .part-card-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .part-cat-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    background: var(--gray-100); color: var(--gray-600); font-size: .7rem; font-weight: 600;
+  }
+  .part-appliance-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    background: var(--blue-light); color: var(--blue); font-size: .7rem; font-weight: 600;
+  }
+  .part-name { font-weight: 800; font-size: 1rem; color: var(--gray-900); margin-bottom: 3px; }
+  .part-specs { font-size: .82rem; color: var(--gray-500); }
+  .part-pricing { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .part-price-original {
+    font-size: .75rem; color: var(--gray-400); text-decoration: line-through;
+  }
+  .part-price-premium {
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; padding: 5px 10px; border-radius: 8px;
+    font-size: .88rem; font-weight: 800; white-space: nowrap;
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+  }
+  .part-price-pct { font-size: .6rem; font-weight: 600; opacity: .85; letter-spacing: .04em; }
+
+  .part-card-body { padding: 0 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .part-section-label {
+    font-size: .68rem; font-weight: 700; color: var(--gray-400);
+    text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px;
+  }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 5px; }
+  .tag { padding: 3px 8px; border-radius: 5px; font-size: .73rem; }
+  .tag-oem { background: var(--blue-light); color: var(--blue); font-weight: 600; }
+  .tag-universal { background: var(--green-light); color: var(--green); font-weight: 600; }
+  .tag-brand { background: var(--orange-light); color: var(--orange-dark); font-weight: 600; }
+  .part-models-row { font-size: .78rem; color: var(--gray-500); line-height: 1.45; }
+  .part-note-row {
+    display: flex; gap: 6px; align-items: flex-start;
+    padding: 8px 10px; background: var(--yellow-light); border-radius: 7px;
+    font-size: .78rem; color: #713f12; line-height: 1.4;
+  }
+
+  .part-card-footer {
+    padding: 10px 16px; background: var(--gray-50); border-top: 1px solid var(--gray-100);
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .part-brands-row { display: flex; flex-wrap: wrap; gap: 4px; }
+  .part-catalog-link {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 6px 12px; border-radius: 7px;
+    background: var(--orange-light); color: var(--orange-dark);
+    font-size: .78rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+    border: 1px solid var(--orange-mid); transition: all .15s;
+  }
+  .part-catalog-link:hover { background: var(--orange); color: #fff; border-color: var(--orange); }
+
+  /* ── CATALOG CTA BANNER ── */
+  .catalog-cta-banner {
+    background: linear-gradient(135deg, #1f2937, #111827); border-radius: var(--radius);
+    padding: 18px 20px; display: flex; align-items: center; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; margin-top: 8px;
+  }
+  .catalog-cta-left { display: flex; align-items: center; gap: 12px; }
+  .catalog-cta-badge {
+    background: linear-gradient(135deg, var(--orange), var(--orange-dark));
+    color: #fff; font-size: .7rem; font-weight: 800; padding: 4px 10px;
+    border-radius: 7px; white-space: nowrap; letter-spacing: .04em; flex-shrink: 0;
+  }
+  .catalog-cta-text { display: flex; flex-direction: column; gap: 2px; }
+  .catalog-cta-text strong { color: #fff; font-size: .88rem; }
+  .catalog-cta-text span { color: #9ca3af; font-size: .75rem; }
+  .catalog-cta-btn {
+    padding: 10px 20px; background: var(--orange); color: #fff; border-radius: 9px;
+    font-size: .85rem; font-weight: 700; text-decoration: none; white-space: nowrap;
+    transition: background .15s; flex-shrink: 0;
+  }
+  .catalog-cta-btn:hover { background: var(--orange-dark); }
+
+  .hidden { display: none !important; }
+</style>
+
+<script define:vars={{ SUPA_URL, SUPA_KEY, partsJSON, servicemodesJSON, serviceBrandsJSON, serviceAppsJSON }}>
+const PARTS_DATA = JSON.parse(partsJSON);
+const SERVICE_DATA = JSON.parse(servicemodesJSON);
+const SERVICE_BRANDS_LIST = JSON.parse(serviceBrandsJSON);
+const SERVICE_APPS_LIST = JSON.parse(serviceAppsJSON);
+
+const $ = id => document.getElementById(id);
+
+// ── AUTH ────────────────────────────────────────────────────────────────────
+async function checkAuth() {
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  if (!token || !uid) { window.location.href = '/master/login/'; return; }
+
+  const res = await fetch(`${SUPA_URL}/auth/v1/user`, {
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` }
+  });
+  if (!res.ok) { localStorage.clear(); window.location.href = '/master/login/'; return; }
+
+  const profileRes = await fetch(
+    `${SUPA_URL}/rest/v1/master_profiles?id=eq.${uid}&select=*`,
+    { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` } }
+  );
+  const profiles = await profileRes.json();
+  const profile = profiles?.[0];
+
+  $('loading-overlay').classList.add('hidden');
+
+  if (!profile || !profile.is_premium) {
+    $('paywall-screen').classList.remove('hidden');
+  } else {
+    showDashboard(profile);
+  }
+}
+
+function showDashboard(profile) {
+  $('dashboard-screen').classList.remove('hidden');
+  const email = localStorage.getItem('sb_email') || '';
+  $('user-email-display').textContent = email;
+  $('perk-email-display').textContent = email;
+  // promo code based on uid fragment
+  const uid = localStorage.getItem('sb_uid') || '';
+  $('perk-promo-code').textContent = 'MASTER15-' + uid.slice(0, 6).toUpperCase();
+  loadOrders();
+  renderParts();
+  renderServiceModes();
+}
+
+// ── LOGOUT ──────────────────────────────────────────────────────────────────
+function logout() {
+  localStorage.removeItem('sb_token');
+  localStorage.removeItem('sb_refresh');
+  localStorage.removeItem('sb_uid');
+  localStorage.removeItem('sb_email');
+  window.location.href = '/master/login/';
+}
+$('logout-btn').addEventListener('click', logout);
+$('logout-paywall-btn').addEventListener('click', logout);
+
+// ── PAYMENT MOCK ─────────────────────────────────────────────────────────────
+$('pay-btn').addEventListener('click', async () => {
+  const btn = $('pay-btn');
+  const txt = $('pay-btn-text');
+  const spin = $('pay-btn-spinner');
+  btn.disabled = true;
+  txt.textContent = 'Обработка платежа...';
+  spin.classList.remove('hidden');
+
+  await new Promise(r => setTimeout(r, 2000));
+
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  const premiumUntil = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
+
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/master_profiles?id=eq.${uid}`,
+    {
+      method: 'PATCH',
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({ is_premium: true, premium_until: premiumUntil }),
+    }
+  );
+
+  if (res.ok) {
+    $('paywall-screen').classList.add('hidden');
+    const profiles = await res.json();
+    showDashboard(profiles?.[0] || {});
+  } else {
+    btn.disabled = false;
+    txt.textContent = 'Попробовать снова';
+    spin.classList.add('hidden');
+  }
+});
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+document.querySelectorAll('.dash-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.dash-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.getElementById(`tab-${target}`).classList.add('active');
+  });
+});
+
+// ── COLLAPSIBLE ADD ORDER ────────────────────────────────────────────────────
+$('toggle-add-order').addEventListener('click', () => {
+  const wrap = $('add-order-form-wrap');
+  const header = $('toggle-add-order');
+  wrap.classList.toggle('hidden');
+  header.classList.toggle('open');
+});
+
+// ── ORDERS ───────────────────────────────────────────────────────────────────
+let allOrders = [];
+let currentFilter = 'all';
+
+const STATUS_LABELS = { new: 'Новый', in_progress: 'В работе', completed: 'Выполнен', cancelled: 'Отменён' };
+const STATUS_CLASSES = { new: 'status-new', in_progress: 'status-in_progress', completed: 'status-completed', cancelled: 'status-cancelled' };
+
+function fmt(n) {
+  return Number(n || 0).toLocaleString('ru-RU') + ' ₽';
+}
+
+function renderStats(orders) {
+  const done = orders.filter(o => o.status === 'completed');
+  const revenue = done.reduce((s, o) => s + Number(o.parts_cost || 0) + Number(o.labor_cost || 0), 0);
+  const expenses = done.reduce((s, o) => s + Number(o.parts_cost || 0), 0);
+  const profit = done.reduce((s, o) => s + Number(o.labor_cost || 0), 0);
+  $('stat-revenue').textContent = fmt(revenue);
+  $('stat-expenses').textContent = fmt(expenses);
+  $('stat-profit').textContent = fmt(profit);
+  $('stat-count').textContent = orders.length;
+}
+
+function renderOrders() {
+  const list = $('orders-list');
+  const filtered = currentFilter === 'all' ? allOrders : allOrders.filter(o => o.status === currentFilter);
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">${currentFilter === 'all' ? 'Заказов пока нет. Добавьте первый!' : 'Нет заказов с таким статусом.'}</div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(o => {
+    const total = Number(o.parts_cost || 0) + Number(o.labor_cost || 0);
+    const date = o.created_at ? new Date(o.created_at).toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: '2-digit' }) : '';
+    return `<div class="order-card">
+      <div class="order-card-top">
+        <div>
+          <div class="order-client">${o.client_name || '—'}</div>
+          ${o.client_phone ? `<div class="order-phone">${o.client_phone}</div>` : ''}
+          <div class="order-appliance">${o.appliance_type || ''}${o.brand_model ? ' · ' + o.brand_model : ''}</div>
+        </div>
+        <span class="status-badge ${STATUS_CLASSES[o.status] || ''}">${STATUS_LABELS[o.status] || o.status}</span>
+      </div>
+      ${o.fault_description ? `<div class="order-desc">${o.fault_description}</div>` : ''}
+      <div class="order-meta">
+        ${total > 0 ? `<span class="order-price">Итого: ${fmt(total)}</span>` : ''}
+        <span class="order-date">${date}</span>
+      </div>
+      <div class="order-actions">
+        <select class="status-select-inline" data-id="${o.id}" onchange="updateOrderStatus('${o.id}', this.value)">
+          ${Object.entries(STATUS_LABELS).map(([v,l]) => `<option value="${v}"${o.status===v?' selected':''}>${l}</option>`).join('')}
+        </select>
+        <button class="delete-btn" onclick="deleteOrder('${o.id}')">Удалить</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadOrders() {
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  const res = await fetch(
+    `${SUPA_URL}/rest/v1/master_orders?user_id=eq.${uid}&order=created_at.desc`,
+    { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` } }
+  );
+  if (res.ok) {
+    allOrders = await res.json();
+    renderStats(allOrders);
+    renderOrders();
+  }
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.status;
+    renderOrders();
+  });
+});
+
+$('add-order-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target;
+  const submitBtn = $('add-order-submit');
+  const errEl = $('order-form-error');
+  errEl.classList.add('hidden');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Сохраняем...';
+
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  const data = {
+    user_id: uid,
+    client_name: form.client_name.value.trim(),
+    client_phone: form.client_phone.value.trim(),
+    client_city: form.client_city.value.trim(),
+    appliance_type: form.appliance_type.value.trim(),
+    brand_model: form.brand_model.value.trim(),
+    fault_description: form.fault_description.value.trim(),
+    work_done: form.work_done.value.trim(),
+    parts_cost: parseFloat(form.parts_cost.value) || 0,
+    labor_cost: parseFloat(form.labor_cost.value) || 0,
+    status: form.status.value,
+  };
+
+  const res = await fetch(`${SUPA_URL}/rest/v1/master_orders`, {
+    method: 'POST',
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (res.ok) {
+    form.reset();
+    $('add-order-form-wrap').classList.add('hidden');
+    $('toggle-add-order').classList.remove('open');
+    await loadOrders();
+  } else {
+    const err = await res.json().catch(() => ({}));
+    errEl.textContent = err.message || 'Ошибка при сохранении. Попробуйте ещё раз.';
+    errEl.classList.remove('hidden');
+  }
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Сохранить заказ';
+});
+
+window.updateOrderStatus = async (id, status) => {
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status }),
+  });
+  const idx = allOrders.findIndex(o => o.id === id);
+  if (idx !== -1) allOrders[idx].status = status;
+  renderStats(allOrders);
+  renderOrders();
+};
+
+window.deleteOrder = async (id) => {
+  if (!confirm('Удалить заказ?')) return;
+  const token = localStorage.getItem('sb_token');
+  const uid = localStorage.getItem('sb_uid');
+  await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
+    method: 'DELETE',
+    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` },
+  });
+  allOrders = allOrders.filter(o => o.id !== id);
+  renderStats(allOrders);
+  renderOrders();
+};
+
+// ── PARTS CALCULATOR ─────────────────────────────────────────────────────────
+let calcBrand = '';
+let calcCat = '';
+let calcQ = '';
+let calcSort = 'default';
+
+function parsePriceMin(priceStr) {
+  const m = priceStr.match(/\d[\d\s]*/);
+  return m ? parseInt(m[0].replace(/\s/g, ''), 10) : 9999;
+}
+
+function discountedPrice(priceStr) {
+  return priceStr.replace(/(\d[\d\s]*)/g, match => {
+    const n = parseInt(match.replace(/\s/g, ''), 10);
+    return Math.round(n * 0.85).toLocaleString('ru-RU');
+  });
+}
+
+function renderParts() {
+  // Brand buttons
+  document.querySelectorAll('#brand-selector .brand-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#brand-selector .brand-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calcBrand = btn.dataset.brand;
+      filterCalcParts();
+    });
+  });
+
+  // Category buttons
+  document.querySelectorAll('#category-selector .cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#category-selector .cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      calcCat = btn.dataset.cat;
+      filterCalcParts();
+    });
+  });
+
+  // Spec search
+  const searchInput = $('parts-spec-search');
+  searchInput.addEventListener('input', () => { calcQ = searchInput.value; filterCalcParts(); });
+  $('spec-clear-btn').addEventListener('click', () => { searchInput.value = ''; calcQ = ''; filterCalcParts(); });
+
+  // Hints
+  document.querySelectorAll('.spec-hint').forEach(hint => {
+    hint.addEventListener('click', () => {
+      searchInput.value = hint.dataset.q;
+      calcQ = hint.dataset.q;
+      filterCalcParts();
+    });
+  });
+
+  // Sort
+  $('parts-sort').addEventListener('change', e => { calcSort = e.target.value; filterCalcParts(); });
+
+  filterCalcParts();
+}
+
+function filterCalcParts() {
+  const q = calcQ.toLowerCase().trim();
+  let results = PARTS_DATA;
+
+  if (calcBrand) results = results.filter(p => p.fitsBrands.includes(calcBrand));
+  if (calcCat) results = results.filter(p => p.category === calcCat);
+  if (q) results = results.filter(p =>
+    p.name.toLowerCase().includes(q) ||
+    p.specs.toLowerCase().includes(q) ||
+    p.oem.some(x => x.toLowerCase().includes(q)) ||
+    p.universal.some(x => x.toLowerCase().includes(q)) ||
+    (p.notes || '').toLowerCase().includes(q) ||
+    p.fitsModels.toLowerCase().includes(q)
+  );
+
+  if (calcSort === 'price-asc') results = [...results].sort((a, b) => parsePriceMin(a.price) - parsePriceMin(b.price));
+  else if (calcSort === 'cat') results = [...results].sort((a, b) => a.category.localeCompare(b.category));
+
+  $('parts-result-count').textContent = results.length === PARTS_DATA.length
+    ? `Все запчасти (${results.length})`
+    : `Найдено: ${results.length}`;
+
+  const container = $('parts-results');
+  if (results.length === 0) {
+    container.innerHTML = `<div class="empty-state">Ничего не найдено — попробуйте изменить фильтры или <a href="/zapchasti/" style="color:var(--orange)">посмотрите полный каталог</a></div>`;
+    return;
+  }
+
+  container.innerHTML = results.map(p => {
+    const originalMin = parsePriceMin(p.price);
+    const discountMin = Math.round(originalMin * 0.85);
+    const priceOrigDisplay = p.price;
+    const priceDiscDisplay = discountedPrice(p.price);
+    const hasUniversal = p.universal.length > 0;
+    return `
+    <div class="part-card">
+      <div class="part-card-top">
+        <div class="part-card-meta">
+          <div class="part-card-badges">
+            <span class="part-cat-badge">${p.categoryName}</span>
+            <span class="part-appliance-badge">${p.appliance}</span>
+          </div>
+          <div class="part-name">${p.name}</div>
+          <div class="part-specs">${p.specs}</div>
+        </div>
+        <div class="part-pricing">
+          <div class="part-price-original">${priceOrigDisplay}</div>
+          <div class="part-price-premium">
+            <span>${priceDiscDisplay} ₽</span>
+            <span class="part-price-pct">−15% МАСТЕР</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="part-card-body">
+        <div>
+          <div class="part-section-label">OEM-номера</div>
+          <div class="tags-row">
+            ${p.oem.map(x => `<span class="tag tag-oem">${x}</span>`).join('')}
+          </div>
+        </div>
+        ${hasUniversal ? `
+        <div>
+          <div class="part-section-label">Универсальные аналоги</div>
+          <div class="tags-row">
+            ${p.universal.map(x => `<span class="tag tag-universal">✓ ${x}</span>`).join('')}
+          </div>
+        </div>` : ''}
+        ${p.fitsModels ? `
+        <div class="part-models-row">📋 <strong>Модели:</strong> ${p.fitsModels}</div>` : ''}
+        ${p.notes ? `
+        <div class="part-note-row">💡 ${p.notes}</div>` : ''}
+      </div>
+
+      <div class="part-card-footer">
+        <div class="part-brands-row">
+          ${p.fitsBrands.map(b => `<span class="tag tag-brand">${b}</span>`).join('')}
+        </div>
+        <a href="/zapchasti/" target="_blank" class="part-catalog-link">
+          В каталог −15% →
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── SERVICE MODES ────────────────────────────────────────────────────────────
+function populateServiceFilters() {
+  const brandSel = $('service-brand-filter');
+  SERVICE_BRANDS_LIST.forEach(b => { const o = document.createElement('option'); o.value = b; o.textContent = b; brandSel.appendChild(o); });
+  const appSel = $('service-appliance-filter');
+  SERVICE_APPS_LIST.forEach(a => { const o = document.createElement('option'); o.value = a; o.textContent = a; appSel.appendChild(o); });
+}
+
+function renderServiceModes() {
+  populateServiceFilters();
+  filterServiceModes();
+  ['service-brand-filter','service-appliance-filter','service-search'].forEach(id => {
+    $(id).addEventListener('input', filterServiceModes);
+  });
+}
+
+function filterServiceModes() {
+  const brand = $('service-brand-filter').value;
+  const app = $('service-appliance-filter').value;
+  const q = $('service-search').value.toLowerCase().trim();
+
+  let results = SERVICE_DATA;
+  if (brand) results = results.filter(m => m.brand === brand);
+  if (app) results = results.filter(m => m.appliance === app);
+  if (q) results = results.filter(m =>
+    m.brand.toLowerCase().includes(q) ||
+    m.modeName.toLowerCase().includes(q) ||
+    m.appliance.toLowerCase().includes(q) ||
+    m.steps.some(s => s.toLowerCase().includes(q))
+  );
+
+  const container = $('service-results');
+  if (results.length === 0) {
+    container.innerHTML = '<div class="empty-state">Ничего не найдено.</div>';
+    return;
+  }
+
+  container.innerHTML = results.map(m => `
+    <div class="service-card">
+      <div class="service-card-header" onclick="toggleServiceCard(this)">
+        <div>
+          <span class="service-brand-badge">${m.brand}</span>
+          <div class="service-mode-name">${m.modeName}</div>
+          <div class="service-appliance-tag">${m.appliance}</div>
+        </div>
+        <span class="service-expand-btn">▼</span>
+      </div>
+      <div class="service-card-body">
+        <div class="service-steps">
+          ${m.steps.map((s, i) => `<div class="service-step"><span class="step-num">${i+1}</span><span>${s}</span></div>`).join('')}
+        </div>
+        ${m.notes ? `<div class="service-note"><span class="service-note-label">📌 Примечание:</span>${m.notes}</div>` : ''}
+        ${m.exitMethod ? `<div class="service-exit"><span class="service-exit-label">✅ Выход из режима:</span>${m.exitMethod}</div>` : ''}
+        ${m.diagramHint ? `<div class="service-diagram"><span class="service-diagram-label">🔌 Схема платы:</span>${m.diagramHint}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+window.toggleServiceCard = (header) => {
+  header.classList.toggle('open');
+  header.nextElementSibling.classList.toggle('open');
+};
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+checkAuth();
+</script>
+
+</main>
+  <SiteFooter />
+</Layout>
