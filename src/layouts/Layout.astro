@@ -1,20 +1,106 @@
 ---
+const SITE_URL = 'https://master-tehniki74.store';
+const SITE_NAME = 'Центр восстановления бытовой техники';
+
 interface Props {
   title: string;
   description?: string;
+  keywords?: string;
+  schema?: string;
+  geoPlace?: string;
+  canonical?: string;
+  ogImage?: string;
+  noindex?: boolean;
 }
-const { title, description = 'Мастер Техники 74 — ремонт бытовой техники в Челябинске' } = Astro.props;
+
+const {
+  title,
+  description = 'Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле — холодильники, стиральные машины, электроплиты. Выезд на дом, гарантия 12 месяцев.',
+  keywords,
+  schema,
+  geoPlace = 'Миасс',
+  canonical,
+  ogImage = `${SITE_URL}/favicon.svg`,
+  noindex = false,
+} = Astro.props;
+
+const canonicalUrl = canonical ?? (SITE_URL + Astro.url.pathname);
+
+const globalSchema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: SITE_NAME,
+  telephone: '+78512577757',
+  url: SITE_URL,
+  logo: `${SITE_URL}/favicon.svg`,
+  description: 'Профессиональный ремонт бытовой техники в Миассе, Златоусте и Чебаркуле. Гарантия, выезд на дом.',
+  priceRange: '₽₽',
+  currenciesAccepted: 'RUB',
+  paymentAccepted: 'Cash, Card',
+  openingHours: 'Mo-Su 09:00-20:00',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'ул. Победы, д. 18',
+    addressLocality: 'Миасс',
+    addressRegion: 'Челябинская область',
+    postalCode: '456304',
+    addressCountry: 'RU',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 55.05, longitude: 60.10 },
+  areaServed: [
+    { '@type': 'City', name: 'Миасс' },
+    { '@type': 'City', name: 'Златоуст' },
+    { '@type': 'City', name: 'Чебаркуль' },
+  ],
+  sameAs: ['https://t.me/Drugan1900', 'https://vk.com/maastermiass174'],
+});
 ---
 <!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content={description} />
+
+  <!-- Primary SEO -->
   <title>{title}</title>
+  <meta name="description" content={description} />
+  {keywords && <meta name="keywords" content={keywords} />}
+  <link rel="canonical" href={canonicalUrl} />
+  {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+  <!-- Open Graph (Yandex, VK, social) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonicalUrl} />
+  <meta property="og:site_name" content={SITE_NAME} />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:image" content={ogImage} />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImage} />
+
+  <!-- Geo / Yandex local -->
+  <meta name="geo.region" content="RU-CHE" />
+  <meta name="geo.placename" content={geoPlace} />
+
+  <!-- Favicons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Global LocalBusiness schema -->
+  <script type="application/ld+json" set:html={globalSchema} />
+
+  <!-- Page-specific schema -->
+  {schema && <script type="application/ld+json" set:html={schema} />}
+
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -27,6 +113,8 @@ const { title, description = 'Мастер Техники 74 — ремонт б
     a { color: inherit; }
     img { max-width: 100%; height: auto; }
   </style>
+
+  <slot name="head" />
 </head>
 <body>
   <slot />

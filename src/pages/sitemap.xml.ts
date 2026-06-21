@@ -13,7 +13,7 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/`, changefreq: 'weekly', priority: '1.0', lastmod: today });
   pages.push({ loc: `${siteUrl}/blog/`, changefreq: 'weekly', priority: '0.9' });
   pages.push({ loc: `${siteUrl}/b2b/`, changefreq: 'monthly', priority: '0.8' });
-  pages.push({ loc: `${siteUrl}/zapchasti/`, changefreq: 'weekly', priority: '0.7' });
+  pages.push({ loc: `${siteUrl}/zapchasti/`, changefreq: 'weekly', priority: '0.85', lastmod: today });
   pages.push({ loc: `${siteUrl}/kalkulator/`, changefreq: 'monthly', priority: '0.8' });
   pages.push({ loc: `${siteUrl}/status/`, changefreq: 'monthly', priority: '0.7' });
   pages.push({ loc: `${siteUrl}/baza-znanii/`, changefreq: 'weekly', priority: '0.8' });
@@ -22,6 +22,11 @@ export async function GET() {
   pages.push({ loc: `${siteUrl}/remont-kofemashiny/`, changefreq: 'monthly', priority: '0.9', lastmod: today });
   pages.push({ loc: `${siteUrl}/karta-sajta/`, changefreq: 'weekly', priority: '0.6' });
   pages.push({ loc: `${siteUrl}/raboty/`, changefreq: 'weekly', priority: '0.7' });
+  pages.push({ loc: `${siteUrl}/diagnostika/`, changefreq: 'monthly', priority: '0.8' });
+  pages.push({ loc: `${siteUrl}/instrumenty/`, changefreq: 'monthly', priority: '0.7' });
+
+  // Каталог мастеров-агрегатор
+  pages.push({ loc: `${siteUrl}/masters/`, changefreq: 'daily', priority: '0.95', lastmod: today });
 
   // SEO work pages
   for (const work of SEO_WORKS) {
@@ -30,7 +35,7 @@ export async function GET() {
 
   // Service pages (general)
   for (const service of Object.values(SERVICES)) {
-    pages.push({ loc: `${siteUrl}/${service.slug}/`, changefreq: 'weekly', priority: '0.85' });
+    pages.push({ loc: `${siteUrl}/${service.slug}/`, changefreq: 'weekly', priority: '0.9', lastmod: today });
   }
 
   // Brand pages per service
@@ -57,14 +62,17 @@ export async function GET() {
   }
 
   for (const city of Object.values(CITIES)) {
-    pages.push({ loc: `${siteUrl}/${city.slug}/`, changefreq: 'weekly', priority: '0.9' });
+    pages.push({ loc: `${siteUrl}/${city.slug}/`, changefreq: 'weekly', priority: '0.9', lastmod: today });
     for (const service of Object.values(SERVICES)) {
-      pages.push({ loc: `${siteUrl}/${city.slug}/${service.slug}/`, changefreq: 'monthly', priority: '0.8' });
+      pages.push({ loc: `${siteUrl}/${city.slug}/${service.slug}/`, changefreq: 'monthly', priority: '0.85' });
     }
   }
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
 ${pages.map(p => `  <url>
     <loc>${p.loc}</loc>
     <changefreq>${p.changefreq}</changefreq>
@@ -73,6 +81,6 @@ ${pages.map(p => `  <url>
 </urlset>`;
 
   return new Response(sitemap, {
-    headers: { 'Content-Type': 'application/xml' },
+    headers: { 'Content-Type': 'application/xml; charset=utf-8' },
   });
 }

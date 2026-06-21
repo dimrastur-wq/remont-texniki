@@ -13,6 +13,7 @@ import { SERVICE_BRANDS } from '../data/seo-pages';
 
 const title = 'Ремонт бытовой техники в Миассе, Златоусте, Чебаркуле | Центр восстановления бытовой техники';
 const description = 'Профессиональный ремонт холодильников, стиральных машин, электроплит, микроволновок и пылесосов. Выезд мастера на дом, доступные цены, гарантия до 12 месяцев. Звоните: 8 (951) 257-77-57';
+const keywords = 'ремонт бытовой техники Миасс, ремонт холодильников Миасс, ремонт стиральных машин Миасс, ремонт электроплит, мастер бытовой техники Zlatoust, ремонт техники Чебаркуль, вызвать мастера на дом Миасс';
 
 const schema = JSON.stringify({
   "@context": "https://schema.org",
@@ -43,7 +44,7 @@ const cityKeys = Object.keys(CITIES);
 const serviceKeys = Object.keys(SERVICES);
 ---
 
-<Layout title={title} description={description} schema={schema}>
+<Layout title={title} description={description} keywords={keywords} schema={schema}>
   <SiteHeader />
   <FloatingButton />
 

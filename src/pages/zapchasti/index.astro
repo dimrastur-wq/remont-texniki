@@ -29,9 +29,34 @@ const categoryIcons: { [key: string]: string } = {
   'Микроволновки': '📡',
   'Водонагреватели': '🔥',
 };
+
+const partsSchema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'Каталог запчастей для бытовой техники',
+  description: 'Запчасти для стиральных машин, холодильников, микроволновок — с доставкой в Миасс, Златоуст, Чебаркуль',
+  numberOfItems: SHOP_PARTS.length,
+  itemListElement: popularParts.slice(0, 10).map((part, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    item: {
+      '@type': 'Product',
+      name: part.name,
+      description: part.description,
+      offers: {
+        '@type': 'Offer',
+        price: retailPrice(part),
+        priceCurrency: 'RUB',
+        availability: part.inStock
+          ? 'https://schema.org/InStock'
+          : 'https://schema.org/OutOfStock',
+      },
+    },
+  })),
+});
 ---
 
-<Layout title={title} description={description} keywords={keywords}>
+<Layout title={title} description={description} keywords={keywords} schema={partsSchema}>
   <SiteHeader />
   <FloatingButton />
 

@@ -20,18 +20,58 @@ const { service } = Astro.props;
 const brands = SERVICE_BRANDS[service.slug] || [];
 const relatedWorks = SEO_WORKS.filter(w => w.appliances.some(a => service.name.toLowerCase().includes(a.toLowerCase()) || a.toLowerCase().includes(service.name.toLowerCase())));
 
-const serviceNameRod = service.slug === 'holodilnik' ? 'холодильников' :
-  service.slug === 'stiralnaya-mashina' ? 'стиральных машин' :
-  service.slug === 'mikrovolnovka' ? 'микроволновок' :
-  service.slug === 'elektroplita' ? 'электроплит' :
-  service.slug === 'pylesos' ? 'пылесосов' :
-  service.slug === 'kofemashina' ? 'кофемашин' : service.name.toLowerCase();
+const serviceNameRod = service.slug === 'remont-holodilnikov' ? 'холодильников' :
+  service.slug === 'remont-stiralnyh-mashin' ? 'стиральных машин' :
+  service.slug === 'remont-mikrovolnovok' ? 'микроволновок' :
+  service.slug === 'remont-elektroplit' ? 'электроплит' :
+  service.slug === 'remont-pylesosov' ? 'пылесосов' :
+  service.slug === 'remont-kofemashiny' ? 'кофемашин' : service.name.toLowerCase();
 
-const title = `Ремонт ${serviceNameRod} в Миассе, Златоусте, Чебаркуле — цены`;
-const description = `Ремонт ${serviceNameRod} всех брендов. Выезд мастера за 1-2 часа, гарантия 12 месяцев.`;
+const cityNames = Object.values(CITIES).map(c => c.name).join(', ');
+
+const title = `Ремонт ${serviceNameRod} в Миассе, Златоусте, Чебаркуле — выезд на дом, гарантия 12 мес`;
+const description = `Ремонт ${serviceNameRod} всех марок в ${cityNames}. Выезд мастера за 1-2 часа, оригинальные запчасти, гарантия 12 месяцев. Диагностика бесплатно. Звоните: ${SITE.phone}`;
+const keywords = `ремонт ${serviceNameRod}, ${service.lsiKeywords?.join(', ') || ''}, выезд на дом, ${Object.values(CITIES).map(c => `ремонт ${serviceNameRod} ${c.namePrepositional}`).join(', ')}`;
+
+const schema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: service.name,
+  description,
+  provider: {
+    '@type': 'LocalBusiness',
+    name: 'Центр восстановления бытовой техники',
+    telephone: SITE.phone,
+    url: SITE.url,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Миасс',
+      addressRegion: 'Челябинская область',
+      addressCountry: 'RU',
+    },
+    openingHours: 'Mo-Su 09:00-20:00',
+  },
+  areaServed: Object.values(CITIES).map(c => ({ '@type': 'City', name: c.name })),
+  offers: service.commonProblems.slice(0, 3).map(p => ({
+    '@type': 'Offer',
+    name: p.problem,
+    description: p.cause,
+    price: p.price.replace(/\D/g, '') || '1000',
+    priceCurrency: 'RUB',
+  })),
+});
+
+const breadcrumbSchema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: SITE.url },
+    { '@type': 'ListItem', position: 2, name: service.name, item: `${SITE.url}/${service.slug}/` },
+  ],
+});
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} keywords={keywords} schema={`[${schema},${breadcrumbSchema}]`}>
   <SiteHeader />
   <FloatingButton />
 
