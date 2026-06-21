@@ -1,0 +1,783 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+
+const title = 'Корзина — оформление заказа запчастей | Центр восстановления бытовой техники';
+const description = 'Оформите заказ запчастей для бытовой техники. Доставка в Миасс, Златоуст, Чебаркуль. Скидка 15% для мастеров.';
+---
+
+<Layout title={title} description={description}>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Запчасти', href: '/zapchasti/' }, { label: 'Корзина' }]} />
+    </div>
+
+    <section class="cart-section">
+      <div class="container">
+        <h1 class="page-title">Корзина</h1>
+
+        <!-- Empty state -->
+        <div id="cart-empty" class="empty-state" style="display:none">
+          <div class="empty-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+          </div>
+          <h2>Корзина пуста</h2>
+          <p>Добавьте запчасти из каталога</p>
+          <a href="/zapchasti/" class="btn-primary">Перейти в каталог</a>
+        </div>
+
+        <!-- Cart content -->
+        <div id="cart-content" style="display:none">
+          <div class="cart-layout">
+
+            <!-- Left: items + form -->
+            <div class="cart-main">
+
+              <!-- Master toggle -->
+              <div class="master-toggle-card">
+                <label class="toggle-label">
+                  <input type="checkbox" id="is-master">
+                  <span class="toggle-track">
+                    <span class="toggle-thumb"></span>
+                  </span>
+                  <span class="toggle-text">
+                    <strong>Я профессиональный мастер</strong>
+                    <small>Применить скидку 15% на все позиции</small>
+                  </span>
+                </label>
+              </div>
+
+              <!-- Items list -->
+              <div class="items-card">
+                <div class="items-header">
+                  <span>Товары</span>
+                  <button class="clear-cart" id="clear-cart">Очистить корзину</button>
+                </div>
+                <div id="cart-items"></div>
+              </div>
+
+              <!-- Order form -->
+              <div class="form-card">
+                <h2>Данные для заказа</h2>
+                <form id="order-form" novalidate>
+                  <div class="form-row">
+                    <div class="form-group">
+                      <label for="f-name">Имя <span class="req">*</span></label>
+                      <input type="text" id="f-name" name="name" placeholder="Ваше имя" required autocomplete="given-name">
+                      <span class="field-error" id="err-name"></span>
+                    </div>
+                    <div class="form-group">
+                      <label for="f-phone">Телефон <span class="req">*</span></label>
+                      <input type="tel" id="f-phone" name="phone" placeholder="+7 (___) ___-__-__" required autocomplete="tel">
+                      <span class="field-error" id="err-phone"></span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="f-city">Город доставки <span class="req">*</span></label>
+                    <select id="f-city" name="city" required>
+                      <option value="">— Выберите город —</option>
+                      <option value="Миасс">Миасс</option>
+                      <option value="Златоуст">Златоуст</option>
+                      <option value="Чебаркуль">Чебаркуль</option>
+                    </select>
+                    <span class="field-error" id="err-city"></span>
+                  </div>
+                  <div class="form-group">
+                    <label for="f-comment">Комментарий (необязательно)</label>
+                    <textarea id="f-comment" name="comment" rows="3" placeholder="Модель техники, адрес, удобное время..."></textarea>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Right: summary + action buttons -->
+            <div class="cart-sidebar">
+              <div class="summary-card">
+                <h2>Итого</h2>
+                <div class="summary-rows" id="summary-rows"></div>
+                <div class="summary-total">
+                  <span>К оплате</span>
+                  <span id="summary-total-price">0 ₽</span>
+                </div>
+                <div class="summary-note" id="summary-note"></div>
+
+                <div class="action-buttons">
+                  <button class="btn-manager" id="btn-manager" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Оформить через менеджера
+                  </button>
+
+                  <button class="btn-pay" id="btn-pay" type="button">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                    Оплатить онлайн картой
+                    <span class="pay-sub">ЮKassa · Prodamus · Mir</span>
+                  </button>
+                </div>
+
+                <div class="secure-note">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  Данные защищены. Оплата — только российские платёжные системы.
+                </div>
+              </div>
+
+              <a href="/zapchasti/" class="back-link">← Продолжить покупки</a>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Success overlay -->
+    <div id="success-overlay" class="overlay" style="display:none">
+      <div class="overlay-card">
+        <div class="success-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <h2>Заказ отправлен!</h2>
+        <p id="success-msg">Менеджер свяжется с вами в течение часа.</p>
+        <a href="/zapchasti/" class="btn-primary">Продолжить покупки</a>
+      </div>
+    </div>
+
+    <!-- Pay overlay (placeholder) -->
+    <div id="pay-overlay" class="overlay" style="display:none">
+      <div class="overlay-card">
+        <button class="overlay-close" id="pay-close">✕</button>
+        <div class="pay-logo-row">
+          <span class="pay-logo yukassa">ЮKassa</span>
+          <span class="pay-logo prodamus">Prodamus</span>
+          <span class="pay-logo mir">МИР</span>
+        </div>
+        <h2>Онлайн-оплата</h2>
+        <p>Интеграция с ЮKassa / Prodamus будет подключена после регистрации магазина.<br>Пока оформите заказ через менеджера — он выставит счёт.</p>
+        <button class="btn-primary" id="pay-to-manager">Оформить через менеджера</button>
+        <button class="btn-ghost" id="pay-cancel">Закрыть</button>
+      </div>
+    </div>
+
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<script>
+  // ── State ──
+  interface CartItem { id: string; name: string; retail: number; master: number; condition: string; qty: number; }
+
+  function getCart(): CartItem[] {
+    try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch { return []; }
+  }
+  function saveCart(cart: CartItem[]) {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event('cart-updated'));
+  }
+
+  let isMaster = false;
+
+  function priceFor(item: CartItem) {
+    return isMaster ? item.master : item.retail;
+  }
+
+  function formatPrice(n: number) {
+    return n.toLocaleString('ru-RU') + ' ₽';
+  }
+
+  // ── Render ──
+  function render() {
+    const cart = getCart();
+    const emptyEl = document.getElementById('cart-empty')!;
+    const contentEl = document.getElementById('cart-content')!;
+    const itemsEl = document.getElementById('cart-items')!;
+    const summaryEl = document.getElementById('summary-rows')!;
+    const totalEl = document.getElementById('summary-total-price')!;
+    const noteEl = document.getElementById('summary-note')!;
+
+    if (cart.length === 0) {
+      emptyEl.style.display = '';
+      contentEl.style.display = 'none';
+      return;
+    }
+    emptyEl.style.display = 'none';
+    contentEl.style.display = '';
+
+    // Items
+    itemsEl.innerHTML = cart.map(item => `
+      <div class="cart-item" data-id="${item.id}">
+        <div class="item-info">
+          <div class="item-name">${item.name}</div>
+          <div class="item-meta">
+            <span class="item-condition ${item.condition === 'Новый' ? 'new' : 'used'}">${item.condition}</span>
+            ${isMaster ? '<span class="item-discount-tag">−15% мастер</span>' : ''}
+          </div>
+        </div>
+        <div class="item-qty-control">
+          <button class="qty-btn qty-minus" data-id="${item.id}">−</button>
+          <span class="qty-val">${item.qty}</span>
+          <button class="qty-btn qty-plus" data-id="${item.id}">+</button>
+        </div>
+        <div class="item-price">${formatPrice(priceFor(item) * item.qty)}</div>
+        <button class="item-remove" data-id="${item.id}" aria-label="Удалить">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    `).join('');
+
+    // Summary
+    const total = cart.reduce((s, i) => s + priceFor(i) * i.qty, 0);
+    summaryEl.innerHTML = cart.map(item => `
+      <div class="sum-row">
+        <span>${item.name.length > 36 ? item.name.slice(0, 36) + '…' : item.name} ×${item.qty}</span>
+        <span>${formatPrice(priceFor(item) * item.qty)}</span>
+      </div>
+    `).join('');
+    totalEl.textContent = formatPrice(total);
+    noteEl.textContent = isMaster ? 'Цены со скидкой 15% для мастеров' : 'Розничные цены';
+    noteEl.className = 'summary-note ' + (isMaster ? 'master' : '');
+
+    // Attach qty/remove listeners
+    document.querySelectorAll('.qty-plus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id!;
+        const c = getCart();
+        const item = c.find(i => i.id === id);
+        if (item) { item.qty++; saveCart(c); render(); }
+      });
+    });
+    document.querySelectorAll('.qty-minus').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id!;
+        const c = getCart();
+        const item = c.find(i => i.id === id);
+        if (item) {
+          item.qty--;
+          if (item.qty <= 0) c.splice(c.indexOf(item), 1);
+          saveCart(c); render();
+        }
+      });
+    });
+    document.querySelectorAll('.item-remove').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = (btn as HTMLElement).dataset.id!;
+        const c = getCart().filter(i => i.id !== id);
+        saveCart(c); render();
+      });
+    });
+  }
+
+  // ── Master toggle ──
+  document.getElementById('is-master')?.addEventListener('change', (e) => {
+    isMaster = (e.target as HTMLInputElement).checked;
+    render();
+  });
+
+  // ── Clear cart ──
+  document.getElementById('clear-cart')?.addEventListener('click', () => {
+    if (confirm('Очистить всю корзину?')) { saveCart([]); render(); }
+  });
+
+  // ── Validate form ──
+  function validateForm(): boolean {
+    const name = (document.getElementById('f-name') as HTMLInputElement).value.trim();
+    const phone = (document.getElementById('f-phone') as HTMLInputElement).value.trim();
+    const city = (document.getElementById('f-city') as HTMLSelectElement).value;
+    let ok = true;
+
+    const setErr = (id: string, msg: string) => {
+      const el = document.getElementById(id)!;
+      el.textContent = msg;
+      if (msg) ok = false;
+    };
+
+    setErr('err-name', name.length < 2 ? 'Введите имя' : '');
+    setErr('err-phone', phone.length < 7 ? 'Введите телефон' : '');
+    setErr('err-city', !city ? 'Выберите город' : '');
+    return ok;
+  }
+
+  function getFormData() {
+    return {
+      name: (document.getElementById('f-name') as HTMLInputElement).value.trim(),
+      phone: (document.getElementById('f-phone') as HTMLInputElement).value.trim(),
+      city: (document.getElementById('f-city') as HTMLSelectElement).value,
+      comment: (document.getElementById('f-comment') as HTMLTextAreaElement).value.trim(),
+    };
+  }
+
+  function buildOrderText(form: ReturnType<typeof getFormData>): string {
+    const cart = getCart();
+    const lines = cart.map(i => `• ${i.name} ×${i.qty} = ${formatPrice(priceFor(i) * i.qty)}`).join('\n');
+    const total = cart.reduce((s, i) => s + priceFor(i) * i.qty, 0);
+    return [
+      '🛒 НОВЫЙ ЗАКАЗ ЗАПЧАСТЕЙ: master-tehniki74.store',
+      `Имя: ${form.name}`,
+      `Телефон: ${form.phone}`,
+      `Город: ${form.city}`,
+      `Тип клиента: ${isMaster ? 'Мастер (−15%)' : 'Розничный покупатель'}`,
+      '',
+      'Состав заказа:',
+      lines,
+      '',
+      `ИТОГО: ${formatPrice(total)}`,
+      form.comment ? `\nКомментарий: ${form.comment}` : '',
+    ].join('\n');
+  }
+
+  // ── Manager button ──
+  document.getElementById('btn-manager')?.addEventListener('click', async () => {
+    if (!validateForm()) return;
+    if (getCart().length === 0) return;
+
+    const form = getFormData();
+    const btn = document.getElementById('btn-manager') as HTMLButtonElement;
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+
+    try {
+      const res = await fetch('/api/send-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          cart: getCart(),
+          isMaster,
+          orderText: buildOrderText(form),
+        }),
+      });
+
+      if (res.ok) {
+        saveCart([]);
+        const overlay = document.getElementById('success-overlay')!;
+        (document.getElementById('success-msg') as HTMLElement).textContent =
+          `Заказ на ${form.city} принят. Менеджер свяжется с вами в течение часа.`;
+        overlay.style.display = 'flex';
+      } else {
+        alert('Ошибка отправки. Позвоните нам по телефону или напишите в Telegram.');
+        btn.disabled = false;
+        btn.textContent = 'Оформить через менеджера';
+      }
+    } catch {
+      alert('Ошибка сети. Проверьте подключение и попробуйте ещё раз.');
+      btn.disabled = false;
+      btn.textContent = 'Оформить через менеджера';
+    }
+  });
+
+  // ── Pay button → show overlay ──
+  document.getElementById('btn-pay')?.addEventListener('click', () => {
+    if (!validateForm()) return;
+    document.getElementById('pay-overlay')!.style.display = 'flex';
+  });
+  document.getElementById('pay-close')?.addEventListener('click', () => {
+    document.getElementById('pay-overlay')!.style.display = 'none';
+  });
+  document.getElementById('pay-cancel')?.addEventListener('click', () => {
+    document.getElementById('pay-overlay')!.style.display = 'none';
+  });
+  document.getElementById('pay-to-manager')?.addEventListener('click', () => {
+    document.getElementById('pay-overlay')!.style.display = 'none';
+    document.getElementById('btn-manager')?.click();
+  });
+
+  // ── Phone mask ──
+  const phoneInput = document.getElementById('f-phone') as HTMLInputElement;
+  phoneInput?.addEventListener('input', () => {
+    let v = phoneInput.value.replace(/\D/g, '');
+    if (v.startsWith('8')) v = '7' + v.slice(1);
+    if (v.startsWith('7')) {
+      phoneInput.value = '+7 (' + v.slice(1, 4) + (v.length > 4 ? ') ' + v.slice(4, 7) : '') + (v.length > 7 ? '-' + v.slice(7, 9) : '') + (v.length > 9 ? '-' + v.slice(9, 11) : '');
+    }
+  });
+
+  render();
+</script>
+
+<style>
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  .cart-section { padding: 24px 0 80px; }
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 32px;
+  }
+
+  /* ── Empty ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+  }
+  .empty-icon { margin-bottom: 20px; }
+  .empty-state h2 { font-size: 1.5rem; color: #0f172a; margin-bottom: 8px; }
+  .empty-state p { color: #64748b; margin-bottom: 24px; }
+
+  /* ── Layout ── */
+  .cart-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+    align-items: start;
+  }
+  .cart-main { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── Cards ── */
+  .master-toggle-card,
+  .items-card,
+  .form-card,
+  .summary-card {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+  }
+
+  /* ── Master toggle ── */
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+  }
+  .toggle-track {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #e2e8f0;
+    border-radius: 12px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  input[type="checkbox"]:checked + .toggle-track { background: #1d4ed8; }
+  .toggle-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  input[type="checkbox"]:checked + .toggle-track .toggle-thumb { transform: translateX(20px); }
+  input[type="checkbox"] { display: none; }
+  .toggle-text { display: flex; flex-direction: column; }
+  .toggle-text strong { font-size: 0.95rem; color: #0f172a; }
+  .toggle-text small { font-size: 0.8rem; color: #64748b; }
+
+  /* ── Items ── */
+  .items-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    font-weight: 600;
+    color: #0f172a;
+  }
+  .clear-cart {
+    font-size: 0.8rem;
+    color: #94a3b8;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: color 0.2s;
+  }
+  .clear-cart:hover { color: #ef4444; }
+
+  .cart-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .cart-item:last-child { border-bottom: none; }
+
+  .item-name { font-size: 0.9rem; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+  .item-meta { display: flex; gap: 6px; align-items: center; }
+  .item-condition {
+    font-size: 0.7rem; font-weight: 700;
+    padding: 2px 7px; border-radius: 4px;
+  }
+  .item-condition.new { background: #dcfce7; color: #15803d; }
+  .item-condition.used { background: #fef3c7; color: #d97706; }
+  .item-discount-tag { font-size: 0.7rem; color: #15803d; font-weight: 600; }
+
+  .item-qty-control {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 4px 8px;
+  }
+  .qty-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #64748b;
+    cursor: pointer;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .qty-btn:hover { background: #e0e7ff; color: #1d4ed8; }
+  .qty-val { font-size: 0.9rem; font-weight: 700; color: #0f172a; min-width: 20px; text-align: center; }
+
+  .item-price { font-size: 1rem; font-weight: 700; color: #0f172a; white-space: nowrap; }
+
+  .item-remove {
+    background: none;
+    border: none;
+    color: #cbd5e1;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    transition: all 0.15s;
+  }
+  .item-remove:hover { color: #ef4444; background: #fee2e2; }
+
+  /* ── Form ── */
+  .form-card h2 { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .form-group label { font-size: 0.85rem; font-weight: 600; color: #374151; }
+  .req { color: #ef4444; }
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #f8fafc;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus { border-color: #1d4ed8; background: #fff; }
+  .form-group textarea { resize: vertical; }
+  .field-error { font-size: 0.75rem; color: #ef4444; min-height: 14px; }
+
+  /* ── Summary sidebar ── */
+  .summary-card h2 { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+  .summary-rows { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .sum-row {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    font-size: 0.82rem; color: #475569; gap: 8px;
+  }
+  .sum-row span:last-child { white-space: nowrap; font-weight: 600; }
+  .summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 2px solid #e2e8f0;
+    margin-top: 4px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .summary-note {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    text-align: right;
+  }
+  .summary-note.master { color: #15803d; }
+
+  .action-buttons { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+
+  .btn-manager {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-manager:hover { background: #1e293b; transform: translateY(-1px); }
+  .btn-manager:disabled { opacity: 0.6; cursor: wait; transform: none; }
+
+  .btn-pay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #1d4ed8 0%, #7c3aed 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .btn-pay:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .pay-sub { font-size: 0.72rem; opacity: 0.75; font-weight: 400; }
+
+  .secure-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: center;
+    justify-content: center;
+  }
+
+  .back-link {
+    display: block;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 12px;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: #1d4ed8; }
+
+  /* ── Shared buttons ── */
+  .btn-primary {
+    display: inline-block;
+    padding: 12px 28px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-primary:hover { background: #1e40af; }
+  .btn-ghost {
+    display: inline-block;
+    padding: 10px 24px;
+    background: transparent;
+    color: #64748b;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+  .btn-ghost:hover { border-color: #94a3b8; color: #0f172a; }
+
+  /* ── Overlays ── */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .overlay-card {
+    position: relative;
+    background: #fff;
+    border-radius: 24px;
+    padding: 48px 36px;
+    max-width: 440px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .overlay-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    background: #f1f5f9;
+    border: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s;
+  }
+  .overlay-close:hover { background: #e2e8f0; color: #0f172a; }
+
+  .success-icon {
+    width: 80px; height: 80px;
+    background: #dcfce7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  .overlay-card h2 { font-size: 1.4rem; font-weight: 800; color: #0f172a; }
+  .overlay-card p { font-size: 0.95rem; color: #64748b; line-height: 1.6; }
+
+  .pay-logo-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+  }
+  .pay-logo {
+    padding: 5px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+  .pay-logo.yukassa { background: #fee2e2; color: #dc2626; }
+  .pay-logo.prodamus { background: #dbeafe; color: #1d4ed8; }
+  .pay-logo.mir { background: #dcfce7; color: #15803d; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .cart-layout { grid-template-columns: 1fr; }
+    .cart-sidebar { order: -1; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .cart-item { grid-template-columns: 1fr auto; grid-template-rows: auto auto; }
+    .item-qty-control { grid-row: 2; }
+    .item-price { grid-row: 2; }
+    .item-remove { grid-row: 1; align-self: start; }
+    .overlay-card { padding: 36px 20px; }
+  }
+</style>

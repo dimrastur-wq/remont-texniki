@@ -181,13 +181,17 @@ const categoryIcons: { [key: string]: string } = {
                         <span class="price-value master">{formatPrice(masterPrice(part))}</span>
                       </div>
                     </div>
-                    <a
-                      href={`${SITE.telegram}?text=${encodeURIComponent(`Здравствуйте! Интересует: ${part.name}`)}`}
-                      target="_blank"
-                      class="card-order"
+                    <button
+                      class="card-order add-to-cart"
+                      data-id={part.id}
+                      data-name={part.name}
+                      data-retail={retailPrice(part)}
+                      data-master={masterPrice(part)}
+                      data-condition={part.condition}
                     >
-                      Заказать в Telegram
-                    </a>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                      В корзину
+                    </button>
                   </div>
                 ))}
               </div>
@@ -226,13 +230,17 @@ const categoryIcons: { [key: string]: string } = {
                         <span class="price-value master">{formatPrice(masterPrice(part))}</span>
                       </div>
                     </div>
-                    <a
-                      href={`${SITE.telegram}?text=${encodeURIComponent(`Здравствуйте! Интересует: ${part.name}`)}`}
-                      target="_blank"
-                      class="card-order"
+                    <button
+                      class="card-order add-to-cart"
+                      data-id={part.id}
+                      data-name={part.name}
+                      data-retail={retailPrice(part)}
+                      data-master={masterPrice(part)}
+                      data-condition={part.condition}
                     >
-                      Заказать в Telegram
-                    </a>
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                      В корзину
+                    </button>
                   </div>
                 ))}
               </div>
@@ -419,6 +427,36 @@ const categoryIcons: { [key: string]: string } = {
   mobileBtn.addEventListener('click', () => {
     sidebar.classList.toggle('open');
     mobileBtn.textContent = sidebar.classList.contains('open') ? 'Закрыть' : 'Фильтры';
+  });
+
+  // ── Cart logic ──
+  function getCart() {
+    try { return JSON.parse(localStorage.getItem('cart') || '[]'); } catch { return []; }
+  }
+  function saveCart(cart) {
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.dispatchEvent(new Event('cart-updated'));
+  }
+
+  document.querySelectorAll('.add-to-cart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const { id, name, retail, master, condition } = btn.dataset;
+      const cart = getCart();
+      const existing = cart.find(i => i.id === id);
+      if (existing) {
+        existing.qty = (existing.qty || 1) + 1;
+      } else {
+        cart.push({ id, name, retail: Number(retail), master: Number(master), condition, qty: 1 });
+      }
+      saveCart(cart);
+
+      btn.textContent = '✓ Добавлено';
+      btn.classList.add('added');
+      setTimeout(() => {
+        btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg> В корзину';
+        btn.classList.remove('added');
+      }, 1500);
+    });
   });
 </script>
 
@@ -729,6 +767,7 @@ const categoryIcons: { [key: string]: string } = {
     margin-top: 6px;
   }
   .card-order:hover { background: #1e40af; }
+  .card-order.added { background: #16a34a; }
 
   /* ── No results ── */
   .no-results {
