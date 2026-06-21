@@ -33,6 +33,9 @@ import SiteFooter from '../../components/SiteFooter.astro';
 
         <!-- Login -->
         <form id="login-form" class="auth-form">
+          <!-- Honeypot -->
+          <input type="text" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true" />
+          <input type="hidden" name="form_loaded_at" id="login-ts" />
           <div class="fg">
             <label for="l-email">Email</label>
             <input type="email" id="l-email" placeholder="master@example.com" required autocomplete="email" />
@@ -54,6 +57,9 @@ import SiteFooter from '../../components/SiteFooter.astro';
 
         <!-- Register -->
         <form id="register-form" class="auth-form" hidden>
+          <!-- Honeypot -->
+          <input type="text" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true" />
+          <input type="hidden" name="form_loaded_at" id="register-ts" />
           <div class="fg">
             <label for="r-name">Ваше имя</label>
             <input type="text" id="r-name" placeholder="Дмитрий" required />
@@ -190,6 +196,28 @@ import SiteFooter from '../../components/SiteFooter.astro';
     window.location.href = '/master/';
   }
 
+  // Initialize timestamps
+  const loginTs = document.getElementById('login-ts') as HTMLInputElement;
+  const registerTs = document.getElementById('register-ts') as HTMLInputElement;
+  const tsNow = String(Date.now());
+  if (loginTs) loginTs.value = tsNow;
+  if (registerTs) registerTs.value = tsNow;
+
+  function validateEmail(raw: string): boolean {
+    const v = raw.trim().toLowerCase();
+    return /^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$/.test(v) && !v.includes('..');
+  }
+
+  function isHoneypotClean(form: HTMLFormElement): boolean {
+    const hp = form.querySelector<HTMLInputElement>('[name="website"]');
+    return !hp || hp.value.trim() === '';
+  }
+  function isTimingOk(form: HTMLFormElement): boolean {
+    const ts = form.querySelector<HTMLInputElement>('[name="form_loaded_at"]');
+    if (!ts || !ts.value) return true;
+    return Date.now() - parseInt(ts.value, 10) >= 1800;
+  }
+
   async function sbAuth(path: string, body: object) {
     const res = await fetch(`${SB_URL}${path}`, {
       method: 'POST',
@@ -221,6 +249,9 @@ import SiteFooter from '../../components/SiteFooter.astro';
       (document.getElementById('login-form') as HTMLElement).hidden = tab !== 'login';
       (document.getElementById('register-form') as HTMLElement).hidden = tab !== 'register';
       (document.getElementById('msg') as HTMLElement).hidden = true;
+      // Reset timestamp on tab switch
+      const ts = tab === 'login' ? loginTs : registerTs;
+      if (ts) ts.value = String(Date.now());
     });
   });
 
@@ -235,9 +266,25 @@ import SiteFooter from '../../components/SiteFooter.astro';
   // Login
   document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const form = e.target as HTMLFormElement;
     const btn = document.getElementById('login-btn') as HTMLButtonElement;
-    const email = (document.getElementById('l-email') as HTMLInputElement).value;
+    const email = (document.getElementById('l-email') as HTMLInputElement).value.trim();
     const password = (document.getElementById('l-pass') as HTMLInputElement).value;
+
+    // Bot check (silent pass)
+    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+      showMsg('Вход выполнен! Перенаправляем...', 'success');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      showMsg('Введите корректный email', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      showMsg('Пароль слишком короткий', 'error');
+      return;
+    }
 
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Входим...';
@@ -258,10 +305,30 @@ import SiteFooter from '../../components/SiteFooter.astro';
   // Register
   document.getElementById('register-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
+    const form = e.target as HTMLFormElement;
     const btn = document.getElementById('register-btn') as HTMLButtonElement;
-    const name = (document.getElementById('r-name') as HTMLInputElement).value;
-    const email = (document.getElementById('r-email') as HTMLInputElement).value;
+    const name = (document.getElementById('r-name') as HTMLInputElement).value.trim();
+    const email = (document.getElementById('r-email') as HTMLInputElement).value.trim();
     const password = (document.getElementById('r-pass') as HTMLInputElement).value;
+
+    // Bot check (silent pass)
+    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+      showMsg('Аккаунт создан! Проверьте почту для подтверждения, затем войдите.', 'info');
+      return;
+    }
+
+    if (name.length < 2) {
+      showMsg('Введите имя (не менее 2 символов)', 'error');
+      return;
+    }
+    if (!validateEmail(email)) {
+      showMsg('Введите корректный email', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      showMsg('Пароль должен быть не менее 6 символов', 'error');
+      return;
+    }
 
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Создаём аккаунт...';

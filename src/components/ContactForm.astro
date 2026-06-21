@@ -55,9 +55,15 @@ const phoneRaw = '79512577757';
       </div>
 
       <form class="contact-form" id="request-form">
+        <!-- Honeypot anti-spam -->
+        <input type="text" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true" />
+        <input type="hidden" name="form_loaded_at" id="contact-ts" />
+        <!-- Captcha placeholder (Yandex SmartCaptcha / Cloudflare Turnstile) -->
+        <div id="contact-captcha" style="display:none;margin-bottom:16px;"></div>
+
         <div class="form-group">
           <label for="name">Ваше имя</label>
-          <input type="text" id="name" name="name" placeholder="Иван Иванов" required />
+          <input type="text" id="name" name="name" placeholder="Иван Иванов" required autocomplete="name" />
         </div>
 
         <div class="form-group">
@@ -310,43 +316,79 @@ const phoneRaw = '79512577757';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
   const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/dimrastur@gmail.com';
 
+  // Initialize timestamp field on page load
+  const tsField = document.getElementById('contact-ts') as HTMLInputElement;
+  if (tsField) tsField.value = String(Date.now());
+
+  function validatePhone(raw: string): { ok: boolean; error?: string } {
+    const digits = raw.replace(/\D/g, '');
+    if (!digits) return { ok: false, error: 'Введите номер телефона' };
+    let n = digits;
+    if (n.startsWith('8') && n.length === 11) n = '7' + n.slice(1);
+    if (n.length === 10 && !n.startsWith('7')) n = '7' + n;
+    if (n.length !== 11) return { ok: false, error: 'Номер должен содержать 11 цифр' };
+    if (!n.startsWith('7')) return { ok: false, error: 'Введите российский номер (+7...)' };
+    return { ok: true };
+  }
+
   const form = document.getElementById('request-form') as HTMLFormElement;
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = form.querySelector('.submit-btn') as HTMLButtonElement;
     const originalText = btn.innerHTML;
 
-    const name = (form.querySelector('#name') as HTMLInputElement).value;
-    const phone = (form.querySelector('#phone-input') as HTMLInputElement).value;
+    const name = (form.querySelector('#name') as HTMLInputElement).value.trim();
+    const phone = (form.querySelector('#phone-input') as HTMLInputElement).value.trim();
     const city = (form.querySelector('#city') as HTMLSelectElement).value;
     const appliance = (form.querySelector('#appliance') as HTMLSelectElement).value;
-    const message = (form.querySelector('#message') as HTMLTextAreaElement).value;
+    const message = (form.querySelector('#message') as HTMLTextAreaElement).value.trim();
+    const website = (form.querySelector('[name="website"]') as HTMLInputElement)?.value || '';
+    const formLoadedAt = (form.querySelector('#contact-ts') as HTMLInputElement)?.value || '';
+
+    if (name.length < 2) {
+      alert('Введите имя (не менее 2 символов)');
+      return;
+    }
+    const phoneCheck = validatePhone(phone);
+    if (!phoneCheck.ok) {
+      alert(phoneCheck.error);
+      return;
+    }
+    if (!city) {
+      alert('Выберите город');
+      return;
+    }
 
     btn.innerHTML = 'Отправка...';
     btn.disabled = true;
 
     try {
+      const payload = {
+        name, phone, city,
+        problem: `${appliance}: ${message}`,
+        website,
+        form_loaded_at: formLoadedAt,
+      };
+
       const [telegramRes, emailRes] = await Promise.allSettled([
         fetch(SUPABASE_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
-          body: JSON.stringify({ name, phone, city, problem: `${appliance}: ${message}` }),
+          body: JSON.stringify(payload),
         }),
         fetch(FORMSUBMIT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
           body: JSON.stringify({
-            name,
-            phone,
-            city,
+            name, phone, city,
             problem: `${appliance}: ${message}`,
             _subject: 'Новая заявка на ремонт — master-tehniki74.store',
           }),
         }),
       ]);
 
-      const success = telegramRes.status === 'fulfilled' && telegramRes.value.ok
-        || emailRes.status === 'fulfilled' && emailRes.value.ok;
+      const success = (telegramRes.status === 'fulfilled' && telegramRes.value.ok)
+        || (emailRes.status === 'fulfilled' && emailRes.value.ok);
 
       if (success) {
         btn.innerHTML = 'Заявка отправлена!';
@@ -358,9 +400,20 @@ const phoneRaw = '79512577757';
           btn.style.boxShadow = '';
           btn.disabled = false;
           form.reset();
+          if (tsField) tsField.value = String(Date.now());
         }, 3000);
       } else {
-        throw new Error('Both delivery channels failed');
+        const errMsg = telegramRes.status === 'fulfilled'
+          ? await telegramRes.value.json().catch(() => ({}))
+          : {};
+        if ((errMsg as any).error?.includes('запросов')) {
+          alert((errMsg as any).error);
+        } else {
+          throw new Error('delivery failed');
+        }
+        btn.innerHTML = originalText;
+        btn.style.background = '';
+        btn.disabled = false;
       }
     } catch {
       btn.innerHTML = 'Ошибка. Позвоните нам!';

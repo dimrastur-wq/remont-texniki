@@ -199,6 +199,9 @@ const schema = JSON.stringify({
               <div class="leave-review">
                 <h3>Оставить отзыв</h3>
                 <form id="review-form">
+                  <!-- Honeypot -->
+                  <input type="text" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true" />
+                  <input type="hidden" name="form_loaded_at" id="review-ts" />
                   <input type="hidden" name="master_id" value={master.id} />
                   <div class="form-row2">
                     <div class="form-group">
@@ -246,6 +249,9 @@ const schema = JSON.stringify({
               <h2>Вызвать мастера</h2>
 
               <form id="call-form">
+                <!-- Honeypot -->
+                <input type="text" name="website" autocomplete="off" tabindex="-1" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true" />
+                <input type="hidden" name="form_loaded_at" id="call-ts" />
                 <input type="hidden" name="master_id" value={master.id} />
                 <div class="form-group">
                   <label>Ваше имя *</label>
@@ -319,6 +325,30 @@ const schema = JSON.stringify({
     document.getElementById('call-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
+  // ── Initialize timestamps ──
+  const now = String(Date.now());
+  const callTs = document.getElementById('call-ts');
+  const reviewTs = document.getElementById('review-ts');
+  if (callTs) callTs.value = now;
+  if (reviewTs) reviewTs.value = now;
+
+  function isHoneypotClean(form) {
+    const hp = form.querySelector('[name="website"]');
+    return !hp || hp.value.trim() === '';
+  }
+  function isTimingOk(form) {
+    const ts = form.querySelector('[name="form_loaded_at"]');
+    if (!ts || !ts.value) return true;
+    return Date.now() - parseInt(ts.value, 10) >= 1800;
+  }
+  function validatePhone(raw) {
+    const digits = raw.replace(/\D/g, '');
+    let n = digits;
+    if (n.startsWith('8') && n.length === 11) n = '7' + n.slice(1);
+    if (n.length === 10 && !n.startsWith('7')) n = '7' + n;
+    return n.length === 11 && n.startsWith('7');
+  }
+
   // ── Phone mask ──
   const phoneInput = document.getElementById('call-phone');
   phoneInput?.addEventListener('input', () => {
@@ -356,6 +386,21 @@ const schema = JSON.stringify({
     const data = Object.fromEntries(new FormData(form));
     const statusEl = document.getElementById('call-status');
     const btn = form.querySelector('button[type="submit"]');
+
+    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+      statusEl.textContent = 'Заявка отправлена! Мастер свяжется с вами в течение часа.';
+      statusEl.className = 'call-status success';
+      form.reset();
+      if (callTs) { callTs.value = String(Date.now()); }
+      return;
+    }
+
+    const phone = data.client_phone || '';
+    if (!validatePhone(phone)) {
+      statusEl.textContent = 'Введите корректный российский номер телефона (+7...).';
+      statusEl.className = 'call-status error';
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
@@ -401,6 +446,16 @@ const schema = JSON.stringify({
     const data = Object.fromEntries(new FormData(form));
     const statusEl = document.getElementById('review-status');
     const btn = form.querySelector('button[type="submit"]');
+
+    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+      statusEl.textContent = 'Спасибо! Отзыв отправлен на проверку и появится в течение суток.';
+      statusEl.className = 'review-status success';
+      form.reset();
+      renderStars(5); pickedRating = 5;
+      document.getElementById('rating-val').value = '5';
+      if (reviewTs) { reviewTs.value = String(Date.now()); }
+      return;
+    }
 
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
