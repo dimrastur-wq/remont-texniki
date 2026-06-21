@@ -1,0 +1,706 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { supabase, SERVICE_LABELS } from '../../lib/supabase';
+import type { MasterPublicProfile, MasterReview } from '../../../lib/supabase';
+
+const { slug } = Astro.params;
+
+// Загружаем мастера
+const { data: masterRaw } = await supabase
+  .from('master_public_profiles')
+  .select('*, city:cities(*)')
+  .eq('slug', slug)
+  .eq('is_active', true)
+  .maybeSingle();
+
+if (!masterRaw) return Astro.redirect('/masters/', 302);
+
+const master = masterRaw as MasterPublicProfile;
+const city = (master as any).city;
+
+// Загружаем одобренные отзывы
+const { data: reviews } = await supabase
+  .from('master_reviews')
+  .select('*')
+  .eq('master_id', master.id)
+  .eq('is_approved', true)
+  .order('created_at', { ascending: false })
+  .limit(20);
+
+// Проверяем параметр ?call=1 для открытия формы
+const showCallForm = new URL(Astro.request.url).searchParams.get('call') === '1';
+
+const title = `${master.display_name} — мастер по ремонту техники в ${city?.name_prep || 'вашем городе'} | Центр восстановления`;
+const description = master.bio
+  ? `${master.bio.slice(0, 155)}…`
+  : `Мастер ${master.display_name}, рейтинг ${master.rating}, ${master.reviews_count} отзывов. Ремонт бытовой техники в ${city?.name_prep || 'Миассе'}.`;
+
+const schema = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: master.display_name,
+  description: master.bio,
+  jobTitle: 'Мастер по ремонту бытовой техники',
+  address: { '@type': 'PostalAddress', addressLocality: city?.name, addressCountry: 'RU' },
+  aggregateRating: master.reviews_count > 0 ? {
+    '@type': 'AggregateRating',
+    ratingValue: master.rating,
+    reviewCount: master.reviews_count,
+  } : undefined,
+});
+---
+
+<Layout title={title} description={description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={schema}></script>
+  </Fragment>
+
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <!-- Breadcrumbs -->
+    <div class="container breadcrumbs-wrap">
+      <nav class="breadcrumbs">
+        <a href="/">Главная</a>
+        <span>/</span>
+        <a href="/masters/">Мастера</a>
+        <span>/</span>
+        <span>{master.display_name}</span>
+      </nav>
+    </div>
+
+    <!-- Profile hero -->
+    <section class="profile-hero">
+      <div class="container">
+        <div class="profile-layout">
+
+          <!-- Left: main info -->
+          <div class="profile-main">
+            <div class="profile-head">
+              <div class="avatar-wrap">
+                {master.avatar_url ? (
+                  <img src={master.avatar_url} alt={master.display_name} class="avatar" />
+                ) : (
+                  <div class="avatar-placeholder">{master.display_name.charAt(0)}</div>
+                )}
+                <span class={`status-indicator ${master.is_online ? 'online' : 'offline'}`}>
+                  {master.is_online ? 'Онлайн' : 'Оффлайн'}
+                </span>
+              </div>
+
+              <div class="profile-info">
+                <div class="name-row">
+                  <h1 class="master-name">{master.display_name}</h1>
+                  {master.is_verified && (
+                    <span class="verified-badge" title="Проверен администрацией">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      Проверен
+                    </span>
+                  )}
+                </div>
+
+                <div class="profile-tags">
+                  {city && (
+                    <span class="tag tag-city">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {city.name}
+                    </span>
+                  )}
+                  <span class="tag tag-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</span>
+                  <span class="tag tag-orders">{master.orders_count} ремонтов</span>
+                </div>
+
+                <div class="rating-row">
+                  <div class="stars">
+                    {[1,2,3,4,5].map(i => (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill={i <= Math.round(master.rating) ? '#f59e0b' : 'none'} stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                    ))}
+                  </div>
+                  <span class="rating-val">{Number(master.rating).toFixed(1)}</span>
+                  <span class="rating-cnt">({master.reviews_count} {master.reviews_count === 1 ? 'отзыв' : master.reviews_count < 5 ? 'отзыва' : 'отзывов'})</span>
+                </div>
+              </div>
+            </div>
+
+            {master.bio && <p class="bio">{master.bio}</p>}
+
+            <!-- Service types -->
+            <div class="services-section">
+              <h2 class="section-h">Специализация</h2>
+              <div class="service-chips">
+                {master.service_types.map(s => (
+                  <a href={`/masters/?service=${s}`} class="service-chip">{SERVICE_LABELS[s] || s}</a>
+                ))}
+              </div>
+            </div>
+
+            <!-- Fixed prices -->
+            {Object.keys(master.fixed_prices || {}).length > 0 && (
+              <div class="prices-section">
+                <h2 class="section-h">Фиксированные цены</h2>
+                <div class="prices-table">
+                  {Object.entries(master.fixed_prices).map(([svc, price]) => (
+                    <div class="price-row">
+                      <span class="price-svc">{SERVICE_LABELS[svc] || svc}</span>
+                      <span class="price-dots"></span>
+                      <span class="price-val">от {(price as number).toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                  ))}
+                  <div class="price-note">Точная стоимость определяется после диагностики</div>
+                </div>
+              </div>
+            )}
+
+            <!-- Reviews -->
+            <div class="reviews-section">
+              <h2 class="section-h">Отзывы клиентов ({(reviews || []).length})</h2>
+              {(reviews || []).length === 0 ? (
+                <p class="no-reviews">Отзывов пока нет. Будьте первым!</p>
+              ) : (
+                <div class="reviews-list">
+                  {(reviews as MasterReview[]).map(r => (
+                    <div class="review-card">
+                      <div class="review-head">
+                        <div class="review-author">
+                          <div class="author-avatar">{r.author_name.charAt(0)}</div>
+                          <div>
+                            <div class="author-name">{r.author_name}</div>
+                            <div class="review-meta">
+                              {r.author_city && <span>{r.author_city}</span>}
+                              {r.appliance && <span>· {r.appliance}</span>}
+                              <span>· {new Date(r.created_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="review-stars">
+                          {[1,2,3,4,5].map(i => (
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill={i <= r.rating ? '#f59e0b' : 'none'} stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                          ))}
+                        </div>
+                      </div>
+                      <p class="review-text">{r.text}</p>
+                      {r.reply && (
+                        <div class="review-reply">
+                          <strong>Ответ мастера:</strong> {r.reply}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <!-- Leave review form -->
+              <div class="leave-review">
+                <h3>Оставить отзыв</h3>
+                <form id="review-form">
+                  <input type="hidden" name="master_id" value={master.id} />
+                  <div class="form-row2">
+                    <div class="form-group">
+                      <label>Ваше имя *</label>
+                      <input type="text" name="author_name" required placeholder="Имя" />
+                    </div>
+                    <div class="form-group">
+                      <label>Город</label>
+                      <input type="text" name="author_city" placeholder="Миасс" />
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label>Что ремонтировали?</label>
+                    <input type="text" name="appliance" placeholder="Холодильник Samsung" />
+                  </div>
+                  <div class="form-group">
+                    <label>Оценка *</label>
+                    <div class="star-picker" id="star-picker">
+                      {[1,2,3,4,5].map(i => (
+                        <button type="button" class="star-btn" data-val={i}>
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                        </button>
+                      ))}
+                    </div>
+                    <input type="hidden" name="rating" id="rating-val" value="5" />
+                  </div>
+                  <div class="form-group">
+                    <label>Текст отзыва *</label>
+                    <textarea name="text" rows="4" required placeholder="Расскажите о своём опыте..."></textarea>
+                  </div>
+                  <button type="submit" class="btn-submit-review">Отправить отзыв</button>
+                  <div id="review-status" class="review-status"></div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: call action card -->
+          <aside class="profile-sidebar">
+            <div class="call-card" id="call-card">
+              <div class="call-card-status">
+                <span class={`dot ${master.is_online ? 'online' : 'offline'}`}></span>
+                {master.is_online ? 'Принимает заявки' : 'Временно недоступен'}
+              </div>
+              <h2>Вызвать мастера</h2>
+
+              <form id="call-form">
+                <input type="hidden" name="master_id" value={master.id} />
+                <div class="form-group">
+                  <label>Ваше имя *</label>
+                  <input type="text" name="client_name" required placeholder="Имя" />
+                </div>
+                <div class="form-group">
+                  <label>Телефон *</label>
+                  <input type="tel" name="client_phone" required placeholder="+7 (___) ___-__-__" id="call-phone" />
+                </div>
+                <div class="form-group">
+                  <label>Вид техники</label>
+                  <select name="service_slug">
+                    <option value="remont-holodilnikov">Холодильник</option>
+                    <option value="remont-stiralnykh-mashin">Стиральная машина</option>
+                    <option value="remont-elektropliit">Электроплита</option>
+                    <option value="remont-mikrovolnovok">Микроволновка</option>
+                    <option value="remont-pylesesov">Пылесос</option>
+                    <option value="remont-kofemashiny">Кофемашина</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Опишите проблему</label>
+                  <textarea name="problem" rows="3" placeholder="Не морозит, не крутит барабан..."></textarea>
+                </div>
+                <button type="submit" class="btn-call-submit">Вызвать мастера</button>
+              </form>
+              <div id="call-status" class="call-status"></div>
+
+              {master.phone && (
+                <a href={`tel:${master.phone.replace(/\D/g,'')}`} class="phone-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  {master.phone}
+                </a>
+              )}
+              {master.telegram && (
+                <a href={`https://t.me/${master.telegram.replace('@','')}`} target="_blank" rel="noopener" class="tg-btn">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.248l-2.03 9.564c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.393c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.893.658z"/></svg>
+                  Telegram
+                </a>
+              )}
+
+              <div class="sidebar-stats">
+                <div class="s-stat">
+                  <strong>{Number(master.rating).toFixed(1)}</strong>
+                  <span>рейтинг</span>
+                </div>
+                <div class="s-stat">
+                  <strong>{master.reviews_count}</strong>
+                  <span>отзывов</span>
+                </div>
+                <div class="s-stat">
+                  <strong>{master.orders_count}</strong>
+                  <span>ремонтов</span>
+                </div>
+              </div>
+            </div>
+
+            <a href="/masters/" class="back-link">← Все мастера</a>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<script define:vars={{ showCallForm, supabaseUrl: import.meta.env.VITE_SUPABASE_URL, supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY }}>
+  // ── Auto-open call form ──
+  if (showCallForm) {
+    document.getElementById('call-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  // ── Phone mask ──
+  const phoneInput = document.getElementById('call-phone');
+  phoneInput?.addEventListener('input', () => {
+    let v = phoneInput.value.replace(/\D/g, '');
+    if (v.startsWith('8')) v = '7' + v.slice(1);
+    if (v.startsWith('7')) {
+      phoneInput.value = '+7 (' + v.slice(1,4) + (v.length>4 ? ') '+v.slice(4,7) : '') + (v.length>7 ? '-'+v.slice(7,9) : '') + (v.length>9 ? '-'+v.slice(9,11) : '');
+    }
+  });
+
+  // ── Star picker ──
+  let pickedRating = 5;
+  const starBtns = document.querySelectorAll('.star-btn');
+  function renderStars(hovered) {
+    starBtns.forEach((btn, idx) => {
+      const filled = idx < (hovered ?? pickedRating);
+      btn.querySelector('svg').setAttribute('fill', filled ? '#f59e0b' : 'none');
+    });
+  }
+  renderStars(5);
+  starBtns.forEach((btn, idx) => {
+    btn.addEventListener('mouseenter', () => renderStars(idx + 1));
+    btn.addEventListener('mouseleave', () => renderStars(pickedRating));
+    btn.addEventListener('click', () => {
+      pickedRating = idx + 1;
+      document.getElementById('rating-val').value = pickedRating;
+      renderStars(pickedRating);
+    });
+  });
+
+  // ── Submit call form ──
+  document.getElementById('call-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form));
+    const statusEl = document.getElementById('call-status');
+    const btn = form.querySelector('button[type="submit"]');
+
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/client_requests`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          master_id: data.master_id,
+          client_name: data.client_name,
+          client_phone: data.client_phone,
+          service_slug: data.service_slug,
+          problem: data.problem,
+          source: 'master_profile',
+        }),
+      });
+
+      if (res.ok || res.status === 201) {
+        statusEl.textContent = 'Заявка отправлена! Мастер свяжется с вами в течение часа.';
+        statusEl.className = 'call-status success';
+        form.reset();
+      } else {
+        throw new Error('HTTP ' + res.status);
+      }
+    } catch {
+      statusEl.textContent = 'Ошибка отправки. Позвоните напрямую.';
+      statusEl.className = 'call-status error';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Вызвать мастера';
+  });
+
+  // ── Submit review ──
+  document.getElementById('review-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const data = Object.fromEntries(new FormData(form));
+    const statusEl = document.getElementById('review-status');
+    const btn = form.querySelector('button[type="submit"]');
+
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+
+    try {
+      const res = await fetch(`${supabaseUrl}/rest/v1/master_reviews`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          master_id: data.master_id,
+          author_name: data.author_name,
+          author_city: data.author_city || null,
+          appliance: data.appliance || null,
+          rating: parseInt(data.rating) || 5,
+          text: data.text,
+          is_approved: false,
+        }),
+      });
+
+      if (res.ok || res.status === 201) {
+        statusEl.textContent = 'Спасибо! Отзыв отправлен на проверку и появится в течение суток.';
+        statusEl.className = 'review-status success';
+        form.reset();
+        renderStars(5); pickedRating = 5;
+        document.getElementById('rating-val').value = '5';
+      } else {
+        throw new Error('HTTP ' + res.status);
+      }
+    } catch {
+      statusEl.textContent = 'Ошибка отправки. Попробуйте ещё раз.';
+      statusEl.className = 'review-status error';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Отправить отзыв';
+  });
+</script>
+
+<style>
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  .breadcrumbs-wrap { padding: 16px 20px; }
+  .breadcrumbs {
+    display: flex; gap: 6px; align-items: center;
+    font-size: 0.82rem; color: #94a3b8;
+    flex-wrap: wrap;
+  }
+  .breadcrumbs a { color: #64748b; }
+  .breadcrumbs a:hover { color: #1d4ed8; }
+  .breadcrumbs span { color: #0f172a; }
+
+  /* ── Profile hero ── */
+  .profile-hero { padding: 0 0 80px; }
+  .profile-layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+  .profile-main { display: flex; flex-direction: column; gap: 28px; }
+
+  /* ── Head ── */
+  .profile-head { display: flex; gap: 20px; align-items: flex-start; }
+  .avatar-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+  .avatar { width: 96px; height: 96px; border-radius: 20px; object-fit: cover; }
+  .avatar-placeholder {
+    width: 96px; height: 96px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .status-indicator {
+    padding: 3px 10px;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .status-indicator.online { background: #dcfce7; color: #15803d; }
+  .status-indicator.offline { background: #f1f5f9; color: #94a3b8; }
+
+  .profile-info { flex: 1; }
+  .name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .master-name { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin: 0; }
+  .verified-badge {
+    display: flex; align-items: center; gap: 4px;
+    background: #1d4ed8; color: #fff;
+    padding: 3px 10px; border-radius: 100px;
+    font-size: 0.72rem; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .profile-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .tag {
+    padding: 4px 12px; border-radius: 100px;
+    font-size: 0.78rem; font-weight: 600;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .tag-city { background: #eff6ff; color: #1d4ed8; }
+  .tag-exp { background: #f0fdf4; color: #15803d; }
+  .tag-orders { background: #fff7ed; color: #c2410c; }
+  .rating-row { display: flex; align-items: center; gap: 8px; }
+  .stars { display: flex; gap: 2px; }
+  .rating-val { font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+  .rating-cnt { font-size: 0.85rem; color: #64748b; }
+
+  .bio { font-size: 0.95rem; color: #475569; line-height: 1.7; margin: 0; }
+
+  /* ── Sections ── */
+  .section-h {
+    font-size: 1.1rem; font-weight: 700; color: #0f172a;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e2e8f0;
+  }
+
+  .services-section, .prices-section, .reviews-section {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+  }
+
+  .service-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .service-chip {
+    padding: 6px 16px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .service-chip:hover { background: #1d4ed8; color: #fff; }
+
+  .prices-table { display: flex; flex-direction: column; gap: 0; }
+  .price-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .price-row:last-of-type { border: none; }
+  .price-svc { font-size: 0.9rem; color: #475569; }
+  .price-dots { flex: 1; border-bottom: 2px dotted #e2e8f0; }
+  .price-val { font-size: 0.9rem; font-weight: 700; color: #0f172a; white-space: nowrap; }
+  .price-note { font-size: 0.78rem; color: #94a3b8; margin-top: 8px; }
+
+  /* ── Reviews ── */
+  .reviews-list { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+  .no-reviews { color: #94a3b8; font-size: 0.9rem; }
+  .review-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+  }
+  .review-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .review-author { display: flex; gap: 10px; align-items: flex-start; }
+  .author-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    color: #fff;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .author-name { font-size: 0.9rem; font-weight: 700; color: #0f172a; }
+  .review-meta { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+  .review-stars { display: flex; gap: 2px; }
+  .review-text { font-size: 0.88rem; color: #475569; line-height: 1.6; margin: 0; }
+  .review-reply {
+    margin-top: 10px; padding: 10px 14px;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-size: 0.83rem;
+    color: #374151;
+    line-height: 1.5;
+  }
+
+  /* ── Leave review form ── */
+  .leave-review {
+    border-top: 2px solid #e2e8f0;
+    padding-top: 20px;
+  }
+  .leave-review h3 { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
+  .form-row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .form-group label { font-size: 0.8rem; font-weight: 600; color: #374151; }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 9px 13px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1d4ed8; background: #fff; }
+  .form-group textarea { resize: vertical; }
+
+  .star-picker { display: flex; gap: 4px; margin-bottom: 4px; }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 2px; transition: transform 0.1s; }
+  .star-btn:hover { transform: scale(1.2); }
+
+  .btn-submit-review {
+    padding: 11px 24px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-submit-review:hover { background: #1e293b; }
+  .review-status, .call-status {
+    margin-top: 10px; font-size: 0.85rem; padding: 10px 14px;
+    border-radius: 8px; display: none;
+  }
+  .review-status:not(:empty), .call-status:not(:empty) { display: block; }
+  .review-status.success, .call-status.success { background: #dcfce7; color: #15803d; }
+  .review-status.error, .call-status.error { background: #fee2e2; color: #dc2626; }
+
+  /* ── Sidebar ── */
+  .profile-sidebar { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
+  .call-card {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .call-card-status {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 0.82rem; font-weight: 600;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot.online { background: #4ade80; }
+  .dot.offline { background: #94a3b8; }
+  .call-card h2 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0; }
+
+  .btn-call-submit {
+    width: 100%;
+    padding: 12px;
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-call-submit:hover { background: #1e40af; }
+
+  .phone-btn, .tg-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .phone-btn { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+  .phone-btn:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .tg-btn { background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd; }
+  .tg-btn:hover { background: #0088cc; color: #fff; border-color: #0088cc; }
+
+  .sidebar-stats { display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid #f1f5f9; }
+  .s-stat { text-align: center; }
+  .s-stat strong { display: block; font-size: 1.1rem; font-weight: 800; color: #0f172a; }
+  .s-stat span { font-size: 0.72rem; color: #94a3b8; }
+
+  .back-link { display: block; text-align: center; font-size: 0.85rem; color: #64748b; }
+  .back-link:hover { color: #1d4ed8; }
+
+  @media (max-width: 900px) {
+    .profile-layout { grid-template-columns: 1fr; }
+    .profile-sidebar { position: static; order: -1; }
+    .form-row2 { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .profile-head { flex-direction: column; }
+    .name-row { flex-wrap: wrap; }
+  }
+</style>

@@ -1,0 +1,688 @@
+---
+export const prerender = false;
+
+import Layout from '../../layouts/Layout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import FloatingButton from '../../components/FloatingButton.astro';
+import { supabase, SERVICE_LABELS } from '../../lib/supabase';
+import type { MasterPublicProfile, City } from '../../lib/supabase';
+
+// Фильтр из query string
+const url = new URL(Astro.request.url);
+const cityFilter = url.searchParams.get('city') || 'all';
+const serviceFilter = url.searchParams.get('service') || 'all';
+const onlineFilter = url.searchParams.get('online') === '1';
+
+// Загружаем активные города
+const { data: cities } = await supabase
+  .from('cities')
+  .select('*')
+  .eq('active', true)
+  .order('name');
+
+// Загружаем мастеров с джойном города
+let query = supabase
+  .from('master_public_profiles')
+  .select('*, city:cities(id,slug,name,name_prep,lat,lng)')
+  .eq('is_active', true)
+  .order('rating', { ascending: false });
+
+if (cityFilter !== 'all') {
+  const city = (cities || []).find(c => c.slug === cityFilter);
+  if (city) query = query.eq('city_id', city.id);
+}
+if (onlineFilter) query = query.eq('is_online', true);
+
+const { data: mastersRaw } = await query;
+let masters: MasterPublicProfile[] = (mastersRaw || []) as MasterPublicProfile[];
+
+if (serviceFilter !== 'all') {
+  masters = masters.filter(m => m.service_types.includes(serviceFilter));
+}
+
+const totalMasters = masters.length;
+const onlineMasters = masters.filter(m => m.is_online).length;
+---
+
+<Layout
+  title="Мастера по ремонту бытовой техники — найти мастера онлайн | Центр восстановления"
+  description="Каталог проверенных мастеров по ремонту бытовой техники в Миассе, Златоусте, Чебаркуле. Рейтинги, отзывы, онлайн-запись."
+>
+  <SiteHeader />
+  <FloatingButton />
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-top">
+          <div>
+            <div class="hero-badge">
+              <span class="online-dot"></span>
+              {onlineMasters} мастеров онлайн сейчас
+            </div>
+            <h1>Мастера по ремонту<br>бытовой техники</h1>
+            <p class="hero-sub">Проверенные специалисты в вашем городе. Смотрите рейтинг, отзывы, цены — и вызывайте мастера напрямую.</p>
+          </div>
+          <div class="hero-stats">
+            <div class="stat-card">
+              <div class="stat-num">{totalMasters}</div>
+              <div class="stat-lbl">мастеров в каталоге</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">{onlineMasters}</div>
+              <div class="stat-lbl">готовы к выезду</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">4.8</div>
+              <div class="stat-lbl">средний рейтинг</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filters + Catalog -->
+    <section class="catalog-section">
+      <div class="container">
+        <form class="filters-bar" method="get" action="/masters/">
+          <div class="filter-group">
+            <label>Город</label>
+            <select name="city">
+              <option value="all" selected={cityFilter === 'all'}>Все города</option>
+              {(cities || []).map(c => (
+                <option value={c.slug} selected={cityFilter === c.slug}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Техника</label>
+            <select name="service">
+              <option value="all" selected={serviceFilter === 'all'}>Все виды</option>
+              {Object.entries(SERVICE_LABELS).map(([slug, label]) => (
+                <option value={slug} selected={serviceFilter === slug}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div class="filter-online">
+            <label class="check-label">
+              <input type="checkbox" name="online" value="1" checked={onlineFilter}>
+              <span class="check-box"></span>
+              Только онлайн
+            </label>
+          </div>
+
+          <button type="submit" class="btn-filter">Найти</button>
+        </form>
+
+        <div class="results-header">
+          <span class="results-count">
+            Найдено: <strong>{totalMasters} мастеров</strong>
+            {cityFilter !== 'all' && <span> · {(cities||[]).find(c=>c.slug===cityFilter)?.name}</span>}
+          </span>
+          <a href="/master/" class="btn-register-master">+ Зарегистрировать мастера</a>
+        </div>
+
+        {masters.length === 0 ? (
+          <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <h3>Мастера не найдены</h3>
+            <p>Попробуйте изменить фильтры или выбрать другой город</p>
+            <a href="/masters/" class="btn-reset">Сбросить фильтры</a>
+          </div>
+        ) : (
+          <div class="masters-grid">
+            {masters.map(master => (
+              <div class="master-card">
+                <div class="card-head">
+                  <div class="avatar-wrap">
+                    {master.avatar_url ? (
+                      <img src={master.avatar_url} alt={master.display_name} class="avatar" />
+                    ) : (
+                      <div class="avatar-placeholder">
+                        {master.display_name.charAt(0)}
+                      </div>
+                    )}
+                    <span class={`status-dot ${master.is_online ? 'online' : 'offline'}`} title={master.is_online ? 'Онлайн' : 'Оффлайн'}></span>
+                  </div>
+
+                  <div class="master-meta">
+                    <div class="master-name-row">
+                      <h2 class="master-name">{master.display_name}</h2>
+                      {master.is_verified && (
+                        <span class="verified-badge" title="Проверенный мастер">
+                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                      )}
+                    </div>
+                    <div class="master-city">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {(master.city as any)?.name || 'Не указан'}
+                    </div>
+                    <div class="master-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</div>
+                  </div>
+
+                  <div class="rating-block">
+                    <div class="rating-num">{Number(master.rating).toFixed(1)}</div>
+                    <div class="rating-stars">
+                      {[1,2,3,4,5].map(i => (
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill={i <= Math.round(master.rating) ? '#f59e0b' : 'none'} stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      ))}
+                    </div>
+                    <div class="rating-count">{master.reviews_count} отз.</div>
+                  </div>
+                </div>
+
+                {master.bio && (
+                  <p class="master-bio">{master.bio.length > 120 ? master.bio.slice(0, 120) + '…' : master.bio}</p>
+                )}
+
+                <div class="service-chips">
+                  {master.service_types.slice(0, 4).map(s => (
+                    <span class="chip">{SERVICE_LABELS[s] || s}</span>
+                  ))}
+                  {master.service_types.length > 4 && <span class="chip chip-more">+{master.service_types.length - 4}</span>}
+                </div>
+
+                {Object.keys(master.fixed_prices || {}).length > 0 && (
+                  <div class="prices-preview">
+                    {Object.entries(master.fixed_prices).slice(0, 2).map(([svc, price]) => (
+                      <div class="price-row">
+                        <span>{SERVICE_LABELS[svc] || svc}</span>
+                        <span class="price-val">от {(price as number).toLocaleString('ru-RU')} ₽</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div class="card-actions">
+                  <a href={`/masters/${master.slug}/`} class="btn-profile">Профиль и отзывы</a>
+                  <a href={`/masters/${master.slug}/?call=1`} class="btn-call">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    Вызвать мастера
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+
+    <!-- Yandex Map placeholder -->
+    <section class="map-section">
+      <div class="container">
+        <h2 class="section-title">Карта мастеров</h2>
+        <p class="section-sub">Подключение Яндекс Карт API запланировано. Мастера будут отображаться в реальном времени.</p>
+        <div class="map-placeholder">
+          <div class="map-inner">
+            {masters.filter(m => (m.city as any)?.lat).map(master => (
+              <div
+                class={`map-pin ${master.is_online ? 'online' : 'offline'}`}
+                title={`${master.display_name} · ${(master.city as any)?.name}`}
+                style={`left:${30 + Math.random() * 50}%;top:${20 + Math.random() * 50}%`}
+              >
+                <div class="pin-bubble">
+                  <span>{Number(master.rating).toFixed(1)}</span>
+                </div>
+                <div class="pin-tip"></div>
+                <div class="pin-label">{master.display_name.split(' ')[0]}</div>
+              </div>
+            ))}
+            <div class="map-api-note">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Яндекс Карты · готово к интеграции
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA для мастеров -->
+    <section class="cta-masters">
+      <div class="container">
+        <div class="cta-card">
+          <div class="cta-left">
+            <h2>Вы мастер?</h2>
+            <p>Зарегистрируйтесь в каталоге, получайте заявки от клиентов вашего города и ведите все заказы в едином кабинете.</p>
+            <ul class="cta-benefits">
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Публичный профиль с рейтингом</li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Заявки из вашего города</li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Подбор запчастей со скидкой 15%</li>
+              <li><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> CRM для учёта заказов</li>
+            </ul>
+          </div>
+          <div class="cta-right">
+            <div class="price-tag">390 ₽/мес</div>
+            <a href="/master/" class="btn-join">Стать мастером платформы</a>
+            <a href="/master/login/" class="btn-login-link">Уже есть аккаунт → войти</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <SiteFooter />
+</Layout>
+
+<style>
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── Hero ── */
+  .hero {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    padding: 56px 0 48px;
+    color: #fff;
+  }
+  .hero-top {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 40px;
+    align-items: center;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #bfdbfe;
+    margin-bottom: 16px;
+  }
+  .online-dot {
+    width: 8px; height: 8px;
+    background: #4ade80;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%,100% { opacity:1; }
+    50% { opacity: 0.4; }
+  }
+  .hero h1 {
+    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 14px;
+    color: #fff;
+  }
+  .hero-sub { font-size: 1rem; color: #94a3b8; max-width: 500px; line-height: 1.6; }
+  .hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 14px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 130px;
+  }
+  .stat-num { font-size: 1.6rem; font-weight: 800; color: #60a5fa; }
+  .stat-lbl { font-size: 0.78rem; color: #94a3b8; margin-top: 2px; }
+
+  /* ── Filters ── */
+  .catalog-section { padding: 40px 0 64px; }
+  .filters-bar {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 28px;
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 150px;
+  }
+  .filter-group label { font-size: 0.78rem; font-weight: 600; color: #64748b; }
+  .filter-group select {
+    padding: 10px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    cursor: pointer;
+  }
+  .filter-group select:focus { border-color: #1d4ed8; background: #fff; }
+  .filter-online { display: flex; align-items: flex-end; padding-bottom: 2px; }
+  .check-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .check-label input { display: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 2px solid #e2e8f0;
+    border-radius: 5px;
+    background: #f8fafc;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .check-label input:checked + .check-box {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .btn-filter {
+    padding: 10px 24px;
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .btn-filter:hover { background: #1e40af; }
+
+  .results-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .results-count { font-size: 0.9rem; color: #64748b; }
+  .results-count strong { color: #0f172a; }
+  .btn-register-master {
+    padding: 8px 16px;
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-register-master:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+
+  /* ── Masters Grid ── */
+  .masters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+  }
+  .master-card {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .master-card:hover { box-shadow: 0 8px 32px rgba(15,23,42,0.1); transform: translateY(-2px); }
+
+  .card-head { display: flex; gap: 14px; align-items: flex-start; }
+  .avatar-wrap { position: relative; flex-shrink: 0; }
+  .avatar {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    object-fit: cover;
+  }
+  .avatar-placeholder {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    color: #fff;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .status-dot {
+    position: absolute;
+    bottom: -3px; right: -3px;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 2.5px solid #fff;
+  }
+  .status-dot.online { background: #4ade80; }
+  .status-dot.offline { background: #94a3b8; }
+
+  .master-meta { flex: 1; min-width: 0; }
+  .master-name-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+  .master-name { font-size: 1rem; font-weight: 700; color: #0f172a; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .verified-badge {
+    width: 18px; height: 18px;
+    background: #1d4ed8;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .master-city {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 0.8rem; color: #64748b;
+    margin-bottom: 2px;
+  }
+  .master-exp { font-size: 0.78rem; color: #94a3b8; }
+
+  .rating-block { text-align: center; flex-shrink: 0; }
+  .rating-num { font-size: 1.3rem; font-weight: 800; color: #0f172a; }
+  .rating-stars { display: flex; gap: 1px; justify-content: center; margin: 2px 0; }
+  .rating-count { font-size: 0.72rem; color: #94a3b8; }
+
+  .master-bio { font-size: 0.84rem; color: #64748b; line-height: 1.5; margin: 0; }
+
+  .service-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    padding: 3px 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border-radius: 100px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .chip-more { background: #f1f5f9; color: #64748b; }
+
+  .prices-preview { display: flex; flex-direction: column; gap: 4px; }
+  .price-row {
+    display: flex; justify-content: space-between;
+    font-size: 0.82rem; color: #475569;
+    padding: 4px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .price-row:last-child { border: none; }
+  .price-val { font-weight: 700; color: #0f172a; }
+
+  .card-actions { display: flex; gap: 8px; margin-top: auto; }
+  .btn-profile {
+    flex: 1;
+    padding: 10px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: center;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-profile:hover { border-color: #1d4ed8; color: #1d4ed8; background: #eff6ff; }
+  .btn-call {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background 0.2s;
+    text-decoration: none;
+  }
+  .btn-call:hover { background: #1e40af; }
+
+  /* ── Empty ── */
+  .empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #64748b;
+  }
+  .empty-state h3 { font-size: 1.3rem; color: #0f172a; margin: 16px 0 8px; }
+  .btn-reset {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 10px 24px;
+    background: #1d4ed8;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+  }
+
+  /* ── Map placeholder ── */
+  .map-section { padding: 0 0 64px; }
+  .section-title { font-size: 1.5rem; font-weight: 800; color: #0f172a; margin-bottom: 6px; }
+  .section-sub { font-size: 0.9rem; color: #64748b; margin-bottom: 20px; }
+  .map-placeholder {
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #f0f7ff;
+    height: 320px;
+  }
+  .map-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 50%, #ddd6fe 100%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 16px;
+  }
+  .map-pin {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateX(-50%);
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .map-pin:hover { transform: translateX(-50%) scale(1.1); z-index: 10; }
+  .pin-bubble {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+  }
+  .map-pin.online .pin-bubble { background: #1d4ed8; }
+  .map-pin.offline .pin-bubble { background: #64748b; }
+  .pin-tip {
+    width: 0; height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    margin-top: -1px;
+  }
+  .map-pin.online .pin-tip { border-top: 8px solid #1d4ed8; }
+  .map-pin.offline .pin-tip { border-top: 8px solid #64748b; }
+  .pin-label { font-size: 0.7rem; font-weight: 600; color: #0f172a; margin-top: 2px; white-space: nowrap; }
+  .map-api-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.8);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    color: #64748b;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── CTA ── */
+  .cta-masters { padding: 0 0 80px; }
+  .cta-card {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 48px;
+    align-items: center;
+    background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 100%);
+    border-radius: 24px;
+    padding: 48px;
+    color: #fff;
+  }
+  .cta-card h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; }
+  .cta-card p { color: #bfdbfe; font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px; }
+  .cta-benefits { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .cta-benefits li { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: #e0f2fe; }
+  .cta-right { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .price-tag {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #4ade80;
+    text-align: center;
+  }
+  .btn-join {
+    display: block;
+    padding: 14px 28px;
+    background: #fff;
+    color: #1d4ed8;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-align: center;
+    white-space: nowrap;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-join:hover { background: #eff6ff; transform: translateY(-1px); }
+  .btn-login-link { font-size: 0.82rem; color: #93c5fd; text-decoration: none; text-align: center; }
+  .btn-login-link:hover { color: #fff; text-decoration: underline; }
+
+  @media (max-width: 900px) {
+    .hero-top { grid-template-columns: 1fr; }
+    .hero-stats { flex-direction: row; flex-wrap: wrap; }
+    .cta-card { grid-template-columns: 1fr; gap: 28px; padding: 32px 24px; }
+  }
+  @media (max-width: 600px) {
+    .masters-grid { grid-template-columns: 1fr; }
+    .filters-bar { flex-direction: column; align-items: stretch; }
+    .map-placeholder { height: 220px; }
+  }
+</style>

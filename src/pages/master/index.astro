@@ -106,6 +106,7 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
       <button class="dash-tab active" data-tab="orders">📦 Заказы</button>
       <button class="dash-tab" data-tab="parts">🔧 Запчасти</button>
       <button class="dash-tab" data-tab="service">📋 Сервис</button>
+      <button class="dash-tab" data-tab="profile">👤 Профиль</button>
       <button class="dash-tab" data-tab="perks">🏷️ Привилегии</button>
     </nav>
   </div>
@@ -446,6 +447,157 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   </div>
 
   <!-- PERKS TAB -->
+  <!-- PROFILE TAB -->
+  <div id="tab-profile" class="tab-content hidden">
+    <div class="tab-inner">
+      <h2 class="tab-h2">Публичный профиль</h2>
+      <p class="tab-sub">Заполните профиль — он будет виден клиентам в каталоге <a href="/masters/" target="_blank">/masters/</a></p>
+
+      <form id="profile-form" class="profile-form" novalidate>
+        <!-- Avatar -->
+        <div class="pf-section">
+          <h3>Фото профиля</h3>
+          <div class="avatar-editor">
+            <div class="av-preview" id="av-preview">
+              <img id="av-img" style="display:none" alt="Аватар" />
+              <span id="av-initials" class="av-initials">?</span>
+            </div>
+            <div class="av-actions">
+              <label class="btn-upload" for="avatar-file">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Загрузить фото
+              </label>
+              <input type="file" id="avatar-file" accept="image/*" style="display:none" />
+              <p class="av-hint">PNG, JPG до 2 МБ. Рекомендуется квадратное фото.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Basic info -->
+        <div class="pf-section">
+          <h3>Основная информация</h3>
+          <div class="pf-grid-2">
+            <div class="pf-group">
+              <label>Имя и фамилия *</label>
+              <input type="text" id="pf-name" name="display_name" required placeholder="Дмитрий Репин" />
+            </div>
+            <div class="pf-group">
+              <label>Опыт работы (лет)</label>
+              <input type="number" id="pf-exp" name="experience_years" min="0" max="50" placeholder="5" />
+            </div>
+          </div>
+          <div class="pf-group">
+            <label>О себе (bio)</label>
+            <textarea id="pf-bio" name="bio" rows="3" placeholder="Расскажите о вашем опыте, специализации и подходе к работе..."></textarea>
+            <span class="pf-hint" id="bio-count">0 / 500 символов</span>
+          </div>
+        </div>
+
+        <!-- Geography -->
+        <div class="pf-section">
+          <h3>География работы</h3>
+          <div class="pf-grid-2">
+            <div class="pf-group">
+              <label>Основной город</label>
+              <select id="pf-city" name="city_id">
+                <option value="">— Выберите город —</option>
+                <option value="miass">Миасс</option>
+                <option value="zlatoust">Златоуст</option>
+                <option value="chebarkul">Чебаркуль</option>
+              </select>
+            </div>
+            <div class="pf-group">
+              <label>Телефон (виден клиентам)</label>
+              <input type="tel" id="pf-phone" name="phone" placeholder="+7 (951) 257-77-57" />
+            </div>
+          </div>
+          <div class="pf-group">
+            <label>Telegram (без @)</label>
+            <input type="text" id="pf-telegram" name="telegram" placeholder="master_name" />
+          </div>
+
+          <div class="cities-checkboxes">
+            <label class="pf-label-sm">Дополнительные города выезда:</label>
+            <div class="cities-grid">
+              <label class="city-check"><input type="checkbox" name="svc_city_miass" value="miass"> Миасс</label>
+              <label class="city-check"><input type="checkbox" name="svc_city_zlatoust" value="zlatoust"> Златоуст</label>
+              <label class="city-check"><input type="checkbox" name="svc_city_chebarkul" value="chebarkul"> Чебаркуль</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div class="pf-section">
+          <h3>Виды ремонта</h3>
+          <div class="services-grid">
+            <label class="svc-check"><input type="checkbox" name="svc_holodilniki" value="remont-holodilnikov"> Холодильники</label>
+            <label class="svc-check"><input type="checkbox" name="svc_stiralki" value="remont-stiralnykh-mashin"> Стиральные машины</label>
+            <label class="svc-check"><input type="checkbox" name="svc_pliti" value="remont-elektropliit"> Электроплиты</label>
+            <label class="svc-check"><input type="checkbox" name="svc_mikro" value="remont-mikrovolnovok"> Микроволновки</label>
+            <label class="svc-check"><input type="checkbox" name="svc_pylos" value="remont-pylesesov"> Пылесосы</label>
+            <label class="svc-check"><input type="checkbox" name="svc_kofe" value="remont-kofemashiny"> Кофемашины</label>
+          </div>
+        </div>
+
+        <!-- Prices -->
+        <div class="pf-section">
+          <h3>Фиксированные цены (от)</h3>
+          <p class="pf-hint-text">Укажите стартовую цену для каждого вида ремонта — клиенты увидят её в профиле.</p>
+          <div class="prices-inputs">
+            <div class="price-input-row">
+              <label>Холодильники</label>
+              <input type="number" name="price_holodilniki" placeholder="1500" min="0" step="100" />
+              <span>₽</span>
+            </div>
+            <div class="price-input-row">
+              <label>Стиральные машины</label>
+              <input type="number" name="price_stiralki" placeholder="1200" min="0" step="100" />
+              <span>₽</span>
+            </div>
+            <div class="price-input-row">
+              <label>Электроплиты</label>
+              <input type="number" name="price_pliti" placeholder="900" min="0" step="100" />
+              <span>₽</span>
+            </div>
+            <div class="price-input-row">
+              <label>Микроволновки</label>
+              <input type="number" name="price_mikro" placeholder="800" min="0" step="100" />
+              <span>₽</span>
+            </div>
+            <div class="price-input-row">
+              <label>Пылесосы</label>
+              <input type="number" name="price_pylos" placeholder="700" min="0" step="100" />
+              <span>₽</span>
+            </div>
+            <div class="price-input-row">
+              <label>Кофемашины</label>
+              <input type="number" name="price_kofe" placeholder="900" min="0" step="100" />
+              <span>₽</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Online status -->
+        <div class="pf-section pf-online-row">
+          <label class="online-toggle-label">
+            <input type="checkbox" id="pf-online" name="is_online" />
+            <span class="online-track"><span class="online-thumb"></span></span>
+            <span>
+              <strong>Принимаю заявки сейчас</strong>
+              <small>Зелёный индикатор онлайн в профиле — клиенты видят, что вы доступны</small>
+            </span>
+          </label>
+        </div>
+
+        <div class="pf-actions">
+          <button type="submit" class="btn-save-profile">Сохранить профиль</button>
+          <a href="/masters/" target="_blank" class="btn-view-profile" id="btn-view-profile" style="display:none">Посмотреть в каталоге →</a>
+        </div>
+        <div id="profile-save-status" class="profile-status"></div>
+      </form>
+    </div>
+  </div>
+
   <div id="tab-perks" class="tab-content hidden">
     <div class="tab-inner">
       <div class="perks-hero">
@@ -655,6 +807,168 @@ const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsI
   .tab-content { display: none; }
   .tab-content.active { display: block; }
   .tab-inner { max-width: 1100px; margin: 0 auto; padding: 20px 16px 40px; }
+  .tab-h2 { font-size: 1.2rem; font-weight: 800; color: #0f172a; margin-bottom: 4px; }
+  .tab-sub { font-size: 0.85rem; color: #64748b; margin-bottom: 24px; }
+  .tab-sub a { color: #1d4ed8; }
+
+  /* ── PROFILE TAB ── */
+  .profile-form { display: flex; flex-direction: column; gap: 24px; }
+  .pf-section {
+    background: #fff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .pf-section h3 { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid #f1f5f9; }
+  .pf-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+  .pf-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+  .pf-group:last-child { margin-bottom: 0; }
+  .pf-group label { font-size: 0.8rem; font-weight: 600; color: #374151; }
+  .pf-group input, .pf-group select, .pf-group textarea {
+    padding: 9px 13px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 9px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .pf-group input:focus, .pf-group select:focus, .pf-group textarea:focus { border-color: #1d4ed8; background: #fff; }
+  .pf-group textarea { resize: vertical; }
+  .pf-hint { font-size: 0.72rem; color: #94a3b8; }
+  .pf-hint-text { font-size: 0.82rem; color: #64748b; margin-bottom: 14px; }
+  .pf-label-sm { font-size: 0.78rem; font-weight: 600; color: #374151; display: block; margin-bottom: 8px; }
+
+  .avatar-editor { display: flex; gap: 20px; align-items: flex-start; }
+  .av-preview {
+    width: 80px; height: 80px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #1d4ed8, #3b82f6);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+  .av-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .av-initials { color: #fff; font-size: 1.8rem; font-weight: 700; }
+  .av-actions { display: flex; flex-direction: column; gap: 8px; }
+  .btn-upload {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-upload:hover { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  .av-hint { font-size: 0.72rem; color: #94a3b8; }
+
+  .cities-checkboxes { margin-top: 14px; }
+  .cities-grid { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+  .city-check, .svc-check {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; color: #374151;
+    cursor: pointer;
+  }
+  .city-check input, .svc-check input { width: 16px; height: 16px; accent-color: #1d4ed8; }
+
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+
+  .prices-inputs { display: flex; flex-direction: column; gap: 10px; }
+  .price-input-row {
+    display: grid;
+    grid-template-columns: 180px 1fr auto;
+    align-items: center;
+    gap: 10px;
+  }
+  .price-input-row label { font-size: 0.85rem; color: #374151; }
+  .price-input-row input {
+    padding: 8px 12px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-family: inherit;
+    color: #0f172a;
+    background: #f8fafc;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .price-input-row input:focus { border-color: #1d4ed8; background: #fff; }
+  .price-input-row span { font-size: 0.85rem; color: #64748b; }
+
+  .pf-online-row { display: flex; align-items: center; }
+  .online-toggle-label { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+  .online-toggle-label input { display: none; }
+  .online-track {
+    position: relative;
+    width: 44px; height: 24px;
+    background: #e2e8f0;
+    border-radius: 12px;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .online-toggle-label input:checked + .online-track { background: #4ade80; }
+  .online-thumb {
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 18px; height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+  }
+  .online-toggle-label input:checked + .online-track .online-thumb { transform: translateX(20px); }
+  .online-toggle-label strong { font-size: 0.9rem; color: #0f172a; display: block; }
+  .online-toggle-label small { font-size: 0.75rem; color: #64748b; }
+
+  .pf-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .btn-save-profile {
+    padding: 12px 28px;
+    background: #1d4ed8;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.2s;
+  }
+  .btn-save-profile:hover { background: #1e40af; }
+  .btn-save-profile:disabled { opacity: 0.6; cursor: wait; }
+  .btn-view-profile {
+    padding: 12px 20px;
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-view-profile:hover { background: #16a34a; color: #fff; border-color: #16a34a; }
+  .profile-status {
+    margin-top: 10px; font-size: 0.85rem; padding: 10px 14px;
+    border-radius: 8px; display: none;
+  }
+  .profile-status:not(:empty) { display: block; }
+  .profile-status.success { background: #dcfce7; color: #15803d; }
+  .profile-status.error { background: #fee2e2; color: #dc2626; }
+
+  @media (max-width: 700px) {
+    .pf-grid-2 { grid-template-columns: 1fr; }
+    .services-grid { grid-template-columns: 1fr 1fr; }
+    .price-input-row { grid-template-columns: 1fr auto auto; }
+    .price-input-row label { grid-column: 1 / -1; }
+  }
 
   /* ── ANALYTICS PANEL ── */
   .analytics-panel {
@@ -1278,7 +1592,10 @@ document.querySelectorAll('.dash-tab').forEach(tab => {
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     tab.classList.add('active');
     const target = tab.dataset.tab;
-    document.getElementById(`tab-${target}`).classList.add('active');
+    document.getElementById(`tab-${target}`)?.classList.add('active');
+    if (target === 'profile' && typeof window._loadProfileData === 'function') {
+      window._loadProfileData();
+    }
   });
 });
 
@@ -1800,6 +2117,201 @@ window.toggleServiceCard = (header) => {
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
 checkAuth();
+
+// ── PROFILE TAB ──────────────────────────────────────────────────────────────
+
+// Avatar preview
+document.getElementById('avatar-file')?.addEventListener('change', async (e) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { alert('Файл больше 2 МБ'); return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const img = document.getElementById('av-img') as HTMLImageElement;
+    const initials = document.getElementById('av-initials')!;
+    img.src = ev.target!.result as string;
+    img.style.display = '';
+    initials.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+// Bio char counter
+document.getElementById('pf-bio')?.addEventListener('input', () => {
+  const len = (document.getElementById('pf-bio') as HTMLTextAreaElement).value.length;
+  const el = document.getElementById('bio-count')!;
+  el.textContent = `${len} / 500 символов`;
+  el.style.color = len > 500 ? '#ef4444' : '#94a3b8';
+});
+
+// Load existing profile data
+async function loadProfileData() {
+  if (!currentUserId) return;
+  try {
+    const res = await fetch(
+      `${SUPA_URL}/rest/v1/master_public_profiles?user_id=eq.${currentUserId}&select=*,city:cities(id,slug)`,
+      { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${currentToken}` } }
+    );
+    const data = await res.json();
+    if (!data || !data.length) return;
+    const p = data[0];
+
+    // Populate fields
+    (document.getElementById('pf-name') as HTMLInputElement).value = p.display_name || '';
+    (document.getElementById('pf-exp') as HTMLInputElement).value = p.experience_years || '';
+    (document.getElementById('pf-bio') as HTMLTextAreaElement).value = p.bio || '';
+    (document.getElementById('pf-phone') as HTMLInputElement).value = p.phone || '';
+    (document.getElementById('pf-telegram') as HTMLInputElement).value = p.telegram || '';
+    (document.getElementById('pf-online') as HTMLInputElement).checked = p.is_online;
+
+    if (p.city?.slug) {
+      (document.getElementById('pf-city') as HTMLSelectElement).value = p.city.slug;
+    }
+
+    // Services
+    (p.service_types || []).forEach((svc: string) => {
+      const cb = document.querySelector(`input[value="${svc}"]`) as HTMLInputElement;
+      if (cb) cb.checked = true;
+    });
+
+    // Prices
+    const priceMap: Record<string, string> = {
+      'remont-holodilnikov': 'holodilniki',
+      'remont-stiralnykh-mashin': 'stiralki',
+      'remont-elektropliit': 'pliti',
+      'remont-mikrovolnovok': 'mikro',
+      'remont-pylesesov': 'pylos',
+      'remont-kofemashiny': 'kofe',
+    };
+    Object.entries(p.fixed_prices || {}).forEach(([svc, price]) => {
+      const key = priceMap[svc];
+      if (key) {
+        const inp = document.querySelector(`input[name="price_${key}"]`) as HTMLInputElement;
+        if (inp) inp.value = String(price);
+      }
+    });
+
+    // Show view link
+    const viewBtn = document.getElementById('btn-view-profile') as HTMLAnchorElement;
+    viewBtn.href = `/masters/${p.slug}/`;
+    viewBtn.style.display = '';
+
+    // Avatar
+    if (p.avatar_url) {
+      const img = document.getElementById('av-img') as HTMLImageElement;
+      const initials = document.getElementById('av-initials')!;
+      img.src = p.avatar_url;
+      img.style.display = '';
+      initials.style.display = 'none';
+    }
+
+    // Update initials
+    const name = p.display_name || '';
+    document.getElementById('av-initials')!.textContent = name.charAt(0).toUpperCase() || '?';
+  } catch(e) {
+    console.error('Profile load error:', e);
+  }
+}
+
+// Expose for tab switch
+window._loadProfileData = loadProfileData;
+
+// Save profile
+document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!currentUserId) return;
+
+  const btn = document.querySelector('.btn-save-profile') as HTMLButtonElement;
+  const status = document.getElementById('profile-save-status')!;
+  btn.disabled = true;
+  btn.textContent = 'Сохраняем...';
+
+  // Collect service types
+  const serviceTypes: string[] = [];
+  document.querySelectorAll('.svc-check input:checked').forEach((cb) => {
+    serviceTypes.push((cb as HTMLInputElement).value);
+  });
+
+  // Collect prices
+  const priceMap: Record<string, string> = {
+    holodilniki: 'remont-holodilnikov',
+    stiralki:    'remont-stiralnykh-mashin',
+    pliti:       'remont-elektropliit',
+    mikro:       'remont-mikrovolnovok',
+    pylos:       'remont-pylesesov',
+    kofe:        'remont-kofemashiny',
+  };
+  const fixedPrices: Record<string, number> = {};
+  Object.entries(priceMap).forEach(([key, slug]) => {
+    const val = (document.querySelector(`input[name="price_${key}"]`) as HTMLInputElement)?.value;
+    if (val && Number(val) > 0) fixedPrices[slug] = Number(val);
+  });
+
+  // Get city id
+  const citySlug = (document.getElementById('pf-city') as HTMLSelectElement).value;
+
+  const payload = {
+    user_id:          currentUserId,
+    display_name:     (document.getElementById('pf-name') as HTMLInputElement).value.trim(),
+    bio:              (document.getElementById('pf-bio') as HTMLTextAreaElement).value.trim() || null,
+    experience_years: Number((document.getElementById('pf-exp') as HTMLInputElement).value) || 0,
+    phone:            (document.getElementById('pf-phone') as HTMLInputElement).value.trim() || null,
+    telegram:         (document.getElementById('pf-telegram') as HTMLInputElement).value.trim() || null,
+    is_online:        (document.getElementById('pf-online') as HTMLInputElement).checked,
+    service_types:    serviceTypes,
+    fixed_prices:     fixedPrices,
+    slug:             (document.getElementById('pf-name') as HTMLInputElement).value.trim()
+                        .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + currentUserId.slice(0,6),
+  };
+
+  try {
+    // Upsert by user_id
+    const res = await fetch(`${SUPA_URL}/rest/v1/master_public_profiles?user_id=eq.${currentUserId}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${currentToken}`,
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (res.ok) {
+      status.textContent = '✓ Профиль сохранён! Он виден в каталоге мастеров.';
+      status.className = 'profile-status success';
+      // Reload to get slug
+      loadProfileData();
+    } else {
+      // Try insert
+      const res2 = await fetch(`${SUPA_URL}/rest/v1/master_public_profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPA_KEY,
+          'Authorization': `Bearer ${currentToken}`,
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res2.ok || res2.status === 201) {
+        status.textContent = '✓ Профиль создан! Он виден в каталоге мастеров.';
+        status.className = 'profile-status success';
+        loadProfileData();
+      } else {
+        const errText = await res2.text();
+        status.textContent = 'Ошибка: ' + errText.slice(0, 150);
+        status.className = 'profile-status error';
+      }
+    }
+  } catch(err) {
+    status.textContent = 'Ошибка сети. Проверьте подключение.';
+    status.className = 'profile-status error';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Сохранить профиль';
+});
 </script>
 
 </main>
