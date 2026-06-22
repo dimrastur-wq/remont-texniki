@@ -10,8 +10,8 @@ const servicemodesJSON = JSON.stringify(SERVICE_MODES);
 const serviceBrandsJSON = JSON.stringify(SERVICE_BRANDS);
 const serviceAppsJSON = JSON.stringify(SERVICE_APPLIANCES);
 
-const SUPA_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
+const SUPA_URL = '';
+const SUPA_KEY = '';
 ---
 
 <Layout title="Кабинет мастера — Мастер Техники 74" description="Личный кабинет профессионального мастера по ремонту бытовой техники" noindex={true}>
@@ -1496,38 +1496,27 @@ const $ = id => document.getElementById(id);
 
 // ── AUTH ────────────────────────────────────────────────────────────────────
 async function checkAuth() {
-  const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
-  if (!token || !uid) { window.location.href = '/master/login/'; return; }
-
-  const res = await fetch(`${SUPA_URL}/auth/v1/user`, {
-    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` }
-  });
-  if (!res.ok) { localStorage.clear(); window.location.href = '/master/login/'; return; }
-
-  const profileRes = await fetch(
-    `${SUPA_URL}/rest/v1/master_profiles?id=eq.${uid}&select=*`,
-    { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` } }
-  );
-  const profiles = await profileRes.json();
-  const profile = profiles?.[0];
+  const token = localStorage.getItem('master_token');
+  const email = localStorage.getItem('master_email');
+  if (!token || !email) { window.location.href = '/master/login/'; return; }
 
   $('loading-overlay').classList.add('hidden');
 
-  if (!profile || !profile.is_premium) {
+  const isPremium = localStorage.getItem('master_premium') === '1';
+  if (!isPremium) {
     $('paywall-screen').classList.remove('hidden');
   } else {
-    showDashboard(profile);
+    showDashboard({});
   }
 }
 
 function showDashboard(profile) {
   $('dashboard-screen').classList.remove('hidden');
-  const email = localStorage.getItem('sb_email') || '';
+  const email = localStorage.getItem('master_email') || '';
   $('user-email-display').textContent = email;
   $('perk-email-display').textContent = email;
-  const uid = localStorage.getItem('sb_uid') || '';
-  $('perk-promo-code').textContent = 'MASTER15-' + uid.slice(0, 6).toUpperCase();
+  const uid = email.replace(/[^a-z0-9]/gi, '').slice(0, 6).toUpperCase();
+  $('perk-promo-code').textContent = 'MASTER15-' + uid;
   updateMonthLabel();
   loadOrders();
   renderParts();
@@ -1536,10 +1525,10 @@ function showDashboard(profile) {
 
 // ── LOGOUT ──────────────────────────────────────────────────────────────────
 function logout() {
-  localStorage.removeItem('sb_token');
-  localStorage.removeItem('sb_refresh');
-  localStorage.removeItem('sb_uid');
-  localStorage.removeItem('sb_email');
+  localStorage.removeItem('master_token');
+  localStorage.removeItem('master_email');
+  localStorage.removeItem('master_name');
+  localStorage.removeItem('master_premium');
   window.location.href = '/master/login/';
 }
 $('logout-btn').addEventListener('click', logout);
@@ -1556,33 +1545,9 @@ $('pay-btn').addEventListener('click', async () => {
 
   await new Promise(r => setTimeout(r, 2000));
 
-  const token = localStorage.getItem('sb_token');
-  const uid = localStorage.getItem('sb_uid');
-  const premiumUntil = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString();
-
-  const res = await fetch(
-    `${SUPA_URL}/rest/v1/master_profiles?id=eq.${uid}`,
-    {
-      method: 'PATCH',
-      headers: {
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=representation',
-      },
-      body: JSON.stringify({ is_premium: true, premium_until: premiumUntil }),
-    }
-  );
-
-  if (res.ok) {
-    $('paywall-screen').classList.add('hidden');
-    const profiles = await res.json();
-    showDashboard(profiles?.[0] || {});
-  } else {
-    btn.disabled = false;
-    txt.textContent = 'Попробовать снова';
-    spin.classList.add('hidden');
-  }
+  localStorage.setItem('master_premium', '1');
+  $('paywall-screen').classList.add('hidden');
+  showDashboard({});
 });
 
 // ── TABS ─────────────────────────────────────────────────────────────────────
@@ -1794,17 +1759,19 @@ function renderOrders() {
 }
 
 async function loadOrders() {
-  const token = localStorage.getItem('sb_token');
-  const uid   = localStorage.getItem('sb_uid');
-  const res = await fetch(
-    `${SUPA_URL}/rest/v1/master_orders?user_id=eq.${uid}&order=created_at.desc`,
-    { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` } }
-  );
-  if (res.ok) {
-    allOrders = await res.json();
-    renderAnalytics(allOrders);
-    renderOrders();
-  }
+  const email = localStorage.getItem('master_email') || 'default';
+  const key = 'master_orders_' + email;
+  try {
+    allOrders = JSON.parse(localStorage.getItem(key) || '[]');
+  } catch { allOrders = []; }
+  renderAnalytics(allOrders);
+  renderOrders();
+}
+
+function saveOrders() {
+  const email = localStorage.getItem('master_email') || 'default';
+  const key = 'master_orders_' + email;
+  localStorage.setItem(key, JSON.stringify(allOrders));
 }
 
 document.querySelectorAll('#status-filter-btns .filter-btn').forEach(btn => {
@@ -1830,10 +1797,10 @@ $('add-order-form').addEventListener('submit', async e => {
   submitBtn.disabled = true;
   submitBtn.textContent = 'Сохраняем...';
 
-  const token = localStorage.getItem('sb_token');
-  const uid   = localStorage.getItem('sb_uid');
+  const email = localStorage.getItem('master_email') || 'default';
   const data = {
-    user_id: uid,
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2),
+    user_id: email,
     client_name:       form.client_name.value.trim(),
     client_phone:      form.client_phone.value.trim(),
     client_city:       form.client_city.value.trim(),
@@ -1844,28 +1811,18 @@ $('add-order-form').addEventListener('submit', async e => {
     parts_cost:  parseFloat(form.parts_cost.value)  || 0,
     labor_cost:  parseFloat(form.labor_cost.value)  || 0,
     status: form.status.value,
+    created_at: new Date().toISOString(),
   };
 
-  const res = await fetch(`${SUPA_URL}/rest/v1/master_orders`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json', 'Prefer': 'return=representation',
-    },
-    body: JSON.stringify(data),
-  });
+  allOrders = [data, ...allOrders];
+  saveOrders();
+  form.reset();
+  $('form-total-val').textContent = '0 ₽';
+  $('add-order-form-wrap').classList.add('hidden');
+  $('toggle-add-order').classList.remove('open');
+  renderAnalytics(allOrders);
+  renderOrders();
 
-  if (res.ok) {
-    form.reset();
-    $('form-total-val').textContent = '0 ₽';
-    $('add-order-form-wrap').classList.add('hidden');
-    $('toggle-add-order').classList.remove('open');
-    await loadOrders();
-  } else {
-    const err = await res.json().catch(() => ({}));
-    errEl.textContent = err.message || 'Ошибка при сохранении.';
-    errEl.classList.remove('hidden');
-  }
   submitBtn.disabled = false;
   submitBtn.textContent = 'Сохранить заказ';
 });
@@ -1880,28 +1837,17 @@ $('add-order-form').addEventListener('submit', async e => {
 });
 
 window.updateOrderStatus = async (id, status) => {
-  const token = localStorage.getItem('sb_token');
-  const uid   = localStorage.getItem('sb_uid');
-  await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
-    method: 'PATCH',
-    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ status }),
-  });
   const idx = allOrders.findIndex(o => o.id === id);
   if (idx !== -1) allOrders[idx].status = status;
+  saveOrders();
   renderAnalytics(allOrders);
   renderOrders();
 };
 
 window.deleteOrder = async (id) => {
   if (!confirm('Удалить заказ?')) return;
-  const token = localStorage.getItem('sb_token');
-  const uid   = localStorage.getItem('sb_uid');
-  await fetch(`${SUPA_URL}/rest/v1/master_orders?id=eq.${id}&user_id=eq.${uid}`, {
-    method: 'DELETE',
-    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${token}` },
-  });
   allOrders = allOrders.filter(o => o.id !== id);
+  saveOrders();
   renderAnalytics(allOrders);
   renderOrders();
 };
@@ -2146,17 +2092,13 @@ document.getElementById('pf-bio')?.addEventListener('input', () => {
 
 // Load existing profile data
 async function loadProfileData() {
-  if (!currentUserId) return;
+  const email = localStorage.getItem('master_email') || '';
+  if (!email) return;
   try {
-    const res = await fetch(
-      `${SUPA_URL}/rest/v1/master_public_profiles?user_id=eq.${currentUserId}&select=*,city:cities(id,slug)`,
-      { headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${currentToken}` } }
-    );
-    const data = await res.json();
-    if (!data || !data.length) return;
-    const p = data[0];
+    const key = 'master_profile_' + email;
+    const p = JSON.parse(localStorage.getItem(key) || 'null');
+    if (!p) return;
 
-    // Populate fields
     (document.getElementById('pf-name') as HTMLInputElement).value = p.display_name || '';
     (document.getElementById('pf-exp') as HTMLInputElement).value = p.experience_years || '';
     (document.getElementById('pf-bio') as HTMLTextAreaElement).value = p.bio || '';
@@ -2164,17 +2106,15 @@ async function loadProfileData() {
     (document.getElementById('pf-telegram') as HTMLInputElement).value = p.telegram || '';
     (document.getElementById('pf-online') as HTMLInputElement).checked = p.is_online;
 
-    if (p.city?.slug) {
-      (document.getElementById('pf-city') as HTMLSelectElement).value = p.city.slug;
+    if (p.city_slug) {
+      (document.getElementById('pf-city') as HTMLSelectElement).value = p.city_slug;
     }
 
-    // Services
     (p.service_types || []).forEach((svc: string) => {
       const cb = document.querySelector(`input[value="${svc}"]`) as HTMLInputElement;
       if (cb) cb.checked = true;
     });
 
-    // Prices
     const priceMap: Record<string, string> = {
       'remont-holodilnikov': 'holodilniki',
       'remont-stiralnykh-mashin': 'stiralki',
@@ -2184,19 +2124,16 @@ async function loadProfileData() {
       'remont-kofemashiny': 'kofe',
     };
     Object.entries(p.fixed_prices || {}).forEach(([svc, price]) => {
-      const key = priceMap[svc];
-      if (key) {
-        const inp = document.querySelector(`input[name="price_${key}"]`) as HTMLInputElement;
+      const key2 = priceMap[svc];
+      if (key2) {
+        const inp = document.querySelector(`input[name="price_${key2}"]`) as HTMLInputElement;
         if (inp) inp.value = String(price);
       }
     });
 
-    // Show view link
     const viewBtn = document.getElementById('btn-view-profile') as HTMLAnchorElement;
-    viewBtn.href = `/masters/${p.slug}/`;
-    viewBtn.style.display = '';
+    if (p.slug) { viewBtn.href = `/masters/${p.slug}/`; viewBtn.style.display = ''; }
 
-    // Avatar
     if (p.avatar_url) {
       const img = document.getElementById('av-img') as HTMLImageElement;
       const initials = document.getElementById('av-initials')!;
@@ -2205,7 +2142,6 @@ async function loadProfileData() {
       initials.style.display = 'none';
     }
 
-    // Update initials
     const name = p.display_name || '';
     document.getElementById('av-initials')!.textContent = name.charAt(0).toUpperCase() || '?';
   } catch(e) {
@@ -2219,20 +2155,19 @@ window._loadProfileData = loadProfileData;
 // Save profile
 document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  if (!currentUserId) return;
+  const email = localStorage.getItem('master_email') || '';
+  if (!email) return;
 
   const btn = document.querySelector('.btn-save-profile') as HTMLButtonElement;
   const status = document.getElementById('profile-save-status')!;
   btn.disabled = true;
   btn.textContent = 'Сохраняем...';
 
-  // Collect service types
   const serviceTypes: string[] = [];
   document.querySelectorAll('.svc-check input:checked').forEach((cb) => {
     serviceTypes.push((cb as HTMLInputElement).value);
   });
 
-  // Collect prices
   const priceMap: Record<string, string> = {
     holodilniki: 'remont-holodilnikov',
     stiralki:    'remont-stiralnykh-mashin',
@@ -2242,17 +2177,17 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
     kofe:        'remont-kofemashiny',
   };
   const fixedPrices: Record<string, number> = {};
-  Object.entries(priceMap).forEach(([key, slug]) => {
-    const val = (document.querySelector(`input[name="price_${key}"]`) as HTMLInputElement)?.value;
+  Object.entries(priceMap).forEach(([key2, slug]) => {
+    const val = (document.querySelector(`input[name="price_${key2}"]`) as HTMLInputElement)?.value;
     if (val && Number(val) > 0) fixedPrices[slug] = Number(val);
   });
 
-  // Get city id
   const citySlug = (document.getElementById('pf-city') as HTMLSelectElement).value;
+  const displayName = (document.getElementById('pf-name') as HTMLInputElement).value.trim();
 
   const payload = {
-    user_id:          currentUserId,
-    display_name:     (document.getElementById('pf-name') as HTMLInputElement).value.trim(),
+    user_id:          email,
+    display_name:     displayName,
     bio:              (document.getElementById('pf-bio') as HTMLTextAreaElement).value.trim() || null,
     experience_years: Number((document.getElementById('pf-exp') as HTMLInputElement).value) || 0,
     phone:            (document.getElementById('pf-phone') as HTMLInputElement).value.trim() || null,
@@ -2260,52 +2195,18 @@ document.getElementById('profile-form')?.addEventListener('submit', async (e) =>
     is_online:        (document.getElementById('pf-online') as HTMLInputElement).checked,
     service_types:    serviceTypes,
     fixed_prices:     fixedPrices,
-    slug:             (document.getElementById('pf-name') as HTMLInputElement).value.trim()
-                        .toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + currentUserId.slice(0,6),
+    city_slug:        citySlug,
+    slug:             displayName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') + '-' + email.replace(/[^a-z0-9]/gi, '').slice(0, 6),
   };
 
   try {
-    // Upsert by user_id
-    const res = await fetch(`${SUPA_URL}/rest/v1/master_public_profiles?user_id=eq.${currentUserId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPA_KEY,
-        'Authorization': `Bearer ${currentToken}`,
-        'Prefer': 'return=minimal',
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (res.ok) {
-      status.textContent = '✓ Профиль сохранён! Он виден в каталоге мастеров.';
-      status.className = 'profile-status success';
-      // Reload to get slug
-      loadProfileData();
-    } else {
-      // Try insert
-      const res2 = await fetch(`${SUPA_URL}/rest/v1/master_public_profiles`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPA_KEY,
-          'Authorization': `Bearer ${currentToken}`,
-          'Prefer': 'return=minimal',
-        },
-        body: JSON.stringify(payload),
-      });
-      if (res2.ok || res2.status === 201) {
-        status.textContent = '✓ Профиль создан! Он виден в каталоге мастеров.';
-        status.className = 'profile-status success';
-        loadProfileData();
-      } else {
-        const errText = await res2.text();
-        status.textContent = 'Ошибка: ' + errText.slice(0, 150);
-        status.className = 'profile-status error';
-      }
-    }
+    const key = 'master_profile_' + email;
+    localStorage.setItem(key, JSON.stringify(payload));
+    status.textContent = '✓ Профиль сохранён!';
+    status.className = 'profile-status success';
+    loadProfileData();
   } catch(err) {
-    status.textContent = 'Ошибка сети. Проверьте подключение.';
+    status.textContent = 'Ошибка сохранения.';
     status.className = 'profile-status error';
   }
 

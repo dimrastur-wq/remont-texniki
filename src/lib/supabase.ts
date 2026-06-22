@@ -1,12 +1,15 @@
-import { createClient } from '@supabase/supabase-js';
+// Типы перенесены в src/data/masters.ts
+// Этот файл оставлен для обратной совместимости импортов
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+export type {
+  MasterPublicProfile,
+  MasterReview,
+  SubscriptionStatus,
+} from '../data/masters';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+export { SERVICE_LABELS } from '../data/masters';
 
-export type SubscriptionStatus = 'free' | 'active' | 'expired';
-
+// Заглушка — больше не используется
 export interface MasterProfile {
   id: string;
   user_id: string;
@@ -36,8 +39,6 @@ export interface MasterOrder {
   updated_at: string;
 }
 
-// ── Aggregator platform types ──
-
 export interface City {
   id: number;
   slug: string;
@@ -45,49 +46,9 @@ export interface City {
   name_gen: string;
   name_prep: string;
   region: string;
-  region_slug: string;
   lat: number | null;
   lng: number | null;
-  population: number | null;
   active: boolean;
-}
-
-export interface MasterPublicProfile {
-  id: string;
-  slug: string;
-  display_name: string;
-  avatar_url: string | null;
-  bio: string | null;
-  experience_years: number;
-  city_id: number | null;
-  service_cities: number[];
-  service_types: string[];
-  fixed_prices: Record<string, number>;
-  phone: string | null;
-  telegram: string | null;
-  is_online: boolean;
-  is_verified: boolean;
-  is_active: boolean;
-  rating: number;
-  reviews_count: number;
-  orders_count: number;
-  subscription_status: string;
-  created_at: string;
-  // joined
-  city?: City;
-}
-
-export interface MasterReview {
-  id: string;
-  master_id: string;
-  author_name: string;
-  author_city: string | null;
-  rating: number;
-  appliance: string | null;
-  text: string;
-  reply: string | null;
-  is_approved: boolean;
-  created_at: string;
 }
 
 export interface ClientRequest {
@@ -95,22 +56,10 @@ export interface ClientRequest {
   master_id: string | null;
   client_name: string;
   client_phone: string;
-  city_id: number | null;
   service_slug: string;
-  appliance: string | null;
-  brand: string | null;
   problem: string | null;
-  status: string;
   source: string;
   created_at: string;
 }
 
-// Service label map
-export const SERVICE_LABELS: Record<string, string> = {
-  'remont-holodilnikov':      'Холодильники',
-  'remont-stiralnykh-mashin': 'Стиральные машины',
-  'remont-elektropliit':      'Электроплиты',
-  'remont-mikrovolnovok':     'Микроволновки',
-  'remont-pylesesov':         'Пылесосы',
-  'remont-kofemashiny':       'Кофемашины',
-};
+import type { SubscriptionStatus } from '../data/masters';

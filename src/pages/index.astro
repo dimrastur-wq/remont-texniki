@@ -1208,11 +1208,10 @@ const serviceKeys = Object.keys(SERVICES);
     contactSubmit.innerHTML = 'Отправка...';
 
     try {
-      const response = await fetch('https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram', {
+      const response = await fetch('/api/send-telegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E',
         },
         body: JSON.stringify({ name, phone, city, problem, type: 'request' }),
       });

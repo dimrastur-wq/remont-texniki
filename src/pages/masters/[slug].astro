@@ -1,44 +1,28 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import FloatingButton from '../../components/FloatingButton.astro';
-import { supabase, SERVICE_LABELS } from '../../lib/supabase';
-import type { MasterPublicProfile, MasterReview } from '../../../lib/supabase';
+import { MASTERS, SERVICE_LABELS, getMasterBySlug, getReviewsForMaster } from '../../data/masters';
+import type { MasterPublicProfile, MasterReview } from '../../data/masters';
+
+export async function getStaticPaths() {
+  return MASTERS.filter(m => m.is_active).map(m => ({ params: { slug: m.slug } }));
+}
 
 const { slug } = Astro.params;
+const master = getMasterBySlug(slug!) as MasterPublicProfile;
+if (!master) return Astro.redirect('/masters/', 302);
 
-// Загружаем мастера
-const { data: masterRaw } = await supabase
-  .from('master_public_profiles')
-  .select('*, city:cities(*)')
-  .eq('slug', slug)
-  .eq('is_active', true)
-  .maybeSingle();
+const reviews = getReviewsForMaster(master.id);
+const showCallForm = Astro.url.searchParams.get('call') === '1';
 
-if (!masterRaw) return Astro.redirect('/masters/', 302);
-
-const master = masterRaw as MasterPublicProfile;
-const city = (master as any).city;
-
-// Загружаем одобренные отзывы
-const { data: reviews } = await supabase
-  .from('master_reviews')
-  .select('*')
-  .eq('master_id', master.id)
-  .eq('is_approved', true)
-  .order('created_at', { ascending: false })
-  .limit(20);
-
-// Проверяем параметр ?call=1 для открытия формы
-const showCallForm = new URL(Astro.request.url).searchParams.get('call') === '1';
-
-const title = `${master.display_name} — мастер по ремонту техники в ${city?.name_prep || 'вашем городе'} | Центр восстановления`;
+const title = `${master.display_name} — мастер по ремонту техники в ${master.city_name_prep} | Центр восстановления`;
 const description = master.bio
   ? `${master.bio.slice(0, 155)}…`
-  : `Мастер ${master.display_name}, рейтинг ${master.rating}, ${master.reviews_count} отзывов. Ремонт бытовой техники в ${city?.name_prep || 'Миассе'}.`;
+  : `Мастер ${master.display_name}, рейтинг ${master.rating}, ${master.reviews_count} отзывов. Ремонт бытовой техники в ${master.city_name_prep}.`;
 
 const schema = JSON.stringify({
   '@context': 'https://schema.org',
@@ -46,7 +30,7 @@ const schema = JSON.stringify({
   name: master.display_name,
   description: master.bio,
   jobTitle: 'Мастер по ремонту бытовой техники',
-  address: { '@type': 'PostalAddress', addressLocality: city?.name, addressCountry: 'RU' },
+  address: { '@type': 'PostalAddress', addressLocality: master.city_name, addressCountry: 'RU' },
   aggregateRating: master.reviews_count > 0 ? {
     '@type': 'AggregateRating',
     ratingValue: master.rating,
@@ -106,14 +90,11 @@ const schema = JSON.stringify({
                 </div>
 
                 <div class="profile-tags">
-                  {city && (
-                    <span class="tag tag-city">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {city.name}
-                    </span>
-                  )}
-                  <span class="tag tag-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</span>
-                  <span class="tag tag-orders">{master.orders_count} ремонтов</span>
+                  <span class="tag tag-city">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {master.city_name}
+                  </span>
+                  <span class="tag tag-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</span>                  <span class="tag tag-orders">{master.orders_count} ремонтов</span>
                 </div>
 
                 <div class="rating-row">
@@ -159,8 +140,8 @@ const schema = JSON.stringify({
 
             <!-- Reviews -->
             <div class="reviews-section">
-              <h2 class="section-h">Отзывы клиентов ({(reviews || []).length})</h2>
-              {(reviews || []).length === 0 ? (
+              <h2 class="section-h">Отзывы клиентов ({reviews.length})</h2>
+              {reviews.length === 0 ? (
                 <p class="no-reviews">Отзывов пока нет. Будьте первым!</p>
               ) : (
                 <div class="reviews-list">
@@ -319,7 +300,7 @@ const schema = JSON.stringify({
   <SiteFooter />
 </Layout>
 
-<script define:vars={{ showCallForm, supabaseUrl: import.meta.env.VITE_SUPABASE_URL, supabaseKey: import.meta.env.VITE_SUPABASE_ANON_KEY }}>
+<script define:vars={{ showCallForm }}>
   // ── Auto-open call form ──
   if (showCallForm) {
     document.getElementById('call-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -406,28 +387,28 @@ const schema = JSON.stringify({
     btn.textContent = 'Отправляем...';
 
     try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/client_requests`, {
+      const res = await fetch('/api/send-telegram', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Prefer': 'return=minimal',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          form: 'master_call',
+          name: data.client_name,
+          phone: data.client_phone,
+          service: data.service_slug,
+          problem: data.problem || '',
           master_id: data.master_id,
-          client_name: data.client_name,
-          client_phone: data.client_phone,
-          service_slug: data.service_slug,
-          problem: data.problem,
-          source: 'master_profile',
+          website: data.website,
+          form_loaded_at: data.form_loaded_at,
         }),
       });
-
-      if (res.ok || res.status === 201) {
+      const json = await res.json();
+      if (res.ok && json.success) {
         statusEl.textContent = 'Заявка отправлена! Мастер свяжется с вами в течение часа.';
         statusEl.className = 'call-status success';
         form.reset();
+      } else if (res.status === 429) {
+        statusEl.textContent = json.message || 'Слишком много заявок. Пожалуйста, подождите.';
+        statusEl.className = 'call-status error';
       } else {
         throw new Error('HTTP ' + res.status);
       }
@@ -461,26 +442,23 @@ const schema = JSON.stringify({
     btn.textContent = 'Отправляем...';
 
     try {
-      const res = await fetch(`${supabaseUrl}/rest/v1/master_reviews`, {
+      const res = await fetch('/api/send-telegram', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-          'Prefer': 'return=minimal',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          master_id: data.master_id,
-          author_name: data.author_name,
-          author_city: data.author_city || null,
-          appliance: data.appliance || null,
-          rating: parseInt(data.rating) || 5,
+          form: 'master_review',
+          name: data.author_name,
+          city: data.author_city || '',
+          appliance: data.appliance || '',
+          rating: data.rating,
           text: data.text,
-          is_approved: false,
+          master_id: data.master_id,
+          website: data.website,
+          form_loaded_at: data.form_loaded_at,
         }),
       });
-
-      if (res.ok || res.status === 201) {
+      const json = await res.json();
+      if (res.ok && json.success) {
         statusEl.textContent = 'Спасибо! Отзыв отправлен на проверку и появится в течение суток.';
         statusEl.className = 'review-status success';
         form.reset();

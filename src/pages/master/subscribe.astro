@@ -628,53 +628,38 @@ import { SITE } from '../../data/services';
 </style>
 
 <script>
-  import { createClient } from '@supabase/supabase-js';
-
-  const supabase = createClient(
-    import.meta.env.VITE_SUPABASE_URL,
-    import.meta.env.VITE_SUPABASE_ANON_KEY
-  );
-
   const loadingScreen = document.getElementById('auth-loading') as HTMLElement;
   const page = document.getElementById('subscribe-page') as HTMLElement;
 
   // ── Auth guard ────────────────────────────────────────────────
-  (async () => {
-    const { data: { session } } = await supabase.auth.getSession();
+  (() => {
+    const token = localStorage.getItem('master_token');
+    const email = localStorage.getItem('master_email');
 
-    if (!session) {
+    if (!token || !email) {
       window.location.href = '/master/login/?next=/master/subscribe/';
       return;
     }
 
-    // Check if already subscribed
-    const { data: profile } = await supabase
-      .from('master_profiles')
-      .select('subscription_status, subscription_expires_at, name')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
-
-    const isActive = profile?.subscription_status === 'active' &&
-      profile?.subscription_expires_at &&
-      new Date(profile.subscription_expires_at) > new Date();
-
+    const isActive = localStorage.getItem('master_premium') === '1';
     if (isActive) {
       window.location.href = '/instrumenty/';
       return;
     }
 
-    // Show page
     loadingScreen.style.display = 'none';
     page.style.opacity = '1';
 
-    // Set user email
     const emailEl = document.getElementById('sub-user-email') as HTMLElement;
-    if (emailEl) emailEl.textContent = session.user.email || '';
+    if (emailEl) emailEl.textContent = email;
   })();
 
   // ── Logout ────────────────────────────────────────────────────
-  document.getElementById('sub-logout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
+  document.getElementById('sub-logout')?.addEventListener('click', () => {
+    localStorage.removeItem('master_token');
+    localStorage.removeItem('master_email');
+    localStorage.removeItem('master_name');
+    localStorage.removeItem('master_premium');
     window.location.href = '/master/login/';
   });
 

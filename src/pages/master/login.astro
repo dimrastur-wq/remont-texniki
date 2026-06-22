@@ -188,11 +188,8 @@ import SiteFooter from '../../components/SiteFooter.astro';
 </style>
 
 <script>
-  const SB_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co';
-  const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
-
   // Redirect if already logged in
-  if (localStorage.getItem('sb_token')) {
+  if (localStorage.getItem('master_token')) {
     window.location.href = '/master/';
   }
 
@@ -218,22 +215,6 @@ import SiteFooter from '../../components/SiteFooter.astro';
     return Date.now() - parseInt(ts.value, 10) >= 1800;
   }
 
-  async function sbAuth(path: string, body: object) {
-    const res = await fetch(`${SB_URL}${path}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'apikey': SB_ANON },
-      body: JSON.stringify(body),
-    });
-    return { ok: res.ok, data: await res.json() };
-  }
-
-  function saveSession(data: { access_token: string; refresh_token: string; user: { id: string; email: string } }) {
-    localStorage.setItem('sb_token', data.access_token);
-    localStorage.setItem('sb_refresh', data.refresh_token || '');
-    localStorage.setItem('sb_uid', data.user.id);
-    localStorage.setItem('sb_email', data.user.email);
-  }
-
   function showMsg(text: string, type: 'error' | 'success' | 'info') {
     const el = document.getElementById('msg') as HTMLElement;
     el.textContent = text;
@@ -249,7 +230,6 @@ import SiteFooter from '../../components/SiteFooter.astro';
       (document.getElementById('login-form') as HTMLElement).hidden = tab !== 'login';
       (document.getElementById('register-form') as HTMLElement).hidden = tab !== 'register';
       (document.getElementById('msg') as HTMLElement).hidden = true;
-      // Reset timestamp on tab switch
       const ts = tab === 'login' ? loginTs : registerTs;
       if (ts) ts.value = String(Date.now());
     });
@@ -263,43 +243,63 @@ import SiteFooter from '../../components/SiteFooter.astro';
     });
   });
 
+  function getAccounts(): Record<string, { name: string; passwordHash: string }> {
+    try {
+      return JSON.parse(localStorage.getItem('master_accounts') || '{}');
+    } catch { return {}; }
+  }
+
+  async function hashPassword(password: string): Promise<string> {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  function saveSession(email: string, name: string) {
+    const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
+    localStorage.setItem('master_token', token);
+    localStorage.setItem('master_email', email);
+    localStorage.setItem('master_name', name);
+  }
+
   // Login
   document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const btn = document.getElementById('login-btn') as HTMLButtonElement;
-    const email = (document.getElementById('l-email') as HTMLInputElement).value.trim();
+    const email = (document.getElementById('l-email') as HTMLInputElement).value.trim().toLowerCase();
     const password = (document.getElementById('l-pass') as HTMLInputElement).value;
 
-    // Bot check (silent pass)
     if (!isHoneypotClean(form) || !isTimingOk(form)) {
       showMsg('Вход выполнен! Перенаправляем...', 'success');
       return;
     }
 
-    if (!validateEmail(email)) {
-      showMsg('Введите корректный email', 'error');
-      return;
-    }
-    if (password.length < 6) {
-      showMsg('Пароль слишком короткий', 'error');
-      return;
-    }
+    if (!validateEmail(email)) { showMsg('Введите корректный email', 'error'); return; }
+    if (password.length < 6) { showMsg('Пароль слишком короткий', 'error'); return; }
 
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Входим...';
 
-    const { ok, data } = await sbAuth('/auth/v1/token?grant_type=password', { email, password });
-
-    if (ok && data.access_token) {
-      saveSession(data);
-      showMsg('Вход выполнен! Перенаправляем...', 'success');
-      setTimeout(() => { window.location.href = '/master/'; }, 800);
-    } else {
-      showMsg(data.error_description || data.message || 'Неверный email или пароль', 'error');
+    const accounts = getAccounts();
+    const account = accounts[email];
+    if (!account) {
+      showMsg('Неверный email или пароль', 'error');
       btn.disabled = false;
       btn.querySelector('span')!.textContent = 'Войти в кабинет';
+      return;
     }
+
+    const hash = await hashPassword(password);
+    if (hash !== account.passwordHash) {
+      showMsg('Неверный email или пароль', 'error');
+      btn.disabled = false;
+      btn.querySelector('span')!.textContent = 'Войти в кабинет';
+      return;
+    }
+
+    saveSession(email, account.name);
+    showMsg('Вход выполнен! Перенаправляем...', 'success');
+    setTimeout(() => { window.location.href = '/master/'; }, 800);
   });
 
   // Register
@@ -308,51 +308,35 @@ import SiteFooter from '../../components/SiteFooter.astro';
     const form = e.target as HTMLFormElement;
     const btn = document.getElementById('register-btn') as HTMLButtonElement;
     const name = (document.getElementById('r-name') as HTMLInputElement).value.trim();
-    const email = (document.getElementById('r-email') as HTMLInputElement).value.trim();
+    const email = (document.getElementById('r-email') as HTMLInputElement).value.trim().toLowerCase();
     const password = (document.getElementById('r-pass') as HTMLInputElement).value;
 
-    // Bot check (silent pass)
     if (!isHoneypotClean(form) || !isTimingOk(form)) {
-      showMsg('Аккаунт создан! Проверьте почту для подтверждения, затем войдите.', 'info');
+      showMsg('Аккаунт создан! Войдите, используя свои данные.', 'info');
       return;
     }
 
-    if (name.length < 2) {
-      showMsg('Введите имя (не менее 2 символов)', 'error');
-      return;
-    }
-    if (!validateEmail(email)) {
-      showMsg('Введите корректный email', 'error');
-      return;
-    }
-    if (password.length < 6) {
-      showMsg('Пароль должен быть не менее 6 символов', 'error');
-      return;
-    }
+    if (name.length < 2) { showMsg('Введите имя (не менее 2 символов)', 'error'); return; }
+    if (!validateEmail(email)) { showMsg('Введите корректный email', 'error'); return; }
+    if (password.length < 6) { showMsg('Пароль должен быть не менее 6 символов', 'error'); return; }
 
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Создаём аккаунт...';
 
-    const { ok, data } = await sbAuth('/auth/v1/signup', {
-      email, password, data: { full_name: name },
-    });
-
-    if (ok) {
-      if (data.access_token) {
-        saveSession(data);
-        showMsg('Аккаунт создан! Перенаправляем...', 'success');
-        setTimeout(() => { window.location.href = '/master/'; }, 800);
-      } else {
-        showMsg('Аккаунт создан! Проверьте почту для подтверждения, затем войдите.', 'info');
-        btn.disabled = false;
-        btn.querySelector('span')!.textContent = 'Создать аккаунт';
-      }
-    } else {
-      const msg = data.msg || data.message || data.error_description || 'Ошибка регистрации';
-      const ruMsg = msg.includes('already registered') ? 'Этот email уже зарегистрирован' : msg;
-      showMsg(ruMsg, 'error');
+    const accounts = getAccounts();
+    if (accounts[email]) {
+      showMsg('Этот email уже зарегистрирован', 'error');
       btn.disabled = false;
       btn.querySelector('span')!.textContent = 'Создать аккаунт';
+      return;
     }
+
+    const passwordHash = await hashPassword(password);
+    accounts[email] = { name, passwordHash };
+    localStorage.setItem('master_accounts', JSON.stringify(accounts));
+
+    saveSession(email, name);
+    showMsg('Аккаунт создан! Перенаправляем...', 'success');
+    setTimeout(() => { window.location.href = '/master/'; }, 800);
   });
 </script>

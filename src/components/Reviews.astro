@@ -253,8 +253,6 @@ const reviewsSchema = JSON.stringify({
 </style>
 
 <script>
-  const SUPABASE_URL = 'https://ujoxaraxvppnxulxjfwg.supabase.co/functions/v1/send-telegram';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVqb3hhcmF4dnBwbnh1bHhqZndnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzc3MDQ1OTMsImV4cCI6MjA5MzI4MDU5M30.UVegLPhJINlt9fm2drUkmnAJoT7mSlMgH5YVHgxfW7E';
   const FORMSUBMIT_URL = 'https://formsubmit.co/ajax/dimrastur@gmail.com';
 
   const form = document.getElementById('review-form') as HTMLFormElement;
@@ -272,9 +270,9 @@ const reviewsSchema = JSON.stringify({
 
     try {
       const [telegramRes, emailRes] = await Promise.allSettled([
-        fetch(SUPABASE_URL, {
+        fetch('/api/send-telegram', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, city, text, type: 'review' }),
         }),
         fetch(FORMSUBMIT_URL, {

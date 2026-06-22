@@ -1,48 +1,21 @@
 ---
-export const prerender = false;
+export const prerender = true;
 
 import Layout from '../../layouts/Layout.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
 import SiteFooter from '../../components/SiteFooter.astro';
 import FloatingButton from '../../components/FloatingButton.astro';
-import { supabase, SERVICE_LABELS } from '../../lib/supabase';
-import type { MasterPublicProfile, City } from '../../lib/supabase';
+import { MASTERS, SERVICE_LABELS } from '../../data/masters';
 
-// Фильтр из query string
-const url = new URL(Astro.request.url);
-const cityFilter = url.searchParams.get('city') || 'all';
-const serviceFilter = url.searchParams.get('service') || 'all';
-const onlineFilter = url.searchParams.get('online') === '1';
+const allMasters = MASTERS.filter(m => m.is_active).sort((a, b) => b.rating - a.rating);
+const totalMasters = allMasters.length;
+const onlineMasters = allMasters.filter(m => m.is_online).length;
 
-// Загружаем активные города
-const { data: cities } = await supabase
-  .from('cities')
-  .select('*')
-  .eq('active', true)
-  .order('name');
-
-// Загружаем мастеров с джойном города
-let query = supabase
-  .from('master_public_profiles')
-  .select('*, city:cities(id,slug,name,name_prep,lat,lng)')
-  .eq('is_active', true)
-  .order('rating', { ascending: false });
-
-if (cityFilter !== 'all') {
-  const city = (cities || []).find(c => c.slug === cityFilter);
-  if (city) query = query.eq('city_id', city.id);
-}
-if (onlineFilter) query = query.eq('is_online', true);
-
-const { data: mastersRaw } = await query;
-let masters: MasterPublicProfile[] = (mastersRaw || []) as MasterPublicProfile[];
-
-if (serviceFilter !== 'all') {
-  masters = masters.filter(m => m.service_types.includes(serviceFilter));
-}
-
-const totalMasters = masters.length;
-const onlineMasters = masters.filter(m => m.is_online).length;
+const cities = [
+  { slug: 'miass', name: 'Миасс' },
+  { slug: 'zlatoust', name: 'Златоуст' },
+  { slug: 'chebarkul', name: 'Чебаркуль' },
+];
 ---
 
 <Layout
@@ -86,129 +59,130 @@ const onlineMasters = masters.filter(m => m.is_online).length;
     <!-- Filters + Catalog -->
     <section class="catalog-section">
       <div class="container">
-        <form class="filters-bar" method="get" action="/masters/">
+        <div class="filters-bar">
           <div class="filter-group">
             <label>Город</label>
-            <select name="city">
-              <option value="all" selected={cityFilter === 'all'}>Все города</option>
-              {(cities || []).map(c => (
-                <option value={c.slug} selected={cityFilter === c.slug}>{c.name}</option>
+            <select id="filter-city">
+              <option value="all">Все города</option>
+              {cities.map(c => (
+                <option value={c.slug}>{c.name}</option>
               ))}
             </select>
           </div>
 
           <div class="filter-group">
             <label>Техника</label>
-            <select name="service">
-              <option value="all" selected={serviceFilter === 'all'}>Все виды</option>
+            <select id="filter-service">
+              <option value="all">Все виды</option>
               {Object.entries(SERVICE_LABELS).map(([slug, label]) => (
-                <option value={slug} selected={serviceFilter === slug}>{label}</option>
+                <option value={slug}>{label}</option>
               ))}
             </select>
           </div>
 
           <div class="filter-online">
             <label class="check-label">
-              <input type="checkbox" name="online" value="1" checked={onlineFilter}>
+              <input type="checkbox" id="filter-online">
               <span class="check-box"></span>
               Только онлайн
             </label>
           </div>
 
-          <button type="submit" class="btn-filter">Найти</button>
-        </form>
+          <button type="button" id="btn-filter" class="btn-filter">Найти</button>
+        </div>
 
         <div class="results-header">
-          <span class="results-count">
-            Найдено: <strong>{totalMasters} мастеров</strong>
-            {cityFilter !== 'all' && <span> · {(cities||[]).find(c=>c.slug===cityFilter)?.name}</span>}
+          <span class="results-count" id="results-count">
+            Найдено: <strong id="results-num">{totalMasters} мастеров</strong>
           </span>
           <a href="/master/" class="btn-register-master">+ Зарегистрировать мастера</a>
         </div>
 
-        {masters.length === 0 ? (
-          <div class="empty-state">
-            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <h3>Мастера не найдены</h3>
-            <p>Попробуйте изменить фильтры или выбрать другой город</p>
-            <a href="/masters/" class="btn-reset">Сбросить фильтры</a>
-          </div>
-        ) : (
-          <div class="masters-grid">
-            {masters.map(master => (
-              <div class="master-card">
-                <div class="card-head">
-                  <div class="avatar-wrap">
-                    {master.avatar_url ? (
-                      <img src={master.avatar_url} alt={master.display_name} class="avatar" />
-                    ) : (
-                      <div class="avatar-placeholder">
-                        {master.display_name.charAt(0)}
-                      </div>
+        <div id="masters-grid" class="masters-grid">
+          {allMasters.map(master => (
+            <div
+              class="master-card"
+              data-city={master.city_slug}
+              data-services={master.service_types.join(',')}
+              data-online={master.is_online ? '1' : '0'}
+            >
+              <div class="card-head">
+                <div class="avatar-wrap">
+                  {master.avatar_url ? (
+                    <img src={master.avatar_url} alt={master.display_name} class="avatar" />
+                  ) : (
+                    <div class="avatar-placeholder">
+                      {master.display_name.charAt(0)}
+                    </div>
+                  )}
+                  <span class={`status-dot ${master.is_online ? 'online' : 'offline'}`} title={master.is_online ? 'Онлайн' : 'Оффлайн'}></span>
+                </div>
+
+                <div class="master-meta">
+                  <div class="master-name-row">
+                    <h2 class="master-name">{master.display_name}</h2>
+                    {master.is_verified && (
+                      <span class="verified-badge" title="Проверенный мастер">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      </span>
                     )}
-                    <span class={`status-dot ${master.is_online ? 'online' : 'offline'}`} title={master.is_online ? 'Онлайн' : 'Оффлайн'}></span>
                   </div>
-
-                  <div class="master-meta">
-                    <div class="master-name-row">
-                      <h2 class="master-name">{master.display_name}</h2>
-                      {master.is_verified && (
-                        <span class="verified-badge" title="Проверенный мастер">
-                          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        </span>
-                      )}
-                    </div>
-                    <div class="master-city">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                      {(master.city as any)?.name || 'Не указан'}
-                    </div>
-                    <div class="master-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</div>
+                  <div class="master-city">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    {master.city_name}
                   </div>
-
-                  <div class="rating-block">
-                    <div class="rating-num">{Number(master.rating).toFixed(1)}</div>
-                    <div class="rating-stars">
-                      {[1,2,3,4,5].map(i => (
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill={i <= Math.round(master.rating) ? '#f59e0b' : 'none'} stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      ))}
-                    </div>
-                    <div class="rating-count">{master.reviews_count} отз.</div>
-                  </div>
+                  <div class="master-exp">{master.experience_years} {master.experience_years === 1 ? 'год' : master.experience_years < 5 ? 'года' : 'лет'} опыта</div>
                 </div>
 
-                {master.bio && (
-                  <p class="master-bio">{master.bio.length > 120 ? master.bio.slice(0, 120) + '…' : master.bio}</p>
-                )}
-
-                <div class="service-chips">
-                  {master.service_types.slice(0, 4).map(s => (
-                    <span class="chip">{SERVICE_LABELS[s] || s}</span>
-                  ))}
-                  {master.service_types.length > 4 && <span class="chip chip-more">+{master.service_types.length - 4}</span>}
-                </div>
-
-                {Object.keys(master.fixed_prices || {}).length > 0 && (
-                  <div class="prices-preview">
-                    {Object.entries(master.fixed_prices).slice(0, 2).map(([svc, price]) => (
-                      <div class="price-row">
-                        <span>{SERVICE_LABELS[svc] || svc}</span>
-                        <span class="price-val">от {(price as number).toLocaleString('ru-RU')} ₽</span>
-                      </div>
+                <div class="rating-block">
+                  <div class="rating-num">{Number(master.rating).toFixed(1)}</div>
+                  <div class="rating-stars">
+                    {[1,2,3,4,5].map(i => (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill={i <= Math.round(master.rating) ? '#f59e0b' : 'none'} stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
                     ))}
                   </div>
-                )}
-
-                <div class="card-actions">
-                  <a href={`/masters/${master.slug}/`} class="btn-profile">Профиль и отзывы</a>
-                  <a href={`/masters/${master.slug}/?call=1`} class="btn-call">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                    Вызвать мастера
-                  </a>
+                  <div class="rating-count">{master.reviews_count} отз.</div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+
+              {master.bio && (
+                <p class="master-bio">{master.bio.length > 120 ? master.bio.slice(0, 120) + '…' : master.bio}</p>
+              )}
+
+              <div class="service-chips">
+                {master.service_types.slice(0, 4).map(s => (
+                  <span class="chip">{SERVICE_LABELS[s] || s}</span>
+                ))}
+                {master.service_types.length > 4 && <span class="chip chip-more">+{master.service_types.length - 4}</span>}
+              </div>
+
+              {Object.keys(master.fixed_prices || {}).length > 0 && (
+                <div class="prices-preview">
+                  {Object.entries(master.fixed_prices).slice(0, 2).map(([svc, price]) => (
+                    <div class="price-row">
+                      <span>{SERVICE_LABELS[svc] || svc}</span>
+                      <span class="price-val">от {(price as number).toLocaleString('ru-RU')} ₽</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div class="card-actions">
+                <a href={`/masters/${master.slug}/`} class="btn-profile">Профиль и отзывы</a>
+                <a href={`/masters/${master.slug}/?call=1`} class="btn-call">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                  Вызвать мастера
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div id="empty-state" class="empty-state" style="display:none">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <h3>Мастера не найдены</h3>
+          <p>Попробуйте изменить фильтры или выбрать другой город</p>
+          <button onclick="document.getElementById('btn-filter').click(); document.getElementById('filter-city').value='all'; document.getElementById('filter-service').value='all'; document.getElementById('filter-online').checked=false; applyFilters();" class="btn-reset">Сбросить фильтры</button>
+        </div>
       </div>
     </section>
 
@@ -218,12 +192,12 @@ const onlineMasters = masters.filter(m => m.is_online).length;
         <h2 class="section-title">Карта мастеров</h2>
         <p class="section-sub">Подключение Яндекс Карт API запланировано. Мастера будут отображаться в реальном времени.</p>
         <div class="map-placeholder">
-          <div class="map-inner">
-            {masters.filter(m => (m.city as any)?.lat).map(master => (
+          <div class="map-inner" id="map-inner">
+            {allMasters.map((master, i) => (
               <div
                 class={`map-pin ${master.is_online ? 'online' : 'offline'}`}
-                title={`${master.display_name} · ${(master.city as any)?.name}`}
-                style={`left:${30 + Math.random() * 50}%;top:${20 + Math.random() * 50}%`}
+                title={`${master.display_name} · ${master.city_name}`}
+                style={`left:${20 + (i % 3) * 25}%;top:${25 + Math.floor(i / 3) * 35}%`}
               >
                 <div class="pin-bubble">
                   <span>{Number(master.rating).toFixed(1)}</span>
@@ -686,3 +660,37 @@ const onlineMasters = masters.filter(m => m.is_online).length;
     .map-placeholder { height: 220px; }
   }
 </style>
+
+<script>
+  function applyFilters() {
+    const city = (document.getElementById('filter-city') as HTMLSelectElement).value;
+    const service = (document.getElementById('filter-service') as HTMLSelectElement).value;
+    const onlineOnly = (document.getElementById('filter-online') as HTMLInputElement).checked;
+
+    const cards = document.querySelectorAll<HTMLElement>('.master-card');
+    let visible = 0;
+    cards.forEach(card => {
+      const matchCity = city === 'all' || card.dataset.city === city;
+      const matchService = service === 'all' || (card.dataset.services || '').split(',').includes(service);
+      const matchOnline = !onlineOnly || card.dataset.online === '1';
+      const show = matchCity && matchService && matchOnline;
+      card.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    const numEl = document.getElementById('results-num');
+    if (numEl) numEl.textContent = `${visible} мастеров`;
+
+    const emptyEl = document.getElementById('empty-state');
+    const gridEl = document.getElementById('masters-grid');
+    if (emptyEl && gridEl) {
+      emptyEl.style.display = visible === 0 ? 'block' : 'none';
+      gridEl.style.display = visible === 0 ? 'none' : '';
+    }
+  }
+
+  document.getElementById('btn-filter')?.addEventListener('click', applyFilters);
+  document.getElementById('filter-city')?.addEventListener('change', applyFilters);
+  document.getElementById('filter-service')?.addEventListener('change', applyFilters);
+  document.getElementById('filter-online')?.addEventListener('change', applyFilters);
+</script>
