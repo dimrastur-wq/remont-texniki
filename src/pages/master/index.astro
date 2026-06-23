@@ -1494,6 +1494,9 @@ const SERVICE_APPS_LIST = JSON.parse(serviceAppsJSON);
 
 const $ = id => document.getElementById(id);
 
+// Run auth check immediately so loading overlay is handled even if later code throws
+checkAuth();
+
 // ── AUTH ────────────────────────────────────────────────────────────────────
 async function checkAuth() {
   const token = localStorage.getItem('master_token');
@@ -1531,11 +1534,11 @@ function logout() {
   localStorage.removeItem('master_premium');
   window.location.href = '/master/login/';
 }
-$('logout-btn').addEventListener('click', logout);
-$('logout-paywall-btn').addEventListener('click', logout);
+$('logout-btn')?.addEventListener('click', logout);
+$('logout-paywall-btn')?.addEventListener('click', logout);
 
 // ── PAYMENT MOCK ─────────────────────────────────────────────────────────────
-$('pay-btn').addEventListener('click', async () => {
+$('pay-btn')?.addEventListener('click', async () => {
   const btn = $('pay-btn');
   const txt = $('pay-btn-text');
   const spin = $('pay-btn-spinner');
@@ -1565,7 +1568,7 @@ document.querySelectorAll('.dash-tab').forEach(tab => {
 });
 
 // ── COLLAPSIBLE ADD ORDER ────────────────────────────────────────────────────
-$('toggle-add-order').addEventListener('click', () => {
+$('toggle-add-order')?.addEventListener('click', () => {
   const wrap = $('add-order-form-wrap');
   const header = $('toggle-add-order');
   wrap.classList.toggle('hidden');
@@ -1694,11 +1697,11 @@ function renderBreakdown(mo) {
 }
 
 // Month navigation
-$('month-prev').addEventListener('click', () => {
+$('month-prev')?.addEventListener('click', () => {
   viewMonth--; if (viewMonth < 0) { viewMonth = 11; viewYear--; }
   renderAnalytics(allOrders);
 });
-$('month-next').addEventListener('click', () => {
+$('month-next')?.addEventListener('click', () => {
   const now = new Date();
   if (viewYear < now.getFullYear() || (viewYear === now.getFullYear() && viewMonth < now.getMonth())) {
     viewMonth++; if (viewMonth > 11) { viewMonth = 0; viewYear++; }
@@ -1783,12 +1786,12 @@ document.querySelectorAll('#status-filter-btns .filter-btn').forEach(btn => {
   });
 });
 
-$('order-search').addEventListener('input', e => {
+$('order-search')?.addEventListener('input', e => {
   orderSearchQ = e.target.value;
   renderOrders();
 });
 
-$('add-order-form').addEventListener('submit', async e => {
+$('add-order-form')?.addEventListener('submit', async e => {
   e.preventDefault();
   const form = e.target;
   const submitBtn = $('add-order-submit');
@@ -1893,8 +1896,8 @@ function renderParts() {
 
   // Spec search
   const searchInput = $('parts-spec-search');
-  searchInput.addEventListener('input', () => { calcQ = searchInput.value; filterCalcParts(); });
-  $('spec-clear-btn').addEventListener('click', () => { searchInput.value = ''; calcQ = ''; filterCalcParts(); });
+  searchInput?.addEventListener('input', () => { calcQ = searchInput.value; filterCalcParts(); });
+  $('spec-clear-btn')?.addEventListener('click', () => { if (searchInput) { searchInput.value = ''; } calcQ = ''; filterCalcParts(); });
 
   // Hints
   document.querySelectorAll('.spec-hint').forEach(hint => {
@@ -1906,7 +1909,7 @@ function renderParts() {
   });
 
   // Sort
-  $('parts-sort').addEventListener('change', e => { calcSort = e.target.value; filterCalcParts(); });
+  $('parts-sort')?.addEventListener('change', e => { calcSort = e.target.value; filterCalcParts(); });
 
   filterCalcParts();
 }
@@ -2009,7 +2012,7 @@ function renderServiceModes() {
   populateServiceFilters();
   filterServiceModes();
   ['service-brand-filter','service-appliance-filter','service-search'].forEach(id => {
-    $(id).addEventListener('input', filterServiceModes);
+    $(id)?.addEventListener('input', filterServiceModes);
   });
 }
 
@@ -2060,9 +2063,6 @@ window.toggleServiceCard = (header) => {
   header.classList.toggle('open');
   header.nextElementSibling.classList.toggle('open');
 };
-
-// ── INIT ─────────────────────────────────────────────────────────────────────
-checkAuth();
 
 // ── PROFILE TAB ──────────────────────────────────────────────────────────────
 
