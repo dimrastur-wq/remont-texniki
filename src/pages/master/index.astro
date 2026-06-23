@@ -1494,24 +1494,45 @@ const SERVICE_APPS_LIST = JSON.parse(serviceAppsJSON);
 
 const $ = id => document.getElementById(id);
 
-// Run auth check immediately so loading overlay is handled even if later code throws
-checkAuth();
+// Safety net: if any JS error occurs, hide spinner and redirect to login
+window.onerror = () => {
+  const ov = document.getElementById('loading-overlay');
+  if (ov && !ov.classList.contains('hidden')) {
+    window.location.href = '/master/login/';
+  }
+};
+
+// Timeout fallback: if overlay still visible after 4s, redirect to login
+setTimeout(() => {
+  const ov = document.getElementById('loading-overlay');
+  if (ov && !ov.classList.contains('hidden')) {
+    window.location.href = '/master/login/';
+  }
+}, 4000);
 
 // ── AUTH ────────────────────────────────────────────────────────────────────
 async function checkAuth() {
-  const token = localStorage.getItem('master_token');
-  const email = localStorage.getItem('master_email');
-  if (!token || !email) { window.location.href = '/master/login/'; return; }
+  try {
+    const token = localStorage.getItem('master_token');
+    const email = localStorage.getItem('master_email');
+    if (!token || !email) { window.location.href = '/master/login/'; return; }
 
-  $('loading-overlay').classList.add('hidden');
+    $('loading-overlay').classList.add('hidden');
 
-  const isPremium = localStorage.getItem('master_premium') === '1';
-  if (!isPremium) {
-    $('paywall-screen').classList.remove('hidden');
-  } else {
-    showDashboard({});
+    const isPremium = localStorage.getItem('master_premium') === '1';
+    if (!isPremium) {
+      $('paywall-screen').classList.remove('hidden');
+    } else {
+      showDashboard({});
+    }
+  } catch (err) {
+    console.error('checkAuth error:', err);
+    window.location.href = '/master/login/';
   }
 }
+
+// Run auth check immediately
+checkAuth();
 
 function showDashboard(profile) {
   $('dashboard-screen').classList.remove('hidden');
