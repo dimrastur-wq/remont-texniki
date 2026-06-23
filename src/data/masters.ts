@@ -49,7 +49,7 @@ export const MASTERS: MasterPublicProfile[] = [
   {
     id: '1',
     slug: 'dmitriy-ivanov',
-    display_name: 'Дмитрий Иванов',
+    display_name: 'Дмитрий Правда',
     avatar_url: '/master-dmitriy.png',
     bio: 'Опытный мастер по ремонту холодильников и стиральных машин. Работаю в Миассе с 2012 года. Выезд в день звонка, гарантия на все работы.',
     experience_years: 12,
@@ -97,7 +97,7 @@ export const MASTERS: MasterPublicProfile[] = [
   {
     id: '3',
     slug: 'sergey-kozlov',
-    display_name: 'Сергей Козлов',
+    display_name: 'Сергей Честный',
     avatar_url: null,
     bio: 'Ремонт кофемашин, пылесосов и мелкой бытовой техники. Принимаю технику в мастерской и с выездом на дом по Чебаркулю.',
     experience_years: 6,
