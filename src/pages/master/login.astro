@@ -269,7 +269,8 @@ import SiteFooter from '../../components/SiteFooter.astro';
     const email = (document.getElementById('l-email') as HTMLInputElement).value.trim().toLowerCase();
     const password = (document.getElementById('l-pass') as HTMLInputElement).value;
 
-    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+    // Silent drop for bots only (honeypot filled) — timing check removed to not block real users
+    if (!isHoneypotClean(form)) {
       showMsg('Вход выполнен! Перенаправляем...', 'success');
       return;
     }
@@ -311,7 +312,7 @@ import SiteFooter from '../../components/SiteFooter.astro';
     const email = (document.getElementById('r-email') as HTMLInputElement).value.trim().toLowerCase();
     const password = (document.getElementById('r-pass') as HTMLInputElement).value;
 
-    if (!isHoneypotClean(form) || !isTimingOk(form)) {
+    if (!isHoneypotClean(form)) {
       showMsg('Аккаунт создан! Войдите, используя свои данные.', 'info');
       return;
     }
