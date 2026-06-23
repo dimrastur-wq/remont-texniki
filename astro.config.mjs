@@ -8,4 +8,9 @@ export default defineConfig({
   trailingSlash: 'always',
   output: 'server',
   adapter: node({ mode: 'middleware' }),
+  vite: {
+    server: {
+      allowedHosts: ['master-tehniki74.ru', 'master-tehniki74.store', 'localhost'],
+    },
+  },
 });
