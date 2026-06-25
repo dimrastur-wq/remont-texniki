@@ -209,6 +209,11 @@ import SiteFooter from '../../components/SiteFooter.astro';
     const hp = form.querySelector<HTMLInputElement>('[name="website"]');
     return !hp || hp.value.trim() === '';
   }
+  function isTimingOk(form: HTMLFormElement): boolean {
+    const ts = form.querySelector<HTMLInputElement>('[name="form_loaded_at"]');
+    if (!ts || !ts.value) return true;
+    return Date.now() - parseInt(ts.value, 10) >= 1800;
+  }
 
   function showMsg(text: string, type: 'error' | 'success' | 'info') {
     const el = document.getElementById('msg') as HTMLElement;
@@ -244,30 +249,27 @@ import SiteFooter from '../../components/SiteFooter.astro';
     } catch { return {}; }
   }
 
-  // Works on both HTTP and HTTPS — no crypto.subtle required
-  function hashPassword(password: string): string {
-    try {
-      return btoa(unescape(encodeURIComponent('v1:' + password)));
-    } catch {
-      return 'plain:' + password;
-    }
+  async function hashPassword(password: string): Promise<string> {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
   function saveSession(email: string, name: string) {
-    const token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    const token = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
     localStorage.setItem('master_token', token);
     localStorage.setItem('master_email', email);
     localStorage.setItem('master_name', name);
   }
 
   // Login
-  document.getElementById('login-form')?.addEventListener('submit', (e) => {
+  document.getElementById('login-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const btn = document.getElementById('login-btn') as HTMLButtonElement;
     const email = (document.getElementById('l-email') as HTMLInputElement).value.trim().toLowerCase();
     const password = (document.getElementById('l-pass') as HTMLInputElement).value;
 
+    // Silent drop for bots only (honeypot filled) — timing check removed to not block real users
     if (!isHoneypotClean(form)) {
       showMsg('Вход выполнен! Перенаправляем...', 'success');
       return;
@@ -279,36 +281,30 @@ import SiteFooter from '../../components/SiteFooter.astro';
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Входим...';
 
-    try {
-      const accounts = getAccounts();
-      const account = accounts[email];
-      if (!account) {
-        showMsg('Неверный email или пароль', 'error');
-        btn.disabled = false;
-        btn.querySelector('span')!.textContent = 'Войти в кабинет';
-        return;
-      }
-
-      const hash = hashPassword(password);
-      if (hash !== account.passwordHash) {
-        showMsg('Неверный email или пароль', 'error');
-        btn.disabled = false;
-        btn.querySelector('span')!.textContent = 'Войти в кабинет';
-        return;
-      }
-
-      saveSession(email, account.name);
-      showMsg('Вход выполнен! Перенаправляем...', 'success');
-      setTimeout(() => { window.location.href = '/master/'; }, 800);
-    } catch (err) {
-      showMsg('Произошла ошибка. Попробуйте ещё раз.', 'error');
+    const accounts = getAccounts();
+    const account = accounts[email];
+    if (!account) {
+      showMsg('Неверный email или пароль', 'error');
       btn.disabled = false;
       btn.querySelector('span')!.textContent = 'Войти в кабинет';
+      return;
     }
+
+    const hash = await hashPassword(password);
+    if (hash !== account.passwordHash) {
+      showMsg('Неверный email или пароль', 'error');
+      btn.disabled = false;
+      btn.querySelector('span')!.textContent = 'Войти в кабинет';
+      return;
+    }
+
+    saveSession(email, account.name);
+    showMsg('Вход выполнен! Перенаправляем...', 'success');
+    setTimeout(() => { window.location.href = '/master/'; }, 800);
   });
 
   // Register
-  document.getElementById('register-form')?.addEventListener('submit', (e) => {
+  document.getElementById('register-form')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const form = e.target as HTMLFormElement;
     const btn = document.getElementById('register-btn') as HTMLButtonElement;
@@ -328,26 +324,20 @@ import SiteFooter from '../../components/SiteFooter.astro';
     btn.disabled = true;
     btn.querySelector('span')!.textContent = 'Создаём аккаунт...';
 
-    try {
-      const accounts = getAccounts();
-      if (accounts[email]) {
-        showMsg('Этот email уже зарегистрирован. Войдите во вкладке "Войти".', 'error');
-        btn.disabled = false;
-        btn.querySelector('span')!.textContent = 'Создать аккаунт';
-        return;
-      }
-
-      const passwordHash = hashPassword(password);
-      accounts[email] = { name, passwordHash };
-      localStorage.setItem('master_accounts', JSON.stringify(accounts));
-
-      saveSession(email, name);
-      showMsg('Аккаунт создан! Перенаправляем...', 'success');
-      setTimeout(() => { window.location.href = '/master/'; }, 800);
-    } catch (err) {
-      showMsg('Произошла ошибка при регистрации. Попробуйте ещё раз.', 'error');
+    const accounts = getAccounts();
+    if (accounts[email]) {
+      showMsg('Этот email уже зарегистрирован', 'error');
       btn.disabled = false;
       btn.querySelector('span')!.textContent = 'Создать аккаунт';
+      return;
     }
+
+    const passwordHash = await hashPassword(password);
+    accounts[email] = { name, passwordHash };
+    localStorage.setItem('master_accounts', JSON.stringify(accounts));
+
+    saveSession(email, name);
+    showMsg('Аккаунт создан! Перенаправляем...', 'success');
+    setTimeout(() => { window.location.href = '/master/'; }, 800);
   });
 </script>
